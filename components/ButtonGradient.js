@@ -9,14 +9,26 @@ const ButtonGradient = ({
   setShow,
   active,
   widthSp,
+  disabled,
+  func,
 }) => {
   return (
     <View style={{ flexDirection: "row", justifyContent: "center" }}>
       <View style={{ width: widthSp ? widthSp : 200 }}>
         <TouchableOpacity
+          disabled={disabled}
           onPress={() => {
+            if (route == "func") {
+              func();
+              return;
+            }
             if (route == "modal") {
               if (active == 2) {
+                setShow((e) => ({
+                  ...e,
+                  show: false,
+                  active: 0,
+                }));
                 navigation.navigate("secure-your-wallet-two");
               } else {
                 return setShow((e) => ({

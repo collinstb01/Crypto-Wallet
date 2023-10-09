@@ -1,7 +1,8 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View, Navigation } from "react-native";
 import React from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-const ReusableCard = ({ text, children, show }) => {
+const ReusableCard = ({ text, children, show, navigation, route }) => {
   return (
     <View style={styles.container}>
       <View
@@ -29,7 +30,22 @@ const ReusableCard = ({ text, children, show }) => {
         )}
       </View>
       <View style={styles.containerTwo}>
-        <Text style={styles.import}>{text}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Ionicons
+            onPress={() => navigation.navigate(route)}
+            name="md-arrow-back"
+            size={20}
+            color="#948fa8"
+            style={{ position: "absolute", left: 30, top: 16 }}
+          />
+          <Text style={styles.import}>{text}</Text>
+        </View>
         {children}
       </View>
     </View>

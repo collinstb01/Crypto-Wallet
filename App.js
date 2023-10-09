@@ -6,6 +6,9 @@ import ImportSeed from "./pages/ImportSeed";
 import CreateNewWallet from "./pages/CreateNewWallet";
 import SecureWallet from "./pages/SecureWallet/SecureWallet";
 import SecureWalletTwo from "./pages/SecureWallet/SecureWalletTwo";
+import SecondPhase from "./pages/SecondPhase/SecondPhase";
+import ThirdPhase from "./pages/ThirdPhase/ThirdPhase";
+import Success from "./pages/Success/Success";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +39,21 @@ export default function App() {
         <Stack.Screen
           name="secure-your-wallet-two"
           component={SecureWalletTwo}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="second-phase"
+          component={SecondPhase}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="third-phase"
+          component={ThirdPhase}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="success"
+          component={Success}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

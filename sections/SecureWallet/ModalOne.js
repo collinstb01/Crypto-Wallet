@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import React from "react";
 import ButtonGradient from "../../components/ButtonGradient";
-import { BlurView } from "@react-native-community/blur";
 import ResuableModalCTN from "../../components/ResuableModalCTN";
 
 const ModalOne = ({ navigation, active, setShow }) => {
@@ -74,7 +73,14 @@ const Content2 = ({ navigation, setShow, active }) => {
           }}
         >
           <TouchableOpacity
-            onPress={() => navigation.navigate("secure-your-wallet-two")}
+            onPress={() => {
+              setShow((e) => ({
+                ...e,
+                show: false,
+                active: 0,
+              }));
+              navigation.navigate("secure-your-wallet-two");
+            }}
           >
             <View
               style={{
@@ -91,7 +97,7 @@ const Content2 = ({ navigation, setShow, active }) => {
           </TouchableOpacity>
           <ButtonGradient
             text={"Skip"}
-            route={"modal"}
+            route={"second-phase"}
             navigation={navigation}
             setShow={setShow}
             active={active}
@@ -117,7 +123,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "400",
     marginTop: 20,
-    fontSize: 17,
+    fontSize: 15,
   },
   ctn: {
     marginTop: 20,

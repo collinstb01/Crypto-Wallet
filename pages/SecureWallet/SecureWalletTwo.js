@@ -1,12 +1,45 @@
-import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  BackHandler,
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import ReusableCard from "../../components/ReusableCard";
 import ButtonGradient from "../../components/ButtonGradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import ModalTwo from "../../sections/SecureWallet/ModalTwo";
+import ResuableModalCTN from "../../components/ResuableModalCTN";
 
 const SecureWalletTwo = ({ navigation }) => {
+  const [show, setShow] = useState(false);
+
+  //   BackHandler.addEventListener("hardwareBackPress", () => {
+  //     console.log("closed");
+  //     setShow(false);
+  //   });
+
+  //   useEffect(() => {
+  //     BackHandler.addEventListener("hardwareBackPress", () => {
+  //       // Return true to prevent the back button from going back to the previous screen
+  //       return true;
+  //     });
+
+  //     return () => {
+  //       BackHandler.removeEventListener("hardwareBackPress");
+  //     };
+  //   }, []);
+
   return (
-    <ReusableCard text={"Secure Your Wallet"}>
+    <ReusableCard
+      text={"Secure Your Wallet"}
+      show={show}
+      navigation={navigation}
+      route="SecureYourWallet"
+    >
+      {show && <View style={styles.overlay}></View>}
       <View style={styles.container}>
         <View>
           <Text style={styles.text}>
@@ -67,9 +100,35 @@ const SecureWalletTwo = ({ navigation }) => {
             marginTop: 30,
           }}
         >
-          <ButtonGradient text={"Next"} route={""} navigation={navigation} />
+          <ButtonGradient
+            text={"Next"}
+            route={"modal"}
+            setShow={setShow}
+            navigation={navigation}
+          />
         </View>
       </View>
+      {show && (
+        <ResuableModalCTN>
+          <Text style={styles.desc1}>Why is it important</Text>
+          <Text style={styles.desc2}>
+            Dont’t risk losing your funds. Protect your wallet by saving your
+            seed phrase in a place you trust.
+          </Text>
+          <Text style={styles.desc2}>
+            It’s the only way to recover your wallet if you get locked out of
+            the app or get a new device.
+          </Text>
+          <View style={{ marginTop: 10 }}>
+            <ButtonGradient
+              text={"Understood"}
+              route={"second-phase"}
+              setShow={setShow}
+              navigation={navigation}
+            />
+          </View>
+        </ResuableModalCTN>
+      )}
     </ReusableCard>
   );
 };
@@ -77,6 +136,28 @@ const SecureWalletTwo = ({ navigation }) => {
 export default SecureWalletTwo;
 
 const styles = StyleSheet.create({
+  overlay: {
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    position: "absolute",
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+    top: -140,
+    left: 0,
+    zIndex: 3,
+  },
+  desc2: {
+    lineHeight: 25,
+    color: "white",
+    fontWeight: "400",
+    marginTop: 20,
+    fontSize: 15,
+  },
+  desc1: {
+    textAlign: "center",
+    color: "white",
+    fontSize: 22,
+    fontWeight: "700",
+  },
   info: {
     color: "#a6a0bb",
     paddingTop: 5,

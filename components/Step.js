@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
@@ -28,6 +28,25 @@ const Step = ({ one }) => {
         {[1, 2, 3].map((val, index) => {
           return (
             <>
+              <View
+                key={index}
+                style={[
+                  styles.line,
+                  {
+                    left: index == 0 ? 20 : 120,
+                    backgroundColor:
+                      one == 1
+                        ? "#2f2a3c"
+                        : one == 2
+                        ? index == 0
+                          ? "#65d2f2"
+                          : "#2f2a3c"
+                        : one == 3
+                        ? "#65d2f2"
+                        : "",
+                  },
+                ]}
+              ></View>
               {val <= one ? (
                 <LinearGradient
                   colors={["#85FFC4", "#5CC6FF", "#BC85FF"]}
@@ -39,10 +58,6 @@ const Step = ({ one }) => {
                 </LinearGradient>
               ) : (
                 <>
-                  <View
-                    key={index}
-                    style={[styles.line, index == 2 && { right: 20 }]}
-                  ></View>
                   <View
                     style={[
                       styles.ball,
@@ -62,7 +77,7 @@ const Step = ({ one }) => {
           fontWeight: "700",
         }}
       >
-        1/3
+        {one}/3
       </Text>
     </View>
   );
@@ -73,7 +88,6 @@ export default Step;
 const styles = StyleSheet.create({
   line: {
     position: "absolute",
-    backgroundColor: "#2f2a3c",
     height: 5,
     width: 100,
     top: 8,
