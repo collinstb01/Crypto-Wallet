@@ -10,8 +10,10 @@ import React, { useEffect } from "react";
 import Step from "../../components/Step";
 import ButtonGradient from "../../components/ButtonGradient";
 
-const Success = () => {
-  const func = () => {};
+const Success = ({ navigation }) => {
+  const func = () => {
+    navigation.navigate("home");
+  };
 
   //   useEffect(() => {
   //     BackHandler.addEventListener("hardwareBackPress", () => {
@@ -48,7 +50,7 @@ const Success = () => {
           </Text>
         </View>
         <View>
-          <ButtonGradient text={"Done"} func={() => func} />
+          <ButtonGradient text={"Done"} route={"func"} func={func} />
         </View>
       </View>
     </View>

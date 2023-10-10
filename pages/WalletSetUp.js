@@ -8,19 +8,12 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import ButtonGradient from "../components/ButtonGradient";
-import { StatusBar } from "expo-status-bar";
+import StatusBarForScreens from "../components/StatusBarForScreens";
 
 const WalletSetUp = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <StatusBar
-        animated={true}
-        backgroundColor="white"
-        // barStyle=""
-        translucent={false}
-        showHideTransition={true}
-        hidden={false}
-      />
+      <StatusBarForScreens />
       <Image style={styles.line2} source={require("../assets/line2.png")} />
       <Image style={styles.line3} source={require("../assets/line3.png")} />
       <View>

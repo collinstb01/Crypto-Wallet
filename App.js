@@ -9,6 +9,7 @@ import SecureWalletTwo from "./pages/SecureWallet/SecureWalletTwo";
 import SecondPhase from "./pages/SecondPhase/SecondPhase";
 import ThirdPhase from "./pages/ThirdPhase/ThirdPhase";
 import Success from "./pages/Success/Success";
+import Home from "./pages/Home/Home";
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,11 @@ export default function App() {
         <Stack.Screen
           name="success"
           component={Success}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="home"
+          component={Home}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

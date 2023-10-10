@@ -67,7 +67,7 @@ const ImportSeed = ({ navigation }) => {
             padding: 15,
             marginTop: 60,
           }}
-          onPress={() => navigation.navigate("ImportSeed")}
+          onPress={() => navigation.navigate("home")}
         >
           <Text style={styles.buttonText}>Import</Text>
         </TouchableOpacity>

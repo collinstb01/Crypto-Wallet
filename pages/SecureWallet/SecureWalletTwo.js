@@ -9,9 +9,8 @@ import {
 import React, { useEffect, useState } from "react";
 import ReusableCard from "../../components/ReusableCard";
 import ButtonGradient from "../../components/ButtonGradient";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import ModalTwo from "../../sections/SecureWallet/ModalTwo";
 import ResuableModalCTN from "../../components/ResuableModalCTN";
+import contantStyles from "../../constants/styles";
 
 const SecureWalletTwo = ({ navigation }) => {
   const [show, setShow] = useState(false);
@@ -39,7 +38,7 @@ const SecureWalletTwo = ({ navigation }) => {
       navigation={navigation}
       route="SecureYourWallet"
     >
-      {show && <View style={styles.overlay}></View>}
+      {show && <View style={contantStyles.overlay}></View>}
       <View style={styles.container}>
         <View>
           <Text style={styles.text}>
@@ -136,15 +135,6 @@ const SecureWalletTwo = ({ navigation }) => {
 export default SecureWalletTwo;
 
 const styles = StyleSheet.create({
-  overlay: {
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-    position: "absolute",
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-    top: -140,
-    left: 0,
-    zIndex: 3,
-  },
   desc2: {
     lineHeight: 25,
     color: "white",
