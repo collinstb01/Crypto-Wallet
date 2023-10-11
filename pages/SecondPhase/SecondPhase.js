@@ -27,6 +27,7 @@ const SecondPhase = ({ navigation }) => {
     "kiwi",
     "lemon",
   ];
+
   return (
     <View style={styles.container}>
       <StatusBar translucent={false} />

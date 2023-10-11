@@ -1,19 +1,22 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Network = ({ bg, text, underline }) => {
+const Network = ({ bg, text, underline, fontSize }) => {
   return (
     <View style={styles.f}>
       <View style={[styles.circle, { backgroundColor: `#${bg}` }]}></View>
-      <Text
-        style={[
-          styles.text,
-          styles.network,
-          underline && { borderWidth: 1, borderBottomColor: "white" },
-        ]}
-      >
-        {text}
-      </Text>
+      <View>
+        <Text
+          style={[
+            styles.text,
+            styles.network,
+            fontSize && { fontSize: fontSize, fontWeight: "600" },
+            underline && { borderWidth: 1, borderBottomColor: "white" },
+          ]}
+        >
+          {text}
+        </Text>
+      </View>
     </View>
   );
 };

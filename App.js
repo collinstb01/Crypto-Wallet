@@ -10,6 +10,10 @@ import SecondPhase from "./pages/SecondPhase/SecondPhase";
 import ThirdPhase from "./pages/ThirdPhase/ThirdPhase";
 import Success from "./pages/Success/Success";
 import Home from "./pages/Home/Home";
+import SendToken from "./pages/SendToken/SendToken";
+import Confrim from "./pages/SendToken/Confrim";
+import Amount from "./pages/SendToken/Amount";
+import TokenDetails from "./pages/TokenDetails/TokenDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -60,6 +64,26 @@ export default function App() {
         <Stack.Screen
           name="home"
           component={Home}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="send-token"
+          component={SendToken}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="send-token/amount"
+          component={Amount}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="send-token/confirm"
+          component={Confrim}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="token-details"
+          component={TokenDetails}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

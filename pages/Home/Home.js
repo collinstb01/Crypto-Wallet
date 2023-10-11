@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -20,17 +21,71 @@ import contantStyles from "../../constants/styles";
 const Home = ({ navigation }) => {
   const [active, setActive] = useState(1);
   const [show, setShow] = useState(false);
+  const [showPerson, setShowPerson] = useState(false);
 
-  BackHandler.addEventListener("hardwareBackPress", () => {
-    navigation.navigate("third-phase");
-  });
+  const [activeCTN, setActiveCTN] = useState(1);
+
+  const funcOne = () => {
+    setActiveCTN(1);
+  };
+
+  const funcTwo = () => {
+    setActiveCTN(2);
+  };
+
+  const funcThree = () => {
+    setActiveCTN(3);
+  };
+
+  //   BackHandler.addEventListener("hardwareBackPress", () => {
+  //     navigation.navigate("third-phase");
+  //   });
+
+  const data = [
+    {
+      name: "Send",
+      icon: "",
+      route: "send-token",
+    },
+
+    {
+      name: "Receive",
+      icon: "",
+      route: "send-token",
+    },
+    {
+      name: "Buy Eth",
+      icon: "",
+      route: "send-token",
+    },
+  ];
+
+  const data2 = [
+    {
+      name: "1inCH Token",
+      icon: "sym1",
+      amount: "10.059 1INCH",
+    },
+
+    {
+      name: "APY Gover... Token",
+      icon: "sym2",
+      amount: "9,993.32 APY",
+    },
+    {
+      name: "Basic Attention Token",
+      icon: "sym3",
+      amount: "84.444 BAT",
+    },
+  ];
 
   const func = () => {};
 
   return (
     <View style={[styles.container]}>
       <Tabs />
-      {show && <View style={contantStyles.overlay}></View>}
+      {show == true && <View style={contantStyles.overlay}></View>}
+      {showPerson == true && <View style={contantStyles.overlay}></View>}
 
       <ScrollView>
         <View>
@@ -41,15 +96,18 @@ const Home = ({ navigation }) => {
                 source={require("../../assets/face1.png")}
                 style={styles.img}
               />
-              <Pressable onPress={() => setShow((e) => !e)}>
-                <View>
+
+              <View>
+                <Pressable onPress={() => setShow((e) => !e)}>
                   <View style={[styles.f, { justifyContent: "flex-start" }]}>
                     <Text style={[styles.text, styles.name]}>Floyd Miles</Text>
                     <Ionicons name="caret-down" size={10} color="white" />
                   </View>
+                </Pressable>
+                <Pressable onPress={() => setShowPerson((e) => !e)}>
                   <Network text={"Ethereum main network"} bg="0b6ffb" />
-                </View>
-              </Pressable>
+                </Pressable>
+              </View>
             </View>
             <View>
               <Ionicons name="md-scan" size={20} color="white" />
@@ -62,13 +120,15 @@ const Home = ({ navigation }) => {
             </Text>
           </View>
           <View style={[styles2.containerLogo]}>
-            {[1, 2, 3].map((val) => (
-              <View>
-                <View style={[styles2.icon]}>
-                  <Ionicons name="send" color={"#66c0ff"} size={25} />
+            {data.map((val) => (
+              <Pressable onPress={() => navigation.navigate(val.route)}>
+                <View>
+                  <View style={[styles2.icon]}>
+                    <Ionicons name="send" color={"#66c0ff"} size={25} />
+                  </View>
+                  <Text style={[styles2.iconText]}>{val.name}</Text>
                 </View>
-                <Text style={[styles2.iconText]}>Send</Text>
-              </View>
+              </Pressable>
             ))}
           </View>
           <View>
@@ -86,34 +146,42 @@ const Home = ({ navigation }) => {
             </View>
 
             <View>
-              {[1, 2, 3].map((val, index) => (
-                <View style={[styles.f, styles3.token]} key={index}>
-                  <View style={[styles.f]}>
-                    <View style={[styles3.border]}>
-                      <Image
-                        source={require("../../assets/sym1.png")}
-                        style={{ width: 30, height: 30 }}
-                      />
+              {data2.map((val, index) => (
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate("token-details", {
+                      tokenName: val.name,
+                    })
+                  }
+                >
+                  <View style={[styles.f, styles3.token]} key={index}>
+                    <View style={[styles.f]}>
+                      <View style={[styles3.border]}>
+                        <Image
+                          source={require(`../../assets/sym1.png`)}
+                          style={{ width: 30, height: 30 }}
+                        />
+                      </View>
+                      <View>
+                        <Text style={[styles3.text, styles3.tokenName]}>
+                          {val.name}
+                        </Text>
+                        <Text style={([styles3.text], { color: "#948fa7" })}>
+                          $3,77
+                          <Text style={{ color: "#57ad7d", fontWeight: "500" }}>
+                            + 3.22%
+                          </Text>
+                        </Text>
+                      </View>
                     </View>
+
                     <View>
                       <Text style={[styles3.text, styles3.tokenName]}>
-                        1inCH Token
-                      </Text>
-                      <Text style={([styles3.text], { color: "#948fa7" })}>
-                        $3,77{" "}
-                        <Text style={{ color: "#57ad7d", fontWeight: "500" }}>
-                          + 3.22%
-                        </Text>
+                        {val.amount}
                       </Text>
                     </View>
                   </View>
-
-                  <View>
-                    <Text style={[styles3.text, styles3.tokenName]}>
-                      10.059 1inCH
-                    </Text>
-                  </View>
-                </View>
+                </Pressable>
               ))}
             </View>
             <ButtonGradient text={"Add Token"} func={func} route={"func"} />
@@ -121,21 +189,113 @@ const Home = ({ navigation }) => {
         </View>
       </ScrollView>
       {show && (
-        <ResuableModalCTN text={"Account"}>
-          <Account func={func} setShow={setShow} navigation={navigation} />
+        <ResuableModalCTN
+          text={activeCTN == 1 ? "Account" : "Create Account"}
+          setShow={setShow}
+          showBackFunc={funcOne}
+          showBack={activeCTN !== 1 && true}
+        >
+          <Account
+            setShow={setShow}
+            navigation={navigation}
+            func2={funcTwo}
+            func3={funcThree}
+            activeCTN={activeCTN}
+          />
+        </ResuableModalCTN>
+      )}
+      {showPerson && (
+        <ResuableModalCTN
+          text={"Networks"}
+          setShow={setShowPerson}
+          showBack={false}
+        >
+          <Networks func={func} setShow={setShow} navigation={navigation} />
         </ResuableModalCTN>
       )}
     </View>
   );
 };
 
-const Account = ({ func, navigation, setShow }) => {
+const Networks = ({ func, navigation, setShow }) => {
+  const data3 = [
+    {
+      name: "Ropsten Test Network",
+      color: "6cda9d",
+    },
+
+    {
+      name: "Kovan Test Network",
+      color: "ffab2e",
+    },
+    {
+      name: "Sepolia Test Network",
+      color: "ff3a58",
+    },
+    {
+      name: "Smart Network Chain",
+      color: "a769ec",
+    },
+  ];
+  return (
+    <>
+      <View style={[styles.f, { marginTop: 10, marginBottom: 30 }]}>
+        <View style={[{ flexDirection: "row", alignItems: "center" }]}>
+          <Network
+            text={"Ethereum main network"}
+            bg="0b6ffb"
+            underline={false}
+            fontSize={17}
+          />
+        </View>
+        <Image
+          source={require("../../assets/check-select.png")}
+          style={{ width: 24, height: 24 }}
+        />
+      </View>
+
+      <Text style={styles3.otherNetwork}>Other Networks</Text>
+      <View>
+        {data3.map((val, key) => (
+          <View
+            style={[styles.f, { marginTop: 10, marginBottom: 20 }]}
+            key={key}
+          >
+            <Network
+              text={val.name}
+              bg={val.color}
+              underline={false}
+              fontSize={17}
+            />
+          </View>
+        ))}
+      </View>
+    </>
+  );
+};
+
+const Account = ({ activeCTN, func2, func3 }) => {
+  return (
+    <>
+      {activeCTN == 1 ? (
+        <AccountMain func2={func2} func3={func3} />
+      ) : activeCTN == 2 ? (
+        <CreatAccount />
+      ) : activeCTN == 3 ? (
+        <ImportAccount />
+      ) : (
+        ""
+      )}
+    </>
+  );
+};
+
+const AccountMain = ({ func2, func3 }) => {
   return (
     <>
       <View style={{ marginTop: 30, marginBottom: 20 }}>
         <Network text={"Ethereum main network"} bg="0b6ffb" underline={true} />
       </View>
-
       <View>
         {[1, 2, 3].map((val, key) => (
           <View
@@ -157,26 +317,136 @@ const Account = ({ func, navigation, setShow }) => {
         ))}
       </View>
       <View style={{ marginTop: 10 }}>
-        <ButtonGradientTwo
-          text={"Creat New Account"}
-          func={func}
-          setShow={setShow}
-          navigation={navigation}
-        />
-        <ButtonGradientTwo
-          text={"Import Account"}
-          func={func}
-          setShow={setShow}
-          navigation={navigation}
+        <ButtonGradientTwo text={"Creat New Account"} func={func2} />
+        <ButtonGradientTwo text={"Import Account"} func={func3} />
+      </View>
+    </>
+  );
+};
+
+const CreatAccount = ({}) => {
+  const createNewWallet = () => {
+    console.log("creating new wallet");
+  };
+  return (
+    <>
+      <Text style={[createAccountImportAccountStyle.text]}>
+        Create New Account
+      </Text>
+      <View style={createAccountImportAccountStyle.inputCTN}>
+        <TextInput
+          placeholder="Account Name"
+          style={createAccountImportAccountStyle.input}
+          placeholderTextColor={"#a49eb9"}
         />
       </View>
+      <ButtonGradientTwo text={"Create"} func={createNewWallet} />
+    </>
+  );
+};
+
+const ImportAccount = ({}) => {
+  const importWallet = () => {
+    console.log("creating new wallet");
+  };
+  return (
+    <>
+      <>
+        <Text style={[createAccountImportAccountStyle.text]}>
+          Import Account
+        </Text>
+        <View style={createAccountImportAccountStyle.CTN}>
+          <Text style={[createAccountImportAccountStyle.importWarning]}>
+            Imported accounts are viewable in your wallet but are not
+            recoverable with your EllAsset seed phrase
+          </Text>
+          <Text style={[createAccountImportAccountStyle.importWarning]}>
+            Learn more about imported accounts{" "}
+            <Text
+              style={{
+                color: "blue",
+                borderBottomColor: "blue",
+                borderWidth: 2,
+                fontWeight: "600",
+              }}
+            >
+              here.
+            </Text>
+          </Text>
+          <TextInput
+            placeholder="Paste your private key string e.g 4xhd83jsjkjjsj98383mnxjyuyrjal38374929"
+            style={createAccountImportAccountStyle.input}
+            placeholderTextColor={"#a49eb9"}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: 15,
+          }}
+        >
+          <Ionicons name="md-scan" color={"white"} size={20} />
+          <Text style={[createAccountImportAccountStyle.scanText, styles.text]}>
+            Or Scan a QR Code
+          </Text>
+        </View>
+        <ButtonGradient route={"func"} text={"Import"} func={importWallet} />
+      </>
     </>
   );
 };
 
 export default Home;
 
+const createAccountImportAccountStyle = StyleSheet.create({
+  scanText: {
+    fontWeight: "600",
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  importWarning: {
+    color: "white",
+    marginBottom: 10,
+    fontSize: 16,
+    lineHeight: 25,
+    fontWeight: "400",
+  },
+  CTN: {
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  inputCTN: {
+    marginTop: 30,
+    marginBottom: 100,
+  },
+  input: {
+    borderRadius: 10,
+    padding: 15,
+    backgroundColor: "#1c1924",
+  },
+  text: {
+    color: "white",
+    fontWeight: "600",
+    // textAlign: "center",
+    borderBottomColor: "#ffffff30",
+    borderBottomWidth: 1,
+    borderStyle: "solid",
+    paddingBottom: 15,
+    marginTop: 30,
+    fontSize: 19,
+  },
+});
+
 const styles3 = StyleSheet.create({
+  otherNetwork: {
+    fontWeight: "600",
+    marginTop: 10,
+    marginBottom: 5,
+    fontSize: 18,
+    color: "white",
+  },
   accountName: {
     fontWeight: "600",
     marginLeft: 10,
@@ -230,8 +500,8 @@ const styles2 = StyleSheet.create({
     marginTop: 40,
     paddingBottom: 15,
     borderBottomColor: "#ffffff30",
-    borderWidth: 1.5,
-    borderStyle: "dashed",
+    borderBottomWidth: 1.5,
+    borderStyle: "solid",
     flexDirection: "row",
     justifyContent: "space-around",
   },
@@ -272,7 +542,7 @@ const styles2 = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 50,
-    marginBottom: 50,
+    marginBottom: 35,
   },
 });
 
@@ -302,5 +572,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#09080d",
     padding: 15,
+    paddingTop: 20,
   },
 });

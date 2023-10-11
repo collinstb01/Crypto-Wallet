@@ -10,4 +10,26 @@ export default contantStyles = {
     left: 0,
     zIndex: 3,
   },
+  input: {
+    borderRadius: 10,
+    padding: 15,
+    backgroundColor: "#1c1924",
+  },
+  inputIcon: { position: "absolute", right: 50, top: 17 },
+  container: {
+    marginTop: 60,
+    marginLeft: 30,
+    marginRight: 30,
+    flex: 1,
+  },
+  flex: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  flex2: {
+    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center",
+  },
 };

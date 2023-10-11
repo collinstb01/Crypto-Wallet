@@ -1,24 +1,59 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { PanGestureHandler } from "react-native-gesture-handler";
+import {
+  PanGestureHandler,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 
-const ResuableModalCTN = ({ children, text }) => {
+const ResuableModalCTN = ({
+  children,
+  text,
+  setShow,
+  showBack,
+  showBackFunc,
+}) => {
   const handlePanResponderMove = (event) => {
-    if (event.nativeEvent.deltaY > 20) {
-      console.log("sssssssssssssssss");
+    if (event.nativeEvent.translationY > 10) {
+      setShow(false);
     }
   };
 
   return (
-    <PanGestureHandler onPanResponderMove={handlePanResponderMove}>
-      <View style={styles.container}>
-        <View style={{ flexDirection: "row", justifyContent: "center" }}>
-          <View style={styles.bar}></View>
-        </View>
-        <Text style={styles.desc1}>{text}</Text>
-        {children}
-      </View>
-    </PanGestureHandler>
+    <View style={styles.container}>
+      <GestureHandlerRootView>
+        <PanGestureHandler onHandlerStateChange={handlePanResponderMove}>
+          <View>
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <View style={styles.bar}></View>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {showBack && (
+                <Pressable onPress={showBackFunc}>
+                  <View
+                    style={{
+                      paddingRight: 0,
+                      position: "relative",
+                      left: -100,
+                    }}
+                  >
+                    <Ionicons name="chevron-back" size={18} color="white" />
+                  </View>
+                </Pressable>
+              )}
+              <Text style={styles.desc1}>{text}</Text>
+            </View>
+            {children}
+          </View>
+        </PanGestureHandler>
+      </GestureHandlerRootView>
+    </View>
   );
 };
 

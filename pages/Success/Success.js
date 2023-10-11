@@ -13,6 +13,7 @@ import ButtonGradient from "../../components/ButtonGradient";
 const Success = ({ navigation }) => {
   const func = () => {
     navigation.navigate("home");
+    // set the user Local
   };
 
   //   useEffect(() => {

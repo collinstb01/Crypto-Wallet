@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
   },
   tinyLogo: {
-    marginTop: 200,
+    marginTop: 0,
   },
   textOne: {
     color: "wheat",
