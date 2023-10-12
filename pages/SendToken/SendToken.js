@@ -47,6 +47,7 @@ const SendToken = ({ navigation }) => {
             // placeholder="Account Name"
             style={[styles.input]}
             placeholderTextColor={"#a49eb9"}
+            editable={false}
           />
           <View style={{ position: "absolute", top: 5, left: 15 }}>
             <Text style={{ color: "#858096", marginBottom: 5 }}>From</Text>

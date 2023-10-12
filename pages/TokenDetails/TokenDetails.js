@@ -22,7 +22,7 @@ const TokenDetails = ({ route, navigation }) => {
 
           <View style={[styles.container]}>
             <View style={styles.prices}>
-              <Text style={styles.priceText1}>10.059 1INCH</Text>
+              <Text style={styles.priceText1}>10.059 {tokenName}</Text>
               <Text style={styles.priceText2}>$39.63</Text>
             </View>
             <View style={styles.icons}>
@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
   icons: {
     flexDirection: "row",
     justifyContent: "center",
+    marginBottom: 30,
   },
   priceText1: {
     color: "white",
@@ -79,12 +80,12 @@ const styles = StyleSheet.create({
   },
   prices: {
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 25,
   },
   container: {
-    marginTop: 60,
-    marginLeft: 30,
-    marginRight: 30,
+    marginTop: 45,
+    marginLeft: 16,
+    marginRight: 16,
     flex: 1,
   },
 });

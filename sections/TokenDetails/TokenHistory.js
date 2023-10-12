@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   SectionList,
   StatusBar,
+  FlatList,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -14,27 +15,34 @@ const TokenHistory = () => {
     {
       title: "Main dishes",
       data: ["Pizza", "Burger", "Risotto"],
+      tx: true,
+      status: "Submitted",
     },
     {
       title: "Sides",
       data: ["French Fries", "Onion Rings", "Fried Shrimps"],
+      tx: false,
+      status: "Confirmed",
     },
     {
       title: "Drinks",
       data: ["Water", "Coke", "Beer"],
+      tx: false,
+      status: "Failed",
     },
     {
       title: "Desserts",
       data: ["Cheese Cake", "Ice Cream"],
+      tx: false,
+      status: "Failed",
     },
   ];
 
   return (
     <View>
       <SafeAreaView style={styles.container}>
-        <SectionList
-          sections={DATA}
-          keyExtractor={(item, index) => item + index}
+        <FlatList
+          data={DATA}
           renderItem={({ item }) => (
             <View style={styles.item}>
               <View style={{ flexDirection: "row" }}>
@@ -44,7 +52,29 @@ const TokenHistory = () => {
                 <View>
                   <Text style={[styles.text1]}>#4 Mar 8,2921 at 06:11AM</Text>
                   <Text style={[styles.text2, styles.text]}>Send 1INCH</Text>
-                  <Text style={[styles.text3]}>Submitted</Text>
+                  <Text
+                    style={{
+                      color:
+                        item.status == "Confirmed"
+                          ? "#58b07e"
+                          : item.status == "Failed"
+                          ? "#8a2234"
+                          : "#dc9429",
+                      fontWeight: "800",
+                    }}
+                  >
+                    {item.status}
+                  </Text>
+                  {item.tx && (
+                    <View style={{ flexDirection: "row", marginTop: 10 }}>
+                      <View style={styles.speed}>
+                        <Text style={[styles.txText]}>Speed Up</Text>
+                      </View>
+                      <View style={styles.cancel}>
+                        <Text style={[styles.txText]}>Cancel</Text>
+                      </View>
+                    </View>
+                  )}
                 </View>
               </View>
               <View style={{ alignItems: "flex-end", flexDirection: "column" }}>
@@ -53,6 +83,7 @@ const TokenHistory = () => {
               </View>
             </View>
           )}
+          keyExtractor={(item) => item.id}
         />
       </SafeAreaView>
     </View>
@@ -62,15 +93,29 @@ const TokenHistory = () => {
 export default TokenHistory;
 
 const styles = StyleSheet.create({
+  speed: {
+    backgroundColor: "#febc5b",
+    marginRight: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 15,
+  },
+  cancel: {
+    backgroundColor: "#ff7186",
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 15,
+  },
+  txText: {
+    fontWeight: "900",
+    color: "white",
+  },
   text5: {
     fontWeight: "600",
   },
   text4: {
     fontWeight: "600",
-    fontSize: 16,
-  },
-  text3: {
-    color: "#f6a54c",
+    fontSize: 18,
   },
   text2: {
     fontSize: 18,

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import StatusBarForScreens from "../../components/StatusBarForScreens";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons, FontAwesome5, Fontisto } from "@expo/vector-icons";
 import Tabs from "../../components/Tabs";
 import ButtonGradient from "../../components/ButtonGradient";
 import ResuableModalCTN from "../../components/ResuableModalCTN";
@@ -44,19 +44,22 @@ const Home = ({ navigation }) => {
   const data = [
     {
       name: "Send",
-      icon: "",
+      iconName: "send",
       route: "send-token",
+      pakage: Ionicons,
     },
 
     {
       name: "Receive",
-      icon: "",
+      iconName: "wallet",
       route: "send-token",
+      pakage: Fontisto,
     },
     {
       name: "Buy Eth",
-      icon: "",
+      iconName: "ethereum",
       route: "send-token",
+      pakage: FontAwesome5,
     },
   ];
 
@@ -124,7 +127,11 @@ const Home = ({ navigation }) => {
               <Pressable onPress={() => navigation.navigate(val.route)}>
                 <View>
                   <View style={[styles2.icon]}>
-                    <Ionicons name="send" color={"#66c0ff"} size={25} />
+                    <val.pakage
+                      name={val.iconName}
+                      color={"#66c0ff"}
+                      size={25}
+                    />
                   </View>
                   <Text style={[styles2.iconText]}>{val.name}</Text>
                 </View>
@@ -150,7 +157,7 @@ const Home = ({ navigation }) => {
                 <Pressable
                   onPress={() =>
                     navigation.navigate("token-details", {
-                      tokenName: val.name,
+                      tokenName: val.name.replace("Token", ""),
                     })
                   }
                 >
