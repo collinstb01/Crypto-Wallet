@@ -1,13 +1,26 @@
-import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  BackHandler,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React from "react";
 import ReusableCard from "../../components/ReusableCard";
 import constants from "../../constants/styles";
 import Network from "../../components/Network";
 import { FontAwesome, Fontisto } from "@expo/vector-icons";
 import TokenHistory from "../../sections/TokenDetails/TokenHistory";
+import LoadingBanner from "../../components/LoadingBanner";
 
 const TokenDetails = ({ route, navigation }) => {
   const { tokenName } = route.params;
+
+  // BackHandler.addEventListener("hardwareBackPress", () => {
+  //   navigation.navigate("home");
+  // });
+
   return (
     <ScrollView>
       <ReusableCard text={"1INCH Token"}>
@@ -40,6 +53,11 @@ const TokenDetails = ({ route, navigation }) => {
               </View>
             </View>
             <TokenHistory />
+            <LoadingBanner
+              text1={"Transaction Submitted"}
+              text2={"Waiting for confirmation"}
+              bg={"#3d3125"}
+            />
           </View>
         </View>
       </ReusableCard>

@@ -18,10 +18,13 @@ import ResuableModalCTN from "../../components/ResuableModalCTN";
 import ButtonGradientTwo from "../../components/ButtonGradientTwo";
 import Network from "../../components/Network";
 import contantStyles from "../../constants/styles";
+import TabstwoContents from "../../components/TabstwoContents";
+
 const Home = ({ navigation }) => {
   const [active, setActive] = useState(1);
   const [show, setShow] = useState(false);
   const [showPerson, setShowPerson] = useState(false);
+  const [showSendEth, setshowSendEth] = useState(false);
 
   const [activeCTN, setActiveCTN] = useState(1);
 
@@ -33,13 +36,13 @@ const Home = ({ navigation }) => {
     setActiveCTN(2);
   };
 
+  // BackHandler.addEventListener("hardwareBackPress", () => {
+  //   navigation.navigate("home");
+  // });
+
   const funcThree = () => {
     setActiveCTN(3);
   };
-
-  //   BackHandler.addEventListener("hardwareBackPress", () => {
-  //     navigation.navigate("third-phase");
-  //   });
 
   const data = [
     {
@@ -52,13 +55,13 @@ const Home = ({ navigation }) => {
     {
       name: "Receive",
       iconName: "wallet",
-      route: "send-token",
+      route: "receive",
       pakage: Fontisto,
     },
     {
       name: "Buy Eth",
       iconName: "ethereum",
-      route: "send-token",
+      route: "buy-eth",
       pakage: FontAwesome5,
     },
   ];
@@ -89,6 +92,7 @@ const Home = ({ navigation }) => {
       <Tabs />
       {show == true && <View style={contantStyles.overlay}></View>}
       {showPerson == true && <View style={contantStyles.overlay}></View>}
+      {showSendEth == true && <View style={contantStyles.overlay}></View>}
 
       <ScrollView>
         <View>
@@ -124,7 +128,15 @@ const Home = ({ navigation }) => {
           </View>
           <View style={[styles2.containerLogo]}>
             {data.map((val) => (
-              <Pressable onPress={() => navigation.navigate(val.route)}>
+              <Pressable
+                onPress={() => {
+                  if (val.route == "buy-eth") {
+                    console.log(true);
+                    return setshowSendEth(true);
+                  }
+                  // navigation.navigate(val.route);
+                }}
+              >
                 <View>
                   <View style={[styles2.icon]}>
                     <val.pakage
@@ -138,20 +150,13 @@ const Home = ({ navigation }) => {
               </Pressable>
             ))}
           </View>
-          <View>
-            <View style={styles2.tabs}>
-              <TouchableOpacity>
-                <Text style={[styles2.text, styles2.tabText]}>Tokens</Text>
-                {active == 1 && <View style={styles3.active}></View>}
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Text style={[styles2.text, styles2.tabText]}>
-                  Collectibles
-                </Text>
-                {active == 2 && <View style={styles3.active}></View>}
-              </TouchableOpacity>
-            </View>
-
+          <View style={{ marginTop: 40 }}>
+            <TabstwoContents
+              active={active}
+              setActive={setActive}
+              text1={"Tokens"}
+              text2={"Collectibles"}
+            />
             <View>
               {data2.map((val, index) => (
                 <Pressable
@@ -218,6 +223,82 @@ const Home = ({ navigation }) => {
           showBack={false}
         >
           <Networks func={func} setShow={setShow} navigation={navigation} />
+        </ResuableModalCTN>
+      )}
+      {showSendEth && (
+        <ResuableModalCTN text={"Receive"} setShow={setShow}>
+          <View
+            style={{
+              flexDirection: "row",
+              flex: 1,
+              marginTop: 20,
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                borderRadius: 25,
+                marginRight: 20,
+              }}
+            >
+              <Image
+                source={require("../../assets/qrcode.png")}
+                style={styles.img}
+              />
+            </View>
+
+            <View>
+              <Text style={styles.textAddress}>
+                0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9
+              </Text>
+              <Pressable onPress={() => copyToClipBoard()}>
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    marginTop: 15,
+                  }}
+                >
+                  <Ionicons
+                    name={copied ? "ios-checkmark" : "ios-copy"}
+                    size={24}
+                    color="#8d36e7"
+                  />
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: "600",
+                      marginHorizontal: 10,
+                      fontSize: 16,
+                    }}
+                  >
+                    Copy
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
+          </View>
+          <View
+            style={{
+              marginTop: 30,
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <View style={{ marginRight: 20 }}>
+              <ButtonGradientTwo text={"Share"} widthSp={true} />
+            </View>
+            <ButtonGradient
+              // setShow={setShow}
+              text={"Request Payment"}
+              route={"func"}
+              widthSp={true}
+              // func={}
+              navigation={navigation}
+            />
+          </View>
         </ResuableModalCTN>
       )}
     </View>
@@ -467,13 +548,6 @@ const styles3 = StyleSheet.create({
     fontSize: 15,
   },
 
-  active: {
-    backgroundColor: "white",
-    width: 60,
-    height: 2.5,
-    position: "absolute",
-    top: 40,
-  },
   tokenName: {
     fontWeight: "700",
     fontSize: 18,
@@ -498,20 +572,6 @@ const styles3 = StyleSheet.create({
 });
 
 const styles2 = StyleSheet.create({
-  tabText: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 22,
-  },
-  tabs: {
-    marginTop: 40,
-    paddingBottom: 15,
-    borderBottomColor: "#ffffff30",
-    borderBottomWidth: 1.5,
-    borderStyle: "solid",
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
   icon: {
     height: 60,
     width: 60,

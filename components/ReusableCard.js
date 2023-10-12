@@ -25,7 +25,7 @@ const ReusableCard = ({
           position: "relative",
           height: 10,
           width: Dimensions.get("window").width,
-          top: 90,
+          top: 70,
           left: 0,
           zIndex: 22,
         }}
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   containerTwo: {
-    marginTop: 100,
+    marginTop: 80,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     backgroundColor: "#131118",

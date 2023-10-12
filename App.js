@@ -14,6 +14,7 @@ import SendToken from "./pages/SendToken/SendToken";
 import Confrim from "./pages/SendToken/Confrim";
 import Amount from "./pages/SendToken/Amount";
 import TokenDetails from "./pages/TokenDetails/TokenDetails";
+import Receive from "./pages/Receive/Receive";
 
 const Stack = createNativeStackNavigator();
 
@@ -84,6 +85,11 @@ export default function App() {
         <Stack.Screen
           name="token-details"
           component={TokenDetails}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="receive"
+          component={Receive}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
