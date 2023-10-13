@@ -1,37 +1,62 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const Tabs = () => {
+const Tabs = ({ route, navigation }) => {
+  const { index } = route.params;
+
+  console.log(index);
+
   return (
     <View style={styles.container}>
-      <View style={{ alignItems: "center" }}>
-        <Ionicons
-          name="md-wallet-sharp"
-          size={20}
-          color="white"
-          style={[styles.icon]}
-        />
-        <Text style={[styles.text]}>Wallet</Text>
-      </View>
+      <TouchableOpacity onPress={() => navigation.navigate("home")}>
+        <View style={{ alignItems: "center" }}>
+          <Ionicons
+            name="md-wallet-sharp"
+            size={20}
+            color={index == 1 ? "white" : "#ffffff3d"}
+            style={[styles.icon]}
+          />
+          <Text style={[styles.text]}>Wallet</Text>
+        </View>
+      </TouchableOpacity>
       <View style={{ alignItems: "center" }}>
         <Ionicons
           name="md-swap-horizontal"
           size={20}
-          color="white"
+          color={index == 2 ? "white" : "#ffffff3d"}
           style={[styles.icon]}
         />
         <Text style={[styles.text]}>Swap</Text>
       </View>
-      <View style={{ alignItems: "center" }}>
-        <Ionicons name="list" size={20} color="white" style={[styles.icon]} />
-        <Text style={[styles.text]}>Transaction</Text>
-      </View>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("transactions", {
+            index: 3,
+          })
+        }
+      >
+        <View style={{ alignItems: "center" }}>
+          <Ionicons
+            name="list"
+            size={20}
+            color={index == 3 ? "white" : "#ffffff3d"}
+            style={[styles.icon]}
+          />
+          <Text style={[styles.text]}>Transaction</Text>
+        </View>
+      </TouchableOpacity>
       <View style={{ alignItems: "center" }}>
         <Ionicons
           name="md-settings"
           size={20}
-          color="white"
+          color={index == 4 ? "white" : "#ffffff3d"}
           style={[styles.icon]}
         />
         <Text style={[styles.text]}>Wallet</Text>

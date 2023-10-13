@@ -1,19 +1,22 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import ButtonGradient from "../components/ButtonGradient";
 
-const Collectibles = () => {
+const Collectibles = ({ ImageNo }) => {
+  const [x, setX] = useState(1);
+
+  console.log(ImageNo);
   const func = () => {};
 
   return (
     <View style={styles.container}>
       <View>
         <Text style={[styles.text1]}>Collectibles</Text>
-        <Text style={[styles.text2]}>Collectibles</Text>
+        <Text style={[styles.text2]}>45 Assests</Text>
       </View>
       <View style={styles.igg}>
         <Image
-          source={require("../assets/ill2.png")}
+          source={require(`../assets/ill${5}.png`)}
           style={{ width: 160, height: 160 }}
         />
       </View>

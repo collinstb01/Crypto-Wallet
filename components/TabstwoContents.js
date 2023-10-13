@@ -38,16 +38,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1.5,
     borderStyle: "solid",
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "center",
   },
   active: {
     backgroundColor: "white",
-    width: 60,
+    width: 80,
     height: 2.5,
     position: "absolute",
     top: 40,
   },
   text: {
     color: "white",
+    marginHorizontal: 20,
   },
 });

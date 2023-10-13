@@ -15,6 +15,7 @@ import Confrim from "./pages/SendToken/Confrim";
 import Amount from "./pages/SendToken/Amount";
 import TokenDetails from "./pages/TokenDetails/TokenDetails";
 import Receive from "./pages/Receive/Receive";
+import Transactions from "./pages/Transactions/Transactions";
 
 const Stack = createNativeStackNavigator();
 
@@ -66,6 +67,7 @@ export default function App() {
           name="home"
           component={Home}
           options={{ headerShown: false }}
+          initialParams={{ index: 1 }}
         />
         <Stack.Screen
           name="send-token"
@@ -90,6 +92,11 @@ export default function App() {
         <Stack.Screen
           name="receive"
           component={Receive}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="transactions"
+          component={Transactions}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

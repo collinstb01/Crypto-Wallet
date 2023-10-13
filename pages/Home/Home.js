@@ -21,12 +21,15 @@ import contantStyles from "../../constants/styles";
 import TabstwoContents from "../../components/TabstwoContents";
 import Collectibles from "../../sections/Collectibles";
 import useHandleScrollFunc from "../../Hooks/handleScroll";
+import QRCodeReceiveToken from "../../components/QRCodeReceiveToken";
+import NameAndNetwork from "../../components/NameAndNetwork";
 
-const Home = ({ navigation }) => {
+const Home = ({ route, navigation }) => {
   const [active, setActive] = useState(1);
   const [show, setShow] = useState(false);
   const [showPerson, setShowPerson] = useState(false);
   const [showSendEth, setshowSendEth] = useState(false);
+  const [text, setText] = useState("");
 
   const [activeCTN, setActiveCTN] = useState(1);
 
@@ -96,7 +99,7 @@ const Home = ({ navigation }) => {
   }, [isScrolling]);
   return (
     <View style={[styles.container]}>
-      {!isScrolling && <Tabs />}
+      {!isScrolling && <Tabs navigation={navigation} route={route} />}
       {show == true && <View style={contantStyles.overlay}></View>}
       {showPerson == true && <View style={contantStyles.overlay}></View>}
       {showSendEth == true && <View style={contantStyles.overlay}></View>}
@@ -105,24 +108,7 @@ const Home = ({ navigation }) => {
         <View>
           <StatusBarForScreens />
           <View style={styles.f}>
-            <View style={styles.f}>
-              <Image
-                source={require("../../assets/face1.png")}
-                style={styles.img}
-              />
-
-              <View>
-                <Pressable onPress={() => setShow((e) => !e)}>
-                  <View style={[styles.f, { justifyContent: "flex-start" }]}>
-                    <Text style={[styles.text, styles.name]}>Floyd Miles</Text>
-                    <Ionicons name="caret-down" size={10} color="white" />
-                  </View>
-                </Pressable>
-                <Pressable onPress={() => setShowPerson((e) => !e)}>
-                  <Network text={"Ethereum main network"} bg="0b6ffb" />
-                </Pressable>
-              </View>
-            </View>
+            <NameAndNetwork setShow={setShow} setShowPerson={setShowPerson} />
             <View>
               <Ionicons name="md-scan" size={20} color="white" />
             </View>
@@ -141,7 +127,7 @@ const Home = ({ navigation }) => {
                     console.log(true);
                     return setshowSendEth(true);
                   }
-                  // navigation.navigate(val.route);
+                  navigation.navigate(val.route);
                 }}
               >
                 <View>
@@ -208,8 +194,8 @@ const Home = ({ navigation }) => {
                 ))}
               </View>
             ) : (
-              [1, 2, 3, 4, 4, 4, 4, 4, ,].map((val) => (
-                <Collectibles navigation={navigation} />
+              [1, 2, 3, 4].map((val) => (
+                <Collectibles navigation={navigation} ImageNo={val} />
               ))
             )}
             <ButtonGradient
@@ -246,79 +232,8 @@ const Home = ({ navigation }) => {
         </ResuableModalCTN>
       )}
       {showSendEth && (
-        <ResuableModalCTN text={"Receive"} setShow={setShow}>
-          <View
-            style={{
-              flexDirection: "row",
-              flex: 1,
-              marginTop: 20,
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: "white",
-                borderRadius: 25,
-                marginRight: 20,
-              }}
-            >
-              <Image
-                source={require("../../assets/qrcode.png")}
-                style={styles.img}
-              />
-            </View>
-
-            <View>
-              <Text style={styles.textAddress}>
-                0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9
-              </Text>
-              <Pressable onPress={() => copyToClipBoard()}>
-                <View
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    marginTop: 15,
-                  }}
-                >
-                  <Ionicons
-                    name={copied ? "ios-checkmark" : "ios-copy"}
-                    size={24}
-                    color="#8d36e7"
-                  />
-                  <Text
-                    style={{
-                      color: "white",
-                      fontWeight: "600",
-                      marginHorizontal: 10,
-                      fontSize: 16,
-                    }}
-                  >
-                    Copy
-                  </Text>
-                </View>
-              </Pressable>
-            </View>
-          </View>
-          <View
-            style={{
-              marginTop: 30,
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <View style={{ marginRight: 20 }}>
-              <ButtonGradientTwo text={"Share"} widthSp={true} />
-            </View>
-            <ButtonGradient
-              // setShow={setShow}
-              text={"Request Payment"}
-              route={"func"}
-              widthSp={true}
-              // func={}
-              navigation={navigation}
-            />
-          </View>
+        <ResuableModalCTN text={"Receive"} setShow={setshowSendEth}>
+          <QRCodeReceiveToken navigation={navigation} text={text} />
         </ResuableModalCTN>
       )}
     </View>
