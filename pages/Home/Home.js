@@ -19,6 +19,8 @@ import ButtonGradientTwo from "../../components/ButtonGradientTwo";
 import Network from "../../components/Network";
 import contantStyles from "../../constants/styles";
 import TabstwoContents from "../../components/TabstwoContents";
+import Collectibles from "../../sections/Collectibles";
+import useHandleScrollFunc from "../../Hooks/handleScroll";
 
 const Home = ({ navigation }) => {
   const [active, setActive] = useState(1);
@@ -87,14 +89,19 @@ const Home = ({ navigation }) => {
 
   const func = () => {};
 
+  const [isScrolling, handleScroll] = useHandleScrollFunc();
+
+  useEffect(() => {
+    console.log(isScrolling);
+  }, [isScrolling]);
   return (
     <View style={[styles.container]}>
-      <Tabs />
+      {!isScrolling && <Tabs />}
       {show == true && <View style={contantStyles.overlay}></View>}
       {showPerson == true && <View style={contantStyles.overlay}></View>}
       {showSendEth == true && <View style={contantStyles.overlay}></View>}
 
-      <ScrollView>
+      <ScrollView onScroll={handleScroll}>
         <View>
           <StatusBarForScreens />
           <View style={styles.f}>
@@ -157,46 +164,59 @@ const Home = ({ navigation }) => {
               text1={"Tokens"}
               text2={"Collectibles"}
             />
-            <View>
-              {data2.map((val, index) => (
-                <Pressable
-                  onPress={() =>
-                    navigation.navigate("token-details", {
-                      tokenName: val.name.replace("Token", ""),
-                    })
-                  }
-                >
-                  <View style={[styles.f, styles3.token]} key={index}>
-                    <View style={[styles.f]}>
-                      <View style={[styles3.border]}>
-                        <Image
-                          source={require(`../../assets/sym1.png`)}
-                          style={{ width: 30, height: 30 }}
-                        />
+            {active == 1 ? (
+              <View>
+                {data2.map((val, index) => (
+                  <Pressable
+                    onPress={() =>
+                      navigation.navigate("token-details", {
+                        tokenName: val.name.replace("Token", ""),
+                      })
+                    }
+                    key={index}
+                  >
+                    <View style={[styles.f, styles3.token]}>
+                      <View style={[styles.f]}>
+                        <View style={[styles3.border]}>
+                          <Image
+                            source={require(`../../assets/sym1.png`)}
+                            style={{ width: 30, height: 30 }}
+                          />
+                        </View>
+                        <View>
+                          <Text style={[styles3.text, styles3.tokenName]}>
+                            {val.name}
+                          </Text>
+                          <Text style={([styles3.text], { color: "#948fa7" })}>
+                            $3,77
+                            <Text
+                              style={{ color: "#57ad7d", fontWeight: "500" }}
+                            >
+                              + 3.22%
+                            </Text>
+                          </Text>
+                        </View>
                       </View>
+
                       <View>
                         <Text style={[styles3.text, styles3.tokenName]}>
-                          {val.name}
-                        </Text>
-                        <Text style={([styles3.text], { color: "#948fa7" })}>
-                          $3,77
-                          <Text style={{ color: "#57ad7d", fontWeight: "500" }}>
-                            + 3.22%
-                          </Text>
+                          {val.amount}
                         </Text>
                       </View>
                     </View>
-
-                    <View>
-                      <Text style={[styles3.text, styles3.tokenName]}>
-                        {val.amount}
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
-              ))}
-            </View>
-            <ButtonGradient text={"Add Token"} func={func} route={"func"} />
+                  </Pressable>
+                ))}
+              </View>
+            ) : (
+              [1, 2, 3, 4, 4, 4, 4, 4, ,].map((val) => (
+                <Collectibles navigation={navigation} />
+              ))
+            )}
+            <ButtonGradient
+              text={active == 1 ? "Add Token" : "Add Collectibles"}
+              func={func}
+              route={"func"}
+            />
           </View>
         </View>
       </ScrollView>
