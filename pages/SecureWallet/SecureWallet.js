@@ -1,9 +1,16 @@
-import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import ReusableCard from "../../components/ReusableCard";
-import img1 from "../../assets/img1.png";
 import ButtonGradient from "../../components/ButtonGradient";
 import ModalOne from "../../sections/SecureWallet/ModalOne";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SecureWallet = ({ navigation }) => {
   const [show, setShow] = useState({
@@ -11,7 +18,23 @@ const SecureWallet = ({ navigation }) => {
     active: 0,
   });
 
-  console.log(show);
+  const _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("password");
+      if (value !== null) {
+        // Data found, use it
+        console.log("Retrieved data:", value);
+      } else {
+        // Data does not exist
+        console.log("No data found for key:", password);
+      }
+    } catch (error) {
+      console.error("Error retrieving data:", error);
+    }
+  };
+  useEffect(() => {
+    _retrieveData();
+  }, []);
 
   return (
     <ReusableCard text={"Secure Your Wallet"} show={show.show}>
@@ -35,7 +58,11 @@ const SecureWallet = ({ navigation }) => {
             the app or get a new device.
           </Text>
         </View>
-        <Text style={styles.text}>Remind Me Later</Text>
+        <Pressable
+          onPress={() => navigation.navigate("secure-your-wallet-two")}
+        >
+          <Text style={styles.text}>Remind Me Later</Text>
+        </Pressable>
         <View
           style={{
             marginTop: 30,

@@ -1,22 +1,39 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import React from "react";
+import {
+  TouchableOpacity,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const Input = ({ text }) => {
+const Input = ({ text, setText }) => {
+  const [showText, setShowText] = useState(false);
+
+  function func(e) {
+    setShowText((e) => !e);
+  }
+
   return (
     <>
       <TextInput
         style={styles.input}
-        onChangeText={() => console.log("text changing")}
+        onChangeText={(value) => setText(value)}
         placeholder={text}
         placeholderTextColor={"#948fa8"}
+        secureTextEntry={showText ? false : true}
       />
-      <Ionicons
-        name="md-eye"
-        size={20}
-        color="#948fa8"
-        style={{ position: "absolute", right: 15, top: 17 }}
-      />
+      <View style={{ position: "absolute", right: 15, top: 17 }}>
+        <TouchableOpacity onPress={(e) => func(e)}>
+          <Ionicons
+            name={showText ? "md-eye-off" : "md-eye"}
+            size={20}
+            color="#948fa8"
+          />
+        </TouchableOpacity>
+      </View>
     </>
   );
 };

@@ -16,7 +16,7 @@ const TokenHistory = ({ DATA, setShow }) => {
     <View>
       <View style={styles.container}>
         {DATA.map((item, index) => (
-          <TouchableOpacity onPress={() => setShow(true)}>
+          <TouchableOpacity onPress={() => setShow(true)} key={index}>
             <View style={styles.item} key={index}>
               <View style={{ flexDirection: "row" }}>
                 <View style={{ marginRight: 10 }}>

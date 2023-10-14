@@ -26,15 +26,23 @@ const Tabs = ({ route, navigation }) => {
           <Text style={[styles.text]}>Wallet</Text>
         </View>
       </TouchableOpacity>
-      <View style={{ alignItems: "center" }}>
-        <Ionicons
-          name="md-swap-horizontal"
-          size={20}
-          color={index == 2 ? "white" : "#ffffff3d"}
-          style={[styles.icon]}
-        />
-        <Text style={[styles.text]}>Swap</Text>
-      </View>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("swap-tokens", {
+            index: 2,
+          })
+        }
+      >
+        <View style={{ alignItems: "center" }}>
+          <Ionicons
+            name="md-swap-horizontal"
+            size={20}
+            color={index == 2 ? "white" : "#ffffff3d"}
+            style={[styles.icon]}
+          />
+          <Text style={[styles.text]}>Swap</Text>
+        </View>
+      </TouchableOpacity>
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("transactions", {

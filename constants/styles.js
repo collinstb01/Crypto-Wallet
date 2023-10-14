@@ -32,4 +32,10 @@ export default contantStyles = {
     flexDirection: "row",
     alignItems: "center",
   },
+  error: {
+    color: "red",
+    fontWeight: "700",
+    fontSize: 16,
+    marginTop: 20,
+  },
 };
