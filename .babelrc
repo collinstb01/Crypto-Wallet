@@ -1,3 +1,6 @@
 {
-  "plugins": ["@babel/plugin-transform-destructuring",  ["module:react-native-dotenv"]]
+  "plugins": [
+    ["@babel/plugin-transform-destructuring", { "loose": true }],
+    ["@babel/plugin-transform-private-methods", { "loose": true }]
+  ]
 }

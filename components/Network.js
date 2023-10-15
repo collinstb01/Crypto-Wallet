@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { _getActiveNetwork } from "../constants/HelperFunctions";
 
 const Network = ({ bg, text, underline, fontSize }) => {
+  const data = _getActiveNetwork();
+
   return (
     <View style={styles.f}>
       <View style={[styles.circle, { backgroundColor: `#${bg}` }]}></View>

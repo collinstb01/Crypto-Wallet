@@ -9,6 +9,7 @@ import {
 import React, { useEffect } from "react";
 import Step from "../../components/Step";
 import ButtonGradient from "../../components/ButtonGradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Success = ({ navigation }) => {
   const func = () => {
@@ -26,6 +27,52 @@ const Success = ({ navigation }) => {
   //       BackHandler.removeEventListener("hardwareBackPress");
   //     };
   //   }, []);
+
+  useEffect(() => {
+    setData();
+  }, []);
+
+  async function setData() {
+    let networks = [
+      {
+        name: "Ethereum main Network",
+        id: "eth",
+        active: 1,
+        color: "6c62c5",
+      },
+      {
+        name: "Sepolia Test Network",
+        id: "sepolia",
+        active: 0,
+        color: "ff3a58",
+      },
+      {
+        name: "Ethereum main Network",
+        id: "kovan",
+        active: 0,
+        color: "a769ec",
+      },
+      {
+        name: "Binance Smart Chain",
+        id: "bsc",
+        active: 0,
+        color: "29d041",
+      },
+    ];
+    const tokens = [
+      {
+        name: "Ethereum",
+        amount: 0,
+        symbol: "Ethereum",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "eth",
+      },
+    ];
+
+    await AsyncStorage.setItem("tokens", JSON.stringify(tokens));
+    await AsyncStorage.setItem("networks", JSON.stringify(networks));
+    await AsyncStorage.setItem("TXhistory", JSON.stringify([]));
+  }
 
   return (
     <View style={styles.continer}>

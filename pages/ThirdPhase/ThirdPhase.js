@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import Step from "../../components/Step";
 import ButtonGradient from "../../components/ButtonGradient";
+import { useSelector } from "react-redux";
 
 export default function ThirdPhase({ navigation }) {
   const [values, setValues] = useState([]);
@@ -9,6 +10,7 @@ export default function ThirdPhase({ navigation }) {
   const [threeValArr, setthreeValArr] = useState([]);
   const [no, setNo] = useState([]);
   const [error, setError] = useState("");
+  const { seedPhrase } = useSelector((state) => state.storage);
 
   const wordsArr = [
     "apple",
@@ -33,9 +35,9 @@ export default function ThirdPhase({ navigation }) {
     setNo(arr);
     setValues((val) => [
       ...val,
-      wordsArr[parseInt(threeRanVal.toString().charAt(0))],
-      wordsArr[parseInt(threeRanVal.toString().charAt(1))],
-      wordsArr[parseInt(threeRanVal.toString().charAt(2))],
+      seedPhrase[parseInt(threeRanVal.toString().charAt(0))],
+      seedPhrase[parseInt(threeRanVal.toString().charAt(1))],
+      seedPhrase[parseInt(threeRanVal.toString().charAt(2))],
     ]);
   }
 
@@ -49,9 +51,9 @@ export default function ThirdPhase({ navigation }) {
 
   function verify() {
     if (
-      wordsArr.indexOf(threeValArr[0]) == no[0] &&
-      wordsArr.indexOf(threeValArr[1]) == no[1] &&
-      wordsArr.indexOf(threeValArr[2]) == no[2]
+      seedPhrase.indexOf(threeValArr[0]) == no[0] &&
+      seedPhrase.indexOf(threeValArr[1]) == no[1] &&
+      seedPhrase.indexOf(threeValArr[2]) == no[2]
     ) {
       return navigation.navigate("success");
     }

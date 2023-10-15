@@ -15,11 +15,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ButtonGradient from "../components/ButtonGradient";
 import { useSelector } from "react-redux";
 import Contants from "../constants/styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import CryptoJS from "react-native-crypto-js";
-// import { ECRYPT__KEY } from "@env";
-
-const encryptionKey = "thisiskey";
+import {
+  _checkPasswordStrength,
+  _createUserAccount,
+} from "../constants/HelperFunctions";
 
 const CreateNewWallet = ({ navigation }) => {
   const { message } = useSelector((state) => state.storage);
@@ -37,82 +36,22 @@ const CreateNewWallet = ({ navigation }) => {
     stength: "Weak",
   });
 
-  const _helperFunc = ({ error, loading }) => {
-    setErr(error);
-    setLoading(loading);
-
-    setTimeout(() => {
-      setErr("");
-    }, 5000);
-  };
-
   useEffect(() => {
-    // number and special
-
-    if (password.length <= 6) {
-      return setPS((e) => ({ ...e, color: "red", stength: "Poor" }));
-    }
-    if (/[^a-zA-Z0-9]/.test(password)) {
-      return setPS((e) => ({ ...e, color: "green", stength: "strong" }));
-    }
-
-    // number and letter
-    if (/[a-zA-Z].*\d|\d.*[a-zA-Z]/.test(password)) {
-      return setPS((e) => ({ ...e, color: "#efa02c", stength: "Weak" }));
-    }
-    return setPS((e) => ({ ...e, color: "red", stength: "Poor" }));
+    _checkPasswordStrength({ password, setPS });
   }, [password]);
 
   const _storeData = async () => {
     try {
-      if (password == "" || confirmPassword == "") {
-        return _helperFunc({
-          error: "Please both fields are required.",
-          loading: false,
-        });
-      }
-
-      if (password.length <= 6) {
-        return _helperFunc({
-          error: "Password Length must be more than 6 characters",
-          loading: false,
-        });
-      }
-
-      if (password !== confirmPassword) {
-        return _helperFunc({
-          error: "Password Doesn't Match,Please try again.",
-          loading: false,
-        });
-      }
-
-      if (passwordStrength.stength == "Poor") {
-        return _helperFunc({
-          error: "Password Too Weak, Should contain both alphabets or numbers.",
-          loading: false,
-        });
-      }
-
-      if (agreed == false) {
-        return _helperFunc({
-          error: "Pleae Agreed to EllAssest Terms.",
-          loading: false,
-        });
-      }
-      const encryptedData = CryptoJS.AES.encrypt(
+      _createUserAccount({
         password,
-        encryptionKey
-      ).toString();
-
-      // hasing Password
-      // const decryptedData = CryptoJS.AES.decrypt(
-      //   encryptedData,
-      //   encryptionKey
-      // ).toString(CryptoJS.enc.Utf8);
-
-      await AsyncStorage.setItem("password", encryptedData);
-
-      navigation.navigate("SecureYourWallet");
+        confirmPassword,
+        setErr,
+        setLoading,
+        passwordStrength,
+        agreed,
+        navigation,
+        route: "SecureYourWallet",
+      });
     } catch (error) {
       console.log(error);
       setErr("An Error Occured");

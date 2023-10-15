@@ -23,6 +23,11 @@ import Collectibles from "../../sections/Collectibles";
 import useHandleScrollFunc from "../../Hooks/handleScroll";
 import QRCodeReceiveToken from "../../components/QRCodeReceiveToken";
 import NameAndNetwork from "../../components/NameAndNetwork";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  _getActiveNetwork,
+  _getNetworks,
+} from "../../constants/HelperFunctions";
 
 const Home = ({ route, navigation }) => {
   const [active, setActive] = useState(1);
@@ -241,34 +246,30 @@ const Home = ({ route, navigation }) => {
 };
 
 const Networks = ({ func, navigation, setShow }) => {
-  const data3 = [
-    {
-      name: "Ropsten Test Network",
-      color: "6cda9d",
-    },
+  const [activeNetwork, setActiveNetwork] = useState(null);
+  const [networks, setNetworks] = useState(null);
 
-    {
-      name: "Kovan Test Network",
-      color: "ffab2e",
-    },
-    {
-      name: "Sepolia Test Network",
-      color: "ff3a58",
-    },
-    {
-      name: "Smart Network Chain",
-      color: "a769ec",
-    },
-  ];
+  const getNetworks = async () => {
+    const data1 = await _getActiveNetwork();
+    const data2 = await _getNetworks();
+
+    setActiveNetwork(JSON.parse(data1));
+    setNetworks(JSON.parse(data2));
+  };
+
+  useEffect(() => {
+    getNetworks();
+  }, []);
+
   return (
     <>
       <View style={[styles.f, { marginTop: 10, marginBottom: 30 }]}>
         <View style={[{ flexDirection: "row", alignItems: "center" }]}>
           <Network
-            text={"Ethereum main network"}
-            bg="0b6ffb"
             underline={false}
             fontSize={17}
+            text={activeNetwork?.name}
+            bg={activeNetwork?.color}
           />
         </View>
         <Image
@@ -279,14 +280,14 @@ const Networks = ({ func, navigation, setShow }) => {
 
       <Text style={styles3.otherNetwork}>Other Networks</Text>
       <View>
-        {data3.map((val, key) => (
+        {networks?.map((val, key) => (
           <View
             style={[styles.f, { marginTop: 10, marginBottom: 20 }]}
             key={key}
           >
             <Network
-              text={val.name}
-              bg={val.color}
+              text={val?.name}
+              bg={val?.color}
               underline={false}
               fontSize={17}
             />

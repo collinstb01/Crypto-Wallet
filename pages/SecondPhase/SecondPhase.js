@@ -6,12 +6,23 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Step from "../../components/Step";
 import ButtonGradient from "../../components/ButtonGradient";
+import { ethers } from "ethers";
+import { encryptionKey } from "../../constants/DATA";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CryptoJS from "react-native-crypto-js";
+import "@ethersproject/shims";
+import { useDispatch, useSelector } from "react-redux";
+import { setSeed } from "../../features/StorageAuth/StorageAuth";
 
 const SecondPhase = ({ navigation }) => {
   const [show, setshow] = useState(false);
+  const [generating, setGenerating] = useState(true);
+  const { seedPhrase } = useSelector((state) => state.storage);
+
+  const dispatch = useDispatch();
 
   const words = [
     "apple",
@@ -27,6 +38,60 @@ const SecondPhase = ({ navigation }) => {
     "kiwi",
     "lemon",
   ];
+
+  // create seed
+
+  const _saveWalletEncryptedData = async () => {
+    console.log("----------generating---------------");
+    setGenerating(true);
+    const walletData = ethers.Wallet.createRandom();
+
+    // create details
+    let phrase = walletData.mnemonic.phrase;
+    let arr = [...phrase.split(" ")];
+
+    dispatch(setSeed({ seedPhrase: arr }));
+    let privateKey = walletData.privateKey;
+    let walletAddress = new ethers.Wallet(privateKey).address;
+
+    // encrypt phrase
+    const encryptedPhrase = CryptoJS.AES.encrypt(
+      phrase,
+      encryptionKey
+    ).toString();
+
+    let user = await AsyncStorage.getItem("user");
+
+    let parseUser = JSON.parse(user);
+    let newUser = { ...parseUser, seedPrase: encryptedPhrase };
+
+    await AsyncStorage.setItem("user", JSON.stringify(newUser));
+
+    const encryptedPrivateKey = CryptoJS.AES.encrypt(
+      privateKey,
+      encryptionKey
+    ).toString();
+
+    const encryptedWalletAddress = CryptoJS.AES.encrypt(
+      walletAddress,
+      encryptionKey
+    ).toString();
+
+    let wallet = {
+      walletAddress: encryptedWalletAddress,
+      privateKey: encryptedPrivateKey,
+      name: "",
+      active: 1,
+    };
+
+    await AsyncStorage.setItem("wallets", JSON.stringify([wallet]));
+    setGenerating(false);
+    console.log("----------generated---------------");
+  };
+
+  useEffect(() => {
+    _saveWalletEncryptedData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -70,7 +135,9 @@ const SecondPhase = ({ navigation }) => {
                   }}
                 >
                   <Image source={require("../../assets/eyeg.png")} />
-                  <Text style={styles.seedButtonText}>View</Text>
+                  <Text style={styles.seedButtonText}>
+                    {generating ? "Generating Seed Phrase" : "View"}
+                  </Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -85,8 +152,8 @@ const SecondPhase = ({ navigation }) => {
                 alignItems: "center",
               }}
             >
-              {words?.map((val, index) => (
-                <View style={{ width: 100, height: "auto" }}>
+              {seedPhrase?.map((val, index) => (
+                <View style={{ width: 100, height: "auto" }} key={index}>
                   <Text
                     style={{
                       color: "white",

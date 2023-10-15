@@ -13,7 +13,7 @@ const Swap = ({ route, navigation }) => {
 
       <ScrollView onScroll={handleScroll}>
         <View style={{ marginBottom: 50 }}>
-          <NameAndNetwork />
+          <NameAndNetworkz />
         </View>
       </ScrollView>
     </View>
