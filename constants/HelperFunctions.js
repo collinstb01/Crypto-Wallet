@@ -127,6 +127,26 @@ export const _getNetworks = async () => {
   return JSON.stringify(networks);
 };
 
+export const _setNetworks = async ({ id }) => {
+  let _network = await AsyncStorage.getItem("networks");
+  // find active and set it to 0
+  // find new active and change to 1
+  let parseNetwork = JSON.parse(_network);
+  const active = parseNetwork.find((val) => val.active == 1);
+  const soonToBeactive = parseNetwork.find((val) => val.id == id);
+  const newVals = parseNetwork
+    .filter((val) => val.id != id)
+    .filter((val) => val.active != 1);
+
+  console.log(active, soonToBeactive);
+  active.active = 0;
+  soonToBeactive.active = 1;
+
+  let newArr = [...newVals, active, soonToBeactive];
+  await AsyncStorage.setItem("networks", JSON.stringify(newArr));
+  return true;
+};
+
 export const _getActiveWallet = async () => {
   const activeWallet = await AsyncStorage.getItem("wallets");
   const parseWallet = JSON.parse(activeWallet);
@@ -136,7 +156,18 @@ export const _getActiveWallet = async () => {
 };
 
 export const _getWallets = async () => {
-  let _wallet = await AsyncStorage.getItem("networks");
+  let _wallet = await AsyncStorage.getItem("wallets");
 
-  return JSON.stringify(_wallet);
+  return _wallet;
 };
+
+const _encryotData = (async = () => {});
+
+export const _decryotData = (async = ({ encryptedData }) => {
+  const decryptedData = CryptoJS.AES.decrypt(
+    encryptedData,
+    encryptionKey
+  ).toString(CryptoJS.enc.Utf8);
+
+  return decryptedData;
+});

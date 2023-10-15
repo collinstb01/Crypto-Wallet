@@ -27,6 +27,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   _getActiveNetwork,
   _getNetworks,
+  _getWallets,
+  _setNetworks,
 } from "../../constants/HelperFunctions";
 
 const Home = ({ route, navigation }) => {
@@ -35,6 +37,10 @@ const Home = ({ route, navigation }) => {
   const [showPerson, setShowPerson] = useState(false);
   const [showSendEth, setshowSendEth] = useState(false);
   const [text, setText] = useState("");
+  const [wallets, setWallets] = useState(null);
+  const [activeNetwork, setActiveNetwork] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [networks, setNetworks] = useState(null);
 
   const [activeCTN, setActiveCTN] = useState(1);
 
@@ -97,6 +103,29 @@ const Home = ({ route, navigation }) => {
 
   const func = () => {};
 
+  const setNetworkToBeActiveFunc = async ({ id }) => {
+    await _setNetworks({ id });
+    setShowPerson(false);
+  };
+
+  const getAccountsNetworks = async () => {
+    setLoading(true);
+
+    const data = await _getWallets();
+    const data2 = await _getActiveNetwork();
+    const data3 = await _getNetworks();
+
+    setWallets(JSON.parse(data));
+    setActiveNetwork(JSON.parse(data2));
+    setNetworks(JSON.parse(data3));
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getAccountsNetworks();
+  }, [showPerson]);
+
   const [isScrolling, handleScroll] = useHandleScrollFunc();
 
   useEffect(() => {
@@ -113,7 +142,11 @@ const Home = ({ route, navigation }) => {
         <View>
           <StatusBarForScreens />
           <View style={styles.f}>
-            <NameAndNetwork setShow={setShow} setShowPerson={setShowPerson} />
+            <NameAndNetwork
+              setShow={setShow}
+              setShowPerson={setShowPerson}
+              activeNetwork={activeNetwork}
+            />
             <View>
               <Ionicons name="md-scan" size={20} color="white" />
             </View>
@@ -224,6 +257,9 @@ const Home = ({ route, navigation }) => {
             func2={funcTwo}
             func3={funcThree}
             activeCTN={activeCTN}
+            activeNetwork={activeNetwork}
+            wallets={wallets}
+            loading={loading}
           />
         </ResuableModalCTN>
       )}
@@ -233,7 +269,14 @@ const Home = ({ route, navigation }) => {
           setShow={setShowPerson}
           showBack={false}
         >
-          <Networks func={func} setShow={setShow} navigation={navigation} />
+          <Networks
+            func={func}
+            setShow={setShowPerson}
+            navigation={navigation}
+            activeNetwork={activeNetwork}
+            networks={networks}
+            setNetworkToBeActiveFunc={setNetworkToBeActiveFunc}
+          />
         </ResuableModalCTN>
       )}
       {showSendEth && (
@@ -245,21 +288,13 @@ const Home = ({ route, navigation }) => {
   );
 };
 
-const Networks = ({ func, navigation, setShow }) => {
-  const [activeNetwork, setActiveNetwork] = useState(null);
-  const [networks, setNetworks] = useState(null);
-
-  const getNetworks = async () => {
-    const data1 = await _getActiveNetwork();
-    const data2 = await _getNetworks();
-
-    setActiveNetwork(JSON.parse(data1));
-    setNetworks(JSON.parse(data2));
-  };
-
-  useEffect(() => {
-    getNetworks();
-  }, []);
+const Networks = ({
+  networks,
+  activeNetwork,
+  setShow,
+  setNetworkToBeActiveFunc,
+}) => {
+  const [id, setId] = useState(null);
 
   return (
     <>
@@ -281,28 +316,36 @@ const Networks = ({ func, navigation, setShow }) => {
       <Text style={styles3.otherNetwork}>Other Networks</Text>
       <View>
         {networks?.map((val, key) => (
-          <View
-            style={[styles.f, { marginTop: 10, marginBottom: 20 }]}
+          <TouchableOpacity
             key={key}
+            onPress={() => setNetworkToBeActiveFunc({ id: val.id })}
           >
-            <Network
-              text={val?.name}
-              bg={val?.color}
-              underline={false}
-              fontSize={17}
-            />
-          </View>
+            <View style={[styles.f, { marginTop: 10, marginBottom: 20 }]}>
+              <Network
+                text={val?.name}
+                bg={val?.color}
+                underline={false}
+                fontSize={17}
+                id={val?.id}
+              />
+            </View>
+          </TouchableOpacity>
         ))}
       </View>
     </>
   );
 };
 
-const Account = ({ activeCTN, func2, func3 }) => {
+const Account = ({ activeCTN, func2, func3, activeNetwork, wallets }) => {
   return (
     <>
       {activeCTN == 1 ? (
-        <AccountMain func2={func2} func3={func3} />
+        <AccountMain
+          func2={func2}
+          func3={func3}
+          activeNetwork={activeNetwork}
+          wallets={wallets}
+        />
       ) : activeCTN == 2 ? (
         <CreatAccount />
       ) : activeCTN == 3 ? (
@@ -314,29 +357,37 @@ const Account = ({ activeCTN, func2, func3 }) => {
   );
 };
 
-const AccountMain = ({ func2, func3 }) => {
+const AccountMain = ({ func2, func3, activeNetwork, wallets }) => {
   return (
     <>
       <View style={{ marginTop: 30, marginBottom: 20 }}>
-        <Network text={"Ethereum main network"} bg="0b6ffb" underline={true} />
+        <Network
+          text={activeNetwork?.name}
+          bg={activeNetwork?.color}
+          underline={true}
+        />
       </View>
       <View>
-        {[1, 2, 3].map((val, key) => (
+        {wallets?.map((val, index) => (
           <View
             style={[styles.f, { marginTop: 10, marginBottom: 10 }]}
-            key={key}
+            key={index}
           >
             <View style={[{ flexDirection: "row", alignItems: "center" }]}>
               <Image
                 source={require("../../assets/face1.png")}
                 style={{ width: 30, height: 30 }}
               />
-              <Text style={[styles.text, styles3.accountName]}>Miles14</Text>
+              <Text style={[styles.text, styles3.accountName]}>
+                {`Account ${index + 1}`}
+              </Text>
             </View>
-            <Image
-              source={require("../../assets/check-select.png")}
-              style={{ width: 24, height: 24 }}
-            />
+            {val.active == 1 && (
+              <Image
+                source={require("../../assets/check-select.png")}
+                style={{ width: 24, height: 24 }}
+              />
+            )}
           </View>
         ))}
       </View>
