@@ -29,6 +29,7 @@ import {
   _createWallet,
   _getActiveNetwork,
   _getNetworks,
+  _getTokens,
   _getWallets,
   _setNetworks,
   _setWallets,
@@ -47,6 +48,7 @@ const Home = ({ route, navigation }) => {
   const [activeNetwork, setActiveNetwork] = useState(null);
   const [loading, setLoading] = useState(false);
   const [networks, setNetworks] = useState(null);
+  const [tokens, setTokens] = useState(null);
 
   const [activeCTN, setActiveCTN] = useState(1);
 
@@ -114,8 +116,8 @@ const Home = ({ route, navigation }) => {
   };
 
   const addTokens = () => {
-    console.log("adding");
     _addTokens({ addr: text });
+    setshowAddToken(false);
   };
 
   console.log(text);
@@ -144,6 +146,13 @@ const Home = ({ route, navigation }) => {
     setNetworks(JSON.parse(data3));
     setLoading(false);
   };
+  const getTokens = async () => {
+    setLoading(true);
+    const data3 = await _getTokens();
+    console.log(data3);
+    setTokens(JSON.parse(data3));
+    setLoading(false);
+  };
 
   useEffect(() => {
     getWalets();
@@ -157,12 +166,17 @@ const Home = ({ route, navigation }) => {
     getNetworks();
   }, [showPerson]);
 
+  useEffect(() => {
+    getTokens();
+  }, [showAddToken, showPerson]);
+
   const [isScrolling, handleScroll] = useHandleScrollFunc();
 
   useEffect(() => {
     console.log("isScrolling");
   }, [isScrolling]);
 
+  console.log(tokens);
   return (
     <View style={[styles.container]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -222,7 +236,7 @@ const Home = ({ route, navigation }) => {
             />
             {active == 1 ? (
               <View>
-                {data2.map((val, index) => (
+                {tokens?.map((val, index) => (
                   <Pressable
                     onPress={() =>
                       navigation.navigate("token-details", {
@@ -256,7 +270,11 @@ const Home = ({ route, navigation }) => {
 
                       <View>
                         <Text style={[styles3.text, styles3.tokenName]}>
-                          {val.amount}
+                          {val.amount
+                            .toString()
+                            .split("")
+                            .splice(0, 4)
+                            .join("")}
                         </Text>
                       </View>
                     </View>

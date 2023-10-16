@@ -237,43 +237,67 @@ export const _decryotData = async ({ encryptedData }) => {
 
 /////TOKENS/////
 
-export const _getTokens = async ({}) => {
-  const tokens = await AsyncStorage.getItem("tokens");
-  const parseTokens = JSON.parse(tokens);
-
-  // getting the balance and all
-  console.log(parseTokens);
-};
-
-export const _addTokens = async ({ addr }) => {
+export const _getTokens = async () => {
   const activeNetwork = await _getActiveNetwork();
   let parseActiveNetwork = JSON.parse(activeNetwork);
 
   const tokens = await AsyncStorage.getItem("tokens");
+
+  let d = JSON.parse(tokens).filter(
+    (val) => val.network == parseActiveNetwork.id
+  );
+
+  console.log("filter data", d, parseActiveNetwork);
+
+  return JSON.stringify(d);
+};
+
+export const _addTokens = async ({ addr }) => {
+  const activeNetwork = await _getActiveNetwork();
+  const activeWallet = await _getActiveWallet();
+  let parseActiveNetwork = JSON.parse(activeNetwork);
+  let parseActiveWallet = JSON.parse(activeWallet);
+
+  const tokens = await AsyncStorage.getItem("tokens");
+
+  if (JSON.parse(tokens).find((val) => val.address == addr)) {
+    return console.log("Already Listed");
+  }
   const parseTokens = JSON.parse(tokens);
 
   let abi = await getContractAbi({
     contractAddress: addr,
   });
 
-  console.log(parseActiveNetwork.rpcURL);
+  // let API_KEY = "3d24b57ebfb8442bb83583ed476e0133";
+  let provider;
 
-  const provider = new ethers.InfuraProvider(parseActiveNetwork.rpcURL);
+  if (parseActiveNetwork.rpcURL == "https://mainnet.infura.io/v3/") {
+    provider = new ethers.JsonRpcProvider(
+      "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
+    );
+  } else {
+    provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
+  }
+
   const contract = new ethers.Contract(addr, abi, provider);
+  const userTokenBalance = await contract.balanceOf(addr);
 
   console.log(contract);
   const token = {
     name: await contract.name(),
-    amount: 0,
+    amount: ethers.formatUnits(userTokenBalance, 18),
     symbol: await contract.symbol(),
-    address: "0x0000000000000000000000000000000000000000",
-    network: "eth",
-    decimals: await contract.decimals(),
+    address: addr,
+    network: activeNetwork.network,
+    userAddr: parseActiveWallet.walletAddress,
+    // decimals: await contract.decimals(),
   };
+
   parseTokens.push(token);
 
   console.log(parseTokens);
-  //   await AsyncStorage.setItem("tokens", JSON.stringify(parseTokens));
+  await AsyncStorage.setItem("tokens", JSON.stringify(parseTokens));
 };
 
 async function getContractAbi({ contractAddress }) {
@@ -287,24 +311,15 @@ async function getContractAbi({ contractAddress }) {
 
 // const ethers = require("ethers");
 
-// // Connect to the Ethereum blockchain.
-// const provider = new ethers.providers.AlchemyProvider("mainnet");
+// const provider = new ethers.providers.WebSocketProvider("ws://localhost:8546");
 
-// // Create a new contract instance for the Ethereum balance contract.
-// const balanceContract = new ethers.Contract(
-//   "0x0000000000000000000000000000000000000000",
-//   ["function balanceOf(address account) external view returns (uint256)"],
-//   provider
-// );
+// const filter = {
+//   to: "0x1234567890abcdef1234567890abcdef12345678",
+// };
 
-// // Get the balance of the address '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B'.
-// const balance = await balanceContract.balanceOf(
-//   "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
-// );
-
-// // Format the balance in ETH.
-// const formattedBalance = ethers.utils.formatUnits(balance, 18);
-
-// console.log(
-//   `The balance of 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B is ${formattedBalance} ETH.`
-// );
+// provider.on("pending", async (txHash, event) => {
+//   if (event.filter(filter)) {
+//     const tx = await provider.getTransaction(txHash);
+//     console.log(tx.hash);
+//   }
+// });
