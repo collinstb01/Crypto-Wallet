@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   circle: {
     height: 7,
     width: 7,
-    borderRadius: 50,
+    borderRadius: 100,
     marginRight: 5,
     marginLeft: 5,
   },

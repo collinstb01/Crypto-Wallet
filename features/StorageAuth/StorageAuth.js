@@ -4,14 +4,18 @@ const StorageAuth = createSlice({
   name: "storage",
   initialState: {
     seedPhrase: null,
-    message: "Initial message",
+    madeChangesMessage: "",
   },
   reducers: {
     setSeed(state, action) {
       state.seedPhrase = action.payload.seedPhrase;
     },
+    setMCMessage(state, action) {
+      state.seedPhrase = action.payload.changes;
+    },
   },
 });
 
-export const { setPassword, setDate, setSeed } = StorageAuth.actions;
+export const { setPassword, setDate, setSeed, setMCMessage } =
+  StorageAuth.actions;
 export default StorageAuth.reducer;

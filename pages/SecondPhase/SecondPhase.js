@@ -82,6 +82,7 @@ const SecondPhase = ({ navigation }) => {
       privateKey: encryptedPrivateKey,
       name: "",
       active: 1,
+      walletName: "",
     };
 
     await AsyncStorage.setItem("wallets", JSON.stringify([wallet]));

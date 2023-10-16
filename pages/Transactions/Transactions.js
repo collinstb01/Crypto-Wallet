@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import StatusBarForScreens from "../../components/StatusBarForScreens";
 import useHandleScrollFunc from "../../Hooks/handleScroll";
 import Tabs from "../../components/Tabs";
@@ -9,10 +9,20 @@ import ResuableModalCTN from "../../components/ResuableModalCTN";
 import Constants from "../../constants/styles";
 import ButtonGradientTwo from "../../components/ButtonGradientTwo";
 import TransactionDInDepth from "../../components/TransactionDInDepth";
+import { _getActiveNetwork } from "../../constants/HelperFunctions";
 
 const Transactions = ({ route, navigation }) => {
   const [isScrolling, handleScroll] = useHandleScrollFunc();
   const [show, setShow] = useState(false);
+  const [activeNetwork, setActiveNetwork] = useState(null);
+
+  const getActiveNetwork = async () => {
+    const data = await _getActiveNetwork();
+    setActiveNetwork(JSON.parse(data));
+  };
+  useEffect(() => {
+    getActiveNetwork();
+  }, []);
 
   const DATATXHistory = [
     {
@@ -50,7 +60,7 @@ const Transactions = ({ route, navigation }) => {
 
       <ScrollView onScroll={handleScroll}>
         <View style={{ marginBottom: 50 }}>
-          <NameAndNetwork />
+          <NameAndNetwork activeNetwork={activeNetwork} />
         </View>
         <TokenHistory DATA={DATATXHistory} setShow={setShow} />
       </ScrollView>

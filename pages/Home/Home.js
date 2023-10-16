@@ -25,11 +25,15 @@ import QRCodeReceiveToken from "../../components/QRCodeReceiveToken";
 import NameAndNetwork from "../../components/NameAndNetwork";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  _createWallet,
   _getActiveNetwork,
   _getNetworks,
   _getWallets,
   _setNetworks,
+  _setWallets,
 } from "../../constants/HelperFunctions";
+import { useDispatch, useSelector } from "react-redux";
+import { setMCMessage } from "../../features/StorageAuth/StorageAuth";
 
 const Home = ({ route, navigation }) => {
   const [active, setActive] = useState(1);
@@ -43,6 +47,8 @@ const Home = ({ route, navigation }) => {
   const [networks, setNetworks] = useState(null);
 
   const [activeCTN, setActiveCTN] = useState(1);
+
+  const { madeChangesMessage } = useSelector((state) => state.storage);
 
   const funcOne = () => {
     setActiveCTN(1);
@@ -108,28 +114,41 @@ const Home = ({ route, navigation }) => {
     setShowPerson(false);
   };
 
-  const getAccountsNetworks = async () => {
+  const getWalets = async () => {
     setLoading(true);
-
     const data = await _getWallets();
-    const data2 = await _getActiveNetwork();
-    const data3 = await _getNetworks();
-
     setWallets(JSON.parse(data));
+    setLoading(false);
+  };
+  const getActiveNetwork = async () => {
+    setLoading(true);
+    const data2 = await _getActiveNetwork();
     setActiveNetwork(JSON.parse(data2));
+    setLoading(false);
+  };
+  const getNetworks = async () => {
+    setLoading(true);
+    const data3 = await _getNetworks();
     setNetworks(JSON.parse(data3));
-
     setLoading(false);
   };
 
   useEffect(() => {
-    getAccountsNetworks();
+    getWalets();
+  }, [show]);
+
+  useEffect(() => {
+    getActiveNetwork();
+  }, [showPerson]);
+
+  useEffect(() => {
+    getNetworks();
   }, [showPerson]);
 
   const [isScrolling, handleScroll] = useHandleScrollFunc();
 
   useEffect(() => {
-    console.log(isScrolling);
+    console.log("isScrolling");
   }, [isScrolling]);
   return (
     <View style={[styles.container]}>
@@ -162,7 +181,6 @@ const Home = ({ route, navigation }) => {
               <Pressable
                 onPress={() => {
                   if (val.route == "buy-eth") {
-                    console.log(true);
                     return setshowSendEth(true);
                   }
                   navigation.navigate(val.route);
@@ -336,7 +354,14 @@ const Networks = ({
   );
 };
 
-const Account = ({ activeCTN, func2, func3, activeNetwork, wallets }) => {
+const Account = ({
+  activeCTN,
+  func2,
+  func3,
+  activeNetwork,
+  wallets,
+  setShow,
+}) => {
   return (
     <>
       {activeCTN == 1 ? (
@@ -345,11 +370,12 @@ const Account = ({ activeCTN, func2, func3, activeNetwork, wallets }) => {
           func3={func3}
           activeNetwork={activeNetwork}
           wallets={wallets}
+          setShow={setShow}
         />
       ) : activeCTN == 2 ? (
-        <CreatAccount />
+        <CreatAccount setShow={setShow} />
       ) : activeCTN == 3 ? (
-        <ImportAccount />
+        <ImportAccount setShow={setShow} />
       ) : (
         ""
       )}
@@ -357,7 +383,11 @@ const Account = ({ activeCTN, func2, func3, activeNetwork, wallets }) => {
   );
 };
 
-const AccountMain = ({ func2, func3, activeNetwork, wallets }) => {
+const AccountMain = ({ func2, func3, activeNetwork, wallets, setShow }) => {
+  const handleChangeAccount = ({ addr }) => {
+    setShow(false);
+    _setWallets({ walletAddress: addr });
+  };
   return (
     <>
       <View style={{ marginTop: 30, marginBottom: 20 }}>
@@ -369,26 +399,31 @@ const AccountMain = ({ func2, func3, activeNetwork, wallets }) => {
       </View>
       <View>
         {wallets?.map((val, index) => (
-          <View
-            style={[styles.f, { marginTop: 10, marginBottom: 10 }]}
+          <TouchableOpacity
             key={index}
+            onPress={() => handleChangeAccount({ addr: val.walletAddress })}
           >
-            <View style={[{ flexDirection: "row", alignItems: "center" }]}>
-              <Image
-                source={require("../../assets/face1.png")}
-                style={{ width: 30, height: 30 }}
-              />
-              <Text style={[styles.text, styles3.accountName]}>
-                {`Account ${index + 1}`}
-              </Text>
+            <View
+              style={[styles.f, { marginTop: 10, marginBottom: 10 }]}
+              key={index}
+            >
+              <View style={[{ flexDirection: "row", alignItems: "center" }]}>
+                <Image
+                  source={require("../../assets/face1.png")}
+                  style={{ width: 30, height: 30 }}
+                />
+                <Text style={[styles.text, styles3.accountName]}>
+                  {`Account ${index + 1}`}
+                </Text>
+              </View>
+              {val.active == 1 && (
+                <Image
+                  source={require("../../assets/check-select.png")}
+                  style={{ width: 24, height: 24 }}
+                />
+              )}
             </View>
-            {val.active == 1 && (
-              <Image
-                source={require("../../assets/check-select.png")}
-                style={{ width: 24, height: 24 }}
-              />
-            )}
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
       <View style={{ marginTop: 10 }}>
@@ -399,9 +434,16 @@ const AccountMain = ({ func2, func3, activeNetwork, wallets }) => {
   );
 };
 
-const CreatAccount = ({}) => {
-  const createNewWallet = () => {
-    console.log("creating new wallet");
+const CreatAccount = ({ setShow }) => {
+  const [walletName, setWalletName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const createNewWallet = async () => {
+    setLoading(true);
+    await _createWallet({ walletName: walletName, setLoading, setError });
+    setLoading(false);
+    setShow(false);
   };
   return (
     <>
@@ -411,11 +453,16 @@ const CreatAccount = ({}) => {
       <View style={createAccountImportAccountStyle.inputCTN}>
         <TextInput
           placeholder="Account Name"
-          style={createAccountImportAccountStyle.input}
+          style={[createAccountImportAccountStyle.input, { color: "white" }]}
           placeholderTextColor={"#a49eb9"}
+          onChangeText={(text) => setWalletName(text)}
         />
       </View>
-      <ButtonGradientTwo text={"Create"} func={createNewWallet} />
+      <ButtonGradientTwo
+        text={loading ? "Creating..." : "Create"}
+        func={createNewWallet}
+      />
+      <Text style={contantStyles.error}>{error}</Text>
     </>
   );
 };

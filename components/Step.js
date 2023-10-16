@@ -27,46 +27,48 @@ const Step = ({ one }) => {
       >
         {[1, 2, 3].map((val, index) => {
           return (
-            <>
-              <View
-                key={index}
-                style={[
-                  styles.line,
-                  {
-                    left: index == 0 ? 20 : 120,
-                    backgroundColor:
-                      one == 1
-                        ? "#2f2a3c"
-                        : one == 2
-                        ? index == 0
+            <View key={index}>
+              <>
+                <View
+                  key={index}
+                  style={[
+                    styles.line,
+                    {
+                      left: index == 0 ? 20 : index == 2 ? -100 : -100000,
+                      backgroundColor:
+                        one == 1
+                          ? "#2f2a3c"
+                          : one == 2
+                          ? index == 0
+                            ? "#65d2f2"
+                            : "#2f2a3c"
+                          : one == 3
                           ? "#65d2f2"
-                          : "#2f2a3c"
-                        : one == 3
-                        ? "#65d2f2"
-                        : "",
-                  },
-                ]}
-              ></View>
-              {val <= one ? (
-                <LinearGradient
-                  colors={["#85FFC4", "#5CC6FF", "#BC85FF"]}
-                  end={{ x: 0.1, y: 0.2 }}
-                  start={{ x: 1, y: 0 }}
-                  style={styles.ball}
-                >
-                  <View style={styles.ball}></View>
-                </LinearGradient>
-              ) : (
-                <>
-                  <View
-                    style={[
-                      styles.ball,
-                      { backgroundColor: "#2f2a3c", borderRadius: 50 },
-                    ]}
-                  ></View>
-                </>
-              )}
-            </>
+                          : "",
+                    },
+                  ]}
+                ></View>
+                {val <= one ? (
+                  <LinearGradient
+                    colors={["#85FFC4", "#5CC6FF", "#BC85FF"]}
+                    end={{ x: 0.1, y: 0.2 }}
+                    start={{ x: 1, y: 0 }}
+                    style={styles.ball}
+                  >
+                    <View style={styles.ball}></View>
+                  </LinearGradient>
+                ) : (
+                  <>
+                    <View
+                      style={[
+                        styles.ball,
+                        { backgroundColor: "#2f2a3c", borderRadius: 50 },
+                      ]}
+                    ></View>
+                  </>
+                )}
+              </>
+            </View>
           );
         })}
       </View>
