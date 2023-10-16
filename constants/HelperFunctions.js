@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CryptoJS from "react-native-crypto-js";
 import { encryptionKey } from "../constants/DATA";
 import { ethers, Wallet, HDNodeWallet } from "ethers";
+import axios from "axios";
 
 export const _checkPasswordStrength = ({ password, setPS }) => {
   if (password.length <= 6) {
@@ -233,3 +234,77 @@ export const _decryotData = async ({ encryptedData }) => {
 
   return decryptedData;
 };
+
+/////TOKENS/////
+
+export const _getTokens = async ({}) => {
+  const tokens = await AsyncStorage.getItem("tokens");
+  const parseTokens = JSON.parse(tokens);
+
+  // getting the balance and all
+  console.log(parseTokens);
+};
+
+export const _addTokens = async ({ addr }) => {
+  const activeNetwork = await _getActiveNetwork();
+  let parseActiveNetwork = JSON.parse(activeNetwork);
+
+  const tokens = await AsyncStorage.getItem("tokens");
+  const parseTokens = JSON.parse(tokens);
+
+  let abi = await getContractAbi({
+    contractAddress: addr,
+  });
+
+  console.log(parseActiveNetwork.rpcURL);
+
+  const provider = new ethers.InfuraProvider(parseActiveNetwork.rpcURL);
+  const contract = new ethers.Contract(addr, abi, provider);
+
+  console.log(contract);
+  const token = {
+    name: await contract.name(),
+    amount: 0,
+    symbol: await contract.symbol(),
+    address: "0x0000000000000000000000000000000000000000",
+    network: "eth",
+    decimals: await contract.decimals(),
+  };
+  parseTokens.push(token);
+
+  console.log(parseTokens);
+  //   await AsyncStorage.setItem("tokens", JSON.stringify(parseTokens));
+};
+
+async function getContractAbi({ contractAddress }) {
+  const response = await axios.get(
+    `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=95GKUEVKANAKHD1J994RT2Z3415D4UI6ZY`
+  );
+  const abi = JSON.parse(response.data.result);
+
+  return abi;
+}
+
+// const ethers = require("ethers");
+
+// // Connect to the Ethereum blockchain.
+// const provider = new ethers.providers.AlchemyProvider("mainnet");
+
+// // Create a new contract instance for the Ethereum balance contract.
+// const balanceContract = new ethers.Contract(
+//   "0x0000000000000000000000000000000000000000",
+//   ["function balanceOf(address account) external view returns (uint256)"],
+//   provider
+// );
+
+// // Get the balance of the address '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B'.
+// const balance = await balanceContract.balanceOf(
+//   "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+// );
+
+// // Format the balance in ETH.
+// const formattedBalance = ethers.utils.formatUnits(balance, 18);
+
+// console.log(
+//   `The balance of 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B is ${formattedBalance} ETH.`
+// );

@@ -25,6 +25,7 @@ import QRCodeReceiveToken from "../../components/QRCodeReceiveToken";
 import NameAndNetwork from "../../components/NameAndNetwork";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  _addTokens,
   _createWallet,
   _getActiveNetwork,
   _getNetworks,
@@ -40,6 +41,7 @@ const Home = ({ route, navigation }) => {
   const [show, setShow] = useState(false);
   const [showPerson, setShowPerson] = useState(false);
   const [showSendEth, setshowSendEth] = useState(false);
+  const [showAddToken, setshowAddToken] = useState(false);
   const [text, setText] = useState("");
   const [wallets, setWallets] = useState(null);
   const [activeNetwork, setActiveNetwork] = useState(null);
@@ -107,7 +109,17 @@ const Home = ({ route, navigation }) => {
     },
   ];
 
-  const func = () => {};
+  const func = () => {
+    setshowAddToken(true);
+  };
+
+  const addTokens = () => {
+    console.log("adding");
+    _addTokens({ addr: text });
+  };
+
+  console.log(text);
+  const importAccount = () => {};
 
   const setNetworkToBeActiveFunc = async ({ id }) => {
     await _setNetworks({ id });
@@ -150,12 +162,14 @@ const Home = ({ route, navigation }) => {
   useEffect(() => {
     console.log("isScrolling");
   }, [isScrolling]);
+
   return (
     <View style={[styles.container]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
       {show == true && <View style={contantStyles.overlay}></View>}
       {showPerson == true && <View style={contantStyles.overlay}></View>}
       {showSendEth == true && <View style={contantStyles.overlay}></View>}
+      {showAddToken == true && <View style={contantStyles.overlay}></View>}
 
       <ScrollView onScroll={handleScroll}>
         <View>
@@ -278,6 +292,8 @@ const Home = ({ route, navigation }) => {
             activeNetwork={activeNetwork}
             wallets={wallets}
             loading={loading}
+            importAccount={importAccount}
+            setText={setText}
           />
         </ResuableModalCTN>
       )}
@@ -288,12 +304,29 @@ const Home = ({ route, navigation }) => {
           showBack={false}
         >
           <Networks
-            func={func}
-            setShow={setShowPerson}
-            navigation={navigation}
             activeNetwork={activeNetwork}
             networks={networks}
             setNetworkToBeActiveFunc={setNetworkToBeActiveFunc}
+          />
+        </ResuableModalCTN>
+      )}
+      {showAddToken && (
+        <ResuableModalCTN
+          text={"Add Token"}
+          setShow={setshowAddToken}
+          showBack={false}
+        >
+          <ImportAccount
+            setShow={setshowAddToken}
+            placeholder={"Paste your Token Address Here"}
+            warning={
+              "Imported token are viewable in your wallet, symbol, balance, and others."
+            }
+            learnMore={"Learn more about imported Tokens "}
+            header={"Add Token"}
+            buttonText={"Add Token"}
+            func={addTokens}
+            setText={setText}
           />
         </ResuableModalCTN>
       )}
@@ -361,6 +394,7 @@ const Account = ({
   activeNetwork,
   wallets,
   setShow,
+  importAccount,
 }) => {
   return (
     <>
@@ -375,7 +409,20 @@ const Account = ({
       ) : activeCTN == 2 ? (
         <CreatAccount setShow={setShow} />
       ) : activeCTN == 3 ? (
-        <ImportAccount setShow={setShow} />
+        <ImportAccount
+          setShow={setShow}
+          placeholder={
+            "Paste your private key string e.g 4xhd83jsjkjjsj98383mnxjyuyrjal38374929"
+          }
+          warning={
+            "Imported accounts are viewable in your wallet but are not recoverable with your EllAsset seed phrase"
+          }
+          learnMore={"Learn more about imported accounts"}
+          header={"Import Account"}
+          buttonText={"Import"}
+          func={importAccount}
+          setText={setText}
+        />
       ) : (
         ""
       )}
@@ -467,23 +514,25 @@ const CreatAccount = ({ setShow }) => {
   );
 };
 
-const ImportAccount = ({}) => {
-  const importWallet = () => {
-    console.log("creating new wallet");
-  };
+const ImportAccount = ({
+  header,
+  placeholder,
+  warning,
+  learnMore,
+  buttonText,
+  func,
+  setText,
+}) => {
   return (
     <>
       <>
-        <Text style={[createAccountImportAccountStyle.text]}>
-          Import Account
-        </Text>
+        <Text style={[createAccountImportAccountStyle.text]}>{header}</Text>
         <View style={createAccountImportAccountStyle.CTN}>
           <Text style={[createAccountImportAccountStyle.importWarning]}>
-            Imported accounts are viewable in your wallet but are not
-            recoverable with your EllAsset seed phrase
+            {warning}
           </Text>
           <Text style={[createAccountImportAccountStyle.importWarning]}>
-            Learn more about imported accounts{" "}
+            {learnMore}
             <Text
               style={{
                 color: "blue",
@@ -492,13 +541,14 @@ const ImportAccount = ({}) => {
                 fontWeight: "600",
               }}
             >
-              here.
+              {learnMore && "here."}
             </Text>
           </Text>
           <TextInput
-            placeholder="Paste your private key string e.g 4xhd83jsjkjjsj98383mnxjyuyrjal38374929"
-            style={createAccountImportAccountStyle.input}
+            placeholder={placeholder}
+            style={[createAccountImportAccountStyle.input, { color: "white" }]}
             placeholderTextColor={"#a49eb9"}
+            onChangeText={(text) => setText(text)}
           />
         </View>
         <View
@@ -514,7 +564,7 @@ const ImportAccount = ({}) => {
             Or Scan a QR Code
           </Text>
         </View>
-        <ButtonGradient route={"func"} text={"Import"} func={importWallet} />
+        <ButtonGradient route={"func"} text={buttonText} func={func} />
       </>
     </>
   );
