@@ -61,7 +61,7 @@ const Transactions = ({ route, navigation }) => {
   }, []);
 
   return (
-    <View style={[styles.container]}>
+    <View style={[Constants.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
       {show && <View style={Constants.overlay}></View>}
 

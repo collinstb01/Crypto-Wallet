@@ -256,6 +256,10 @@ export const _createUserAccount = async ({
   }
 };
 
+export const _importUserAcount = async () => {
+  // request for the user private key
+};
+
 export const _getActiveNetwork = async () => {
   const activeNetwork = await AsyncStorage.getItem("networks");
   const parseNetwork = JSON.parse(activeNetwork);
@@ -304,7 +308,9 @@ export const _getWallets = async () => {
 export const _createWallet = async ({ walletName, setLoading, setError }) => {
   try {
     let wallets = await AsyncStorage.getItem("wallets");
+    let tokens = await AsyncStorage.getItem("tokens");
     let parseWallets = JSON.parse(wallets);
+    let parseTokens = JSON.parse(tokens);
 
     // if (parseWallets.find((val) => val.name == walletName)) {
     //   return setError("Name Already exist, use another Account Name.");
@@ -335,12 +341,50 @@ export const _createWallet = async ({ walletName, setLoading, setError }) => {
       walletName: walletName,
     };
 
+    const tokenArr = [
+      {
+        name: "Ethereum main Network",
+        amount: 0,
+        symbol: "Ethereum",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "eth",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Sepolia Test Network",
+        amount: 0,
+        symbol: "sepolia",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "sepolia",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Smart Chain - Testnet",
+        amount: 0,
+        symbol: "bscTestNet",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "bscTestNet",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Binance Smart Chain",
+        amount: 0,
+        symbol: "bsc",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "bsc",
+        walletAddress: encryptedWalletAddress,
+      },
+    ];
+
+    let newArr = [...parseTokens, ...tokenArr];
     parseWallets.push(walletObj);
 
+    console.log(parseTokens);
     await AsyncStorage.setItem("wallets", JSON.stringify(parseWallets));
+    await AsyncStorage.setItem("tokens", JSON.stringify(newArr));
   } catch (error) {
     setLoading(false);
-    console.log(error);
+    // console.log(error);
   }
 };
 
@@ -459,9 +503,9 @@ export const removeToken = async () => {};
 
 async function getContractAbi({ contractAddress }) {
   try {
-    const response = await axios.get(
-      `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=${ETHERSCAN_API_KEY}`
-    );
+    // const response = await axios.get(
+    //   `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=${ETHERSCAN_API_KEY}`
+    // );
 
     let abi = [
       { inputs: [], stateMutability: "nonpayable", type: "constructor" },
@@ -623,12 +667,11 @@ async function getContractAbi({ contractAddress }) {
 }
 
 export const _getUserTransactions = async ({ WalletAddress }) => {
-  let response = await axios.get(
-    `https://api.etherscan.io/api?module=account&action=txlist&address=${"0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9"}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${ETHERSCAN_API_KEY}`
-  );
-  console.log(response.data);
-
-  return JSON.stringify(response.data);
+  // let response = await axios.get(
+  //   `https://api.etherscan.io/api?module=account&action=txlist&address=${"0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9"}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${ETHERSCAN_API_KEY}`
+  // );
+  // console.log(response.data);
+  // return JSON.stringify(response.data);
 };
 
 const getBalance = async ({ rpcURL, address }) => {

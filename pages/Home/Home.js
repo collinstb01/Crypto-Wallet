@@ -3,6 +3,7 @@ import {
   Image,
   Pressable,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -155,40 +156,41 @@ const Home = ({ route, navigation }) => {
 
   const [isScrolling, handleScroll] = useHandleScrollFunc();
 
-  const provider = new ethers.JsonRpcProvider(
-    "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
-  );
+  // const provider = new ethers.JsonRpcProvider(
+  //   "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
+  // );
 
-  // Specify the wallet address you want to listen to
-  const walletAddress = "0x20b55d117bBa28cD7Eeb1687FFeA0882c5a642c5";
+  // // Specify the wallet address you want to listen to
+  // const walletAddress = "0x20b55d117bBa28cD7Eeb1687FFeA0882c5a642c5";
 
-  // Listen for new blocks
-  provider.on("block", async (blockNumber) => {
-    // Get the block details
-    const block = await provider.getBlock(blockNumber);
+  // // Listen for new blocks
+  // provider.on("block", async (blockNumber) => {
+  //   // Get the block details
+  //   const block = await provider.getBlock(blockNumber);
 
-    // Check each transaction in the block
-    for (let transaction of block.transactions) {
-      // Check if the transaction involves the wallet
-      if (
-        transaction.from === walletAddress ||
-        transaction.to === walletAddress
-      ) {
-        console.log("Transaction involving the wallet found:", transaction);
-      }
-    }
-  });
+  //   // Check each transaction in the block
+  //   for (let transaction of block.transactions) {
+  //     // Check if the transaction involves the wallet
+  //     if (
+  //       transaction.from === walletAddress ||
+  //       transaction.to === walletAddress
+  //     ) {
+  //       console.log("Transaction involving the wallet found:", transaction);
+  //     }
+  //   }
+  // });
   useEffect(() => {
     console.log("isScrolling");
   }, [isScrolling]);
 
   return (
-    <View style={[styles.container]}>
+    <View style={[contantStyles.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
       {show == true && <View style={contantStyles.overlay}></View>}
       {showPerson == true && <View style={contantStyles.overlay}></View>}
       {showSendEth == true && <View style={contantStyles.overlay}></View>}
       {showAddToken == true && <View style={contantStyles.overlay}></View>}
+      <StatusBarForScreens />
 
       <ScrollView onScroll={handleScroll}>
         <View>
@@ -210,7 +212,7 @@ const Home = ({ route, navigation }) => {
             </Text>
           </View>
           <View style={[styles2.containerLogo]}>
-            {data.map((val) => (
+            {data.map((val, index) => (
               <Pressable
                 onPress={() => {
                   if (val.route == "buy-eth") {
@@ -218,6 +220,7 @@ const Home = ({ route, navigation }) => {
                   }
                   navigation.navigate(val.route);
                 }}
+                key={index}
               >
                 <View>
                   <View style={[styles2.icon]}>

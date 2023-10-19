@@ -19,7 +19,7 @@ const SendToken = ({ navigation }) => {
 
   const backFunc = () => {
     console.log("go");
-    navigation.navigate("home");
+    navigation.goBack();
   };
   console.log(valid);
   const handleChange = (e) => {

@@ -13,7 +13,7 @@ const ButtonGradientTwo = ({ text, widthSp, disabled, func }) => {
       <View
         style={[
           styles.button,
-          { width: widthSp ? widthSp : 200, backgroundColor: "#1c1924" },
+          { width: widthSp ? widthSp : "auto", backgroundColor: "#1c1924" },
         ]}
       >
         <TouchableOpacity

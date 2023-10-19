@@ -14,7 +14,7 @@ const ButtonGradient = ({
 }) => {
   return (
     <View style={{ flexDirection: "row", justifyContent: "center" }}>
-      <View style={{ width: widthSp ? widthSp : 200 }}>
+      <View style={{ width: widthSp ? widthSp : "auto" }}>
         <TouchableOpacity
           disabled={disabled}
           onPress={() => {

@@ -18,8 +18,6 @@ import {
   _helperFunc,
 } from "../constants/HelperFunctions";
 import Contants from "../constants/styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Wallet, ethers } from "ethers";
 
 const ImportSeed = ({ navigation }) => {
   const [seedPhrase, setSeedPhrase] = useState("");
@@ -67,9 +65,13 @@ const ImportSeed = ({ navigation }) => {
     setShowSeedPhrase((e) => !e);
   };
 
+  const backFunc = () => {
+    console.log("skksksk");
+    navigation.goBack();
+  };
   console.log(seedPhrase);
   return (
-    <ReusableCard text={"Import From Seed"}>
+    <ReusableCard text={"Import From Seed"} backFunc={backFunc}>
       <View style={styles.inputContainer}>
         <View>
           <TextInput

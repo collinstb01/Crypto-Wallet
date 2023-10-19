@@ -54,7 +54,7 @@ const ReusableCard = ({
             name="chevron-back"
             size={20}
             color="#948fa8"
-            style={{ position: "relative", top: 7.5, left: 20 }}
+            style={{ marginTop: 20, marginLeft: 20 }}
             onPress={backFunc}
           />
           <View

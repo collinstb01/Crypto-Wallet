@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import Clipboard from "@react-native-clipboard/clipboard";
+// import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import ButtonGradient from "./ButtonGradient";
@@ -9,14 +9,14 @@ const QRCodeReceiveToken = ({ navigation, setText, text }) => {
   const [copied, setCopied] = useState("");
 
   const copyToClipBoard = () => {
-    console.log(text);
-    if (text) {
-      Clipboard.setString("text.toString()");
-      setCopied(true);
-    }
-    setTimeout(() => {
-      setCopied(false);
-    }, 4000);
+    // console.log(text);
+    // if (text) {
+    //   Clipboard.setString("text.toString()");
+    //   setCopied(true);
+    // }
+    // setTimeout(() => {
+    //   setCopied(false);
+    // }, 4000);
   };
 
   return (

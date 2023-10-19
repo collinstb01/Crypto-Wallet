@@ -5,12 +5,12 @@ const StatusBarForScreens = ({}) => {
   return (
     <View>
       <StatusBar
-        // animated={true}
-        backgroundColor="white"
-        barStyle="dark-content"
+        animated={true}
+        backgroundColor="#09080c"
+        barStyle="light-content"
         translucent={false}
-        // showHideTransition={true}
-        // hidden={false}
+        showHideTransition={true}
+        hidden={false}
       />
     </View>
   );

@@ -1,4 +1,6 @@
-import { Dimensions } from "react-native";
+import { Dimensions, Platform } from "react-native";
+
+const statusBarHeight = Platform.OS === "ios" ? 65 : 20;
 
 export default contantStyles = {
   overlay: {
@@ -21,6 +23,14 @@ export default contantStyles = {
     marginLeft: 30,
     marginRight: 30,
     flex: 1,
+    paddingTop: statusBarHeight,
+    backgroundColor: "#09080d",
+  },
+  container2Home: {
+    flex: 1,
+    backgroundColor: "#09080d",
+    padding: 15,
+    paddingTop: statusBarHeight,
   },
   flex: {
     justifyContent: "space-between",

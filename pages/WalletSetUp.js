@@ -27,6 +27,7 @@ const WalletSetUp = ({ navigation }) => {
             backgroundColor: "#201D29",
             borderRadius: 25,
             padding: 15,
+            paddingVertical: 18,
             marginTop: 10,
             marginBottom: 10,
           }}

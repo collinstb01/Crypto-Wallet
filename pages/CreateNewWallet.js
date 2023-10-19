@@ -60,14 +60,15 @@ const CreateNewWallet = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={Contants.container}>
       <StatusBar
         animated={true}
-        backgroundColor="white"
         // barStyle=""
         translucent={false}
         showHideTransition={true}
         hidden={false}
+        backgroundColor="white"
+        barStyle="dark-content"
       />
       <Step one={1} />
       <View style={styles.containerTwo}>

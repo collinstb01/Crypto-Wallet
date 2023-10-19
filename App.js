@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import "react-native-get-random-values";
 import WalletSetUp from "./pages/WalletSetUp";
 import { NavigationContainer } from "@react-navigation/native";
@@ -24,6 +24,8 @@ import { store } from "./features/store";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const statusBarHeight = Platform.OS === "ios" ? 80 : 0;
+
   return (
     <Provider store={store}>
       <NavigationContainer>

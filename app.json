@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CryptoWalletV2",
-    "slug": "CryptoWalletV2",
+    "slug": "cryptowallett",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,6 +25,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b1d118bb-2215-4e64-ba43-74d516b9595e"
+      }
+    },
+    "owner": "jayden2322"
   }
 }
