@@ -18,23 +18,17 @@ const SecureWallet = ({ navigation }) => {
     active: 0,
   });
 
-  const _retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem("password");
-      if (value !== null) {
-        // Data found, use it
-        console.log("Retrieved data:", value);
-      } else {
-        // Data does not exist
-        console.log("No data found for key:", password);
-      }
-    } catch (error) {
-      console.error("Error retrieving data:", error);
-    }
-  };
-  useEffect(() => {
-    _retrieveData();
-  }, []);
+  // const _retrieveData = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem("password");
+  //     con
+  //   } catch (error) {
+  //     console.error("Error retrieving data:", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   _retrieveData();
+  // }, []);
 
   return (
     <ReusableCard text={"Secure Your Wallet"} show={show.show}>

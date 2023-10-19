@@ -4,6 +4,8 @@ import { encryptionKey } from "../constants/DATA";
 import { ethers, Wallet, HDNodeWallet } from "ethers";
 import axios from "axios";
 
+let ETHERSCAN_API_KEY = "95GKUEVKANAKHD1J994RT2Z3415D4UI6ZY";
+
 export const _checkPasswordStrength = ({ password, setPS }) => {
   if (password.length <= 6) {
     return setPS((e) => ({ ...e, color: "red", stength: "Poor" }));
@@ -39,6 +41,7 @@ export const _createUserAccount = async ({
   route,
   seedPrase,
 }) => {
+  setLoading(true);
   if (password == "" || confirmPassword == "") {
     return _helperFunc({
       setErr,
@@ -110,7 +113,147 @@ export const _createUserAccount = async ({
       JSON.stringify({ password: encryptedData, seedPrase: "" })
     );
   }
-  navigation.navigate(route);
+  if (route == "") {
+    if (seedPrase == "") {
+      return _helperFunc({
+        error: "Seed Phrase is required.",
+        loading: false,
+        setErr,
+        setLoading,
+      });
+    }
+    let seedPhraseVerification = seedPrase.split(" ");
+    if (seedPhraseVerification.length != 12) {
+      return _helperFunc({
+        error: "Seed Phrase not correct, Please check and try again.",
+        loading: false,
+        setErr,
+        setLoading,
+      });
+    }
+
+    const path = "m/44'/60'/0'/0/0";
+
+    const walletPhraseData = ethers.Wallet.fromPhrase(seedPrase, path);
+
+    const encryptedPrivateKey = await _encryotData({
+      data: walletPhraseData.privateKey,
+    });
+
+    const encryptedWalletAddress = await _encryotData({
+      data: walletPhraseData.address,
+    });
+
+    let wallet = {
+      walletAddress: encryptedWalletAddress,
+      privateKey: encryptedPrivateKey,
+      name: "",
+      active: 1,
+      walletName: "",
+    };
+
+    let networks = [
+      {
+        name: "Ethereum main Network",
+        id: "eth",
+        active: 1,
+        color: "6c62c5",
+        rpcURL: "https://mainnet.infura.io/v3/",
+        chainId: 1,
+      },
+      {
+        name: "Sepolia Test Network",
+        id: "sepolia",
+        active: 0,
+        color: "ff3a58",
+        rpcURL: "https://eth-sepolia.g.alchemy.com/v2/demo",
+        chainId: 11155111,
+      },
+      {
+        name: "Smart Chain - Testnet",
+        id: "bscTestNet",
+        active: 0,
+        color: "a769ec",
+        rpcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+        chainId: 97,
+      },
+      {
+        name: "Binance Smart Chain",
+        id: "bsc",
+        active: 0,
+        color: "29d041",
+        rpcURL: "https://bsc-dataseed.binance.org/",
+        chainId: 56,
+      },
+    ];
+    const tokens = [
+      {
+        name: "Ethereum main Network",
+        amount: Number(
+          await getBalance({
+            rpcURL: networks[0].rpcURL,
+            address: walletPhraseData.address,
+          })
+        ),
+        symbol: "Ethereum",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "eth",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Sepolia Test Network",
+        amount: Number(
+          await getBalance({
+            rpcURL: networks[1].rpcURL,
+            address: walletPhraseData.address,
+          })
+        ),
+        symbol: "sepolia",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "sepolia",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Smart Chain - Testnet",
+        amount: Number(
+          await getBalance({
+            rpcURL: networks[2].rpcURL,
+            address: walletPhraseData.address,
+          })
+        ),
+        symbol: "bscTestNet",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "bscTestNet",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Binance Smart Chain",
+        amount: Number(
+          await getBalance({
+            rpcURL: networks[3].rpcURL,
+            address: walletPhraseData.address,
+          })
+        ),
+        symbol: "bsc",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "bsc",
+        walletAddress: encryptedWalletAddress,
+      },
+    ];
+
+    console.log(walletPhraseData.address);
+    let historys = await _getUserTransactions({
+      WalletAddress: walletPhraseData.address,
+    });
+    await AsyncStorage.setItem("wallets", JSON.stringify([wallet]));
+    await AsyncStorage.setItem("tokens", JSON.stringify(tokens)); //
+    await AsyncStorage.setItem("networks", JSON.stringify(networks)); // done
+    await AsyncStorage.setItem("TXhistory", JSON.stringify([])); // done
+
+    navigation.navigate("home");
+  } else {
+    navigation.navigate(route);
+  }
 };
 
 export const _getActiveNetwork = async () => {
@@ -241,18 +384,26 @@ export const _getTokens = async () => {
   const activeNetwork = await _getActiveNetwork();
   let parseActiveNetwork = JSON.parse(activeNetwork);
 
+  const activeWallet = await _getActiveWallet();
+  let parseActiveWactiveWallet = JSON.parse(activeWallet);
+
   const tokens = await AsyncStorage.getItem("tokens");
 
   let d = JSON.parse(tokens).filter(
     (val) => val.network == parseActiveNetwork.id
   );
+  console.log(parseActiveWactiveWallet);
+  console.log(d);
 
-  console.log("filter data", d, parseActiveNetwork);
-
-  return JSON.stringify(d);
+  let final = d.filter(
+    (val) => val.walletAddress == parseActiveWactiveWallet.walletAddress
+  );
+  return JSON.stringify(final);
 };
 
 export const _addTokens = async ({ addr }) => {
+  console.log("adding");
+
   const activeNetwork = await _getActiveNetwork();
   const activeWallet = await _getActiveWallet();
   let parseActiveNetwork = JSON.parse(activeNetwork);
@@ -260,54 +411,239 @@ export const _addTokens = async ({ addr }) => {
 
   const tokens = await AsyncStorage.getItem("tokens");
 
-  if (JSON.parse(tokens).find((val) => val.address == addr)) {
-    return console.log("Already Listed");
-  }
+  // if (JSON.parse(tokens).find((val) => val.address == addr)) {
+  //   return console.log("Already Listed");
+  // }
+
   const parseTokens = JSON.parse(tokens);
 
   let abi = await getContractAbi({
     contractAddress: addr,
   });
 
+  console.log(parseActiveNetwork.rpcURL);
+
   // let API_KEY = "3d24b57ebfb8442bb83583ed476e0133";
   let provider;
-
   if (parseActiveNetwork.rpcURL == "https://mainnet.infura.io/v3/") {
     provider = new ethers.JsonRpcProvider(
       "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
     );
   } else {
+    console.log("sepolia");
     provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
   }
 
-  const contract = new ethers.Contract(addr, abi, provider);
-  const userTokenBalance = await contract.balanceOf(addr);
+  let userWalletAddress = await _decryotData({
+    encryptedData: parseActiveWallet.walletAddress,
+  });
 
-  console.log(contract);
+  const contract = new ethers.Contract(addr, abi, provider);
+  const userTokenBalance = await contract.balanceOf(userWalletAddress);
+
   const token = {
     name: await contract.name(),
-    amount: ethers.formatUnits(userTokenBalance, 18),
+    amount: Number(userTokenBalance),
     symbol: await contract.symbol(),
     address: addr,
-    network: activeNetwork.network,
-    userAddr: parseActiveWallet.walletAddress,
+    network: parseActiveNetwork.id,
+    walletAddress: parseActiveWallet.walletAddress,
     // decimals: await contract.decimals(),
   };
 
   parseTokens.push(token);
-
-  console.log(parseTokens);
   await AsyncStorage.setItem("tokens", JSON.stringify(parseTokens));
 };
 
-async function getContractAbi({ contractAddress }) {
-  const response = await axios.get(
-    `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=95GKUEVKANAKHD1J994RT2Z3415D4UI6ZY`
-  );
-  const abi = JSON.parse(response.data.result);
+export const removeToken = async () => {};
 
-  return abi;
+async function getContractAbi({ contractAddress }) {
+  try {
+    const response = await axios.get(
+      `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=${ETHERSCAN_API_KEY}`
+    );
+
+    let abi = [
+      { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: true,
+            internalType: "address",
+            name: "owner",
+            type: "address",
+          },
+          {
+            indexed: true,
+            internalType: "address",
+            name: "spender",
+            type: "address",
+          },
+          {
+            indexed: false,
+            internalType: "uint256",
+            name: "value",
+            type: "uint256",
+          },
+        ],
+        name: "Approval",
+        type: "event",
+      },
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: true,
+            internalType: "address",
+            name: "from",
+            type: "address",
+          },
+          {
+            indexed: true,
+            internalType: "address",
+            name: "to",
+            type: "address",
+          },
+          {
+            indexed: false,
+            internalType: "uint256",
+            name: "value",
+            type: "uint256",
+          },
+        ],
+        name: "Transfer",
+        type: "event",
+      },
+      {
+        inputs: [
+          { internalType: "address", name: "owner", type: "address" },
+          { internalType: "address", name: "spender", type: "address" },
+        ],
+        name: "allowance",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          { internalType: "address", name: "spender", type: "address" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "approve",
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+      {
+        inputs: [{ internalType: "address", name: "account", type: "address" }],
+        name: "balanceOf",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [],
+        name: "decimals",
+        outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          { internalType: "address", name: "spender", type: "address" },
+          {
+            internalType: "uint256",
+            name: "subtractedValue",
+            type: "uint256",
+          },
+        ],
+        name: "decreaseAllowance",
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+      {
+        inputs: [
+          { internalType: "address", name: "spender", type: "address" },
+          { internalType: "uint256", name: "addedValue", type: "uint256" },
+        ],
+        name: "increaseAllowance",
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+      {
+        inputs: [],
+        name: "name",
+        outputs: [{ internalType: "string", name: "", type: "string" }],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [],
+        name: "symbol",
+        outputs: [{ internalType: "string", name: "", type: "string" }],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [],
+        name: "totalSupply",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          { internalType: "address", name: "to", type: "address" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "transfer",
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+      {
+        inputs: [
+          { internalType: "address", name: "from", type: "address" },
+          { internalType: "address", name: "to", type: "address" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "transferFrom",
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+    ];
+    return abi;
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+export const _getUserTransactions = async ({ WalletAddress }) => {
+  let response = await axios.get(
+    `https://api.etherscan.io/api?module=account&action=txlist&address=${"0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9"}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${ETHERSCAN_API_KEY}`
+  );
+  console.log(response.data);
+
+  return JSON.stringify(response.data);
+};
+
+const getBalance = async ({ rpcURL, address }) => {
+  console.log("getting");
+
+  const provider = new ethers.JsonRpcProvider(
+    rpcURL == "https://mainnet.infura.io/v3/"
+      ? "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
+      : rpcURL
+  );
+  const balance = await provider.getBalance(address);
+  const balanceInEth = ethers.formatEther(balance);
+  console.log(balanceInEth);
+  return balanceInEth;
+};
 
 // const ethers = require("ethers");
 

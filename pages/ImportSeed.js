@@ -14,20 +14,20 @@ import ReusableCard from "../components/ReusableCard";
 import {
   _checkPasswordStrength,
   _createUserAccount,
+  _encryotData,
   _helperFunc,
 } from "../constants/HelperFunctions";
 import Contants from "../constants/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Wallet, ethers } from "ethers";
 
 const ImportSeed = ({ navigation }) => {
-  const [seedPhrase, setSeedPhrase] = useState(
-    "pple banana cherry dog elephant fox grape horse igloo jellyfish kiwi lemon"
-  );
+  const [seedPhrase, setSeedPhrase] = useState("");
 
   const [error, setErr] = useState(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loding, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showSeedPhrase, setShowSeedPhrase] = useState(false);
 
   useEffect(() => {
@@ -41,75 +41,7 @@ const ImportSeed = ({ navigation }) => {
 
   const _storeData = async () => {
     try {
-      return navigation.navigate("home");
-
-      if (seedPhrase == "") {
-        return _helperFunc({
-          error: "Seed Phrase is required.",
-          loading: false,
-          setErr,
-          setLoading,
-        });
-      }
-      let seedPhraseVerification = seedPhrase.split(" ");
-      if (seedPhraseVerification.length != 12) {
-        return _helperFunc({
-          error: "Seed Phrase not correct, Please check and try again.",
-          loading: false,
-          setErr,
-          setLoading,
-        });
-      }
-
-      let networks = [
-        {
-          name: "Ethereum main Network",
-          id: "eth",
-          active: 1,
-          color: "6c62c5",
-        },
-        {
-          name: "Sepolia Test Network",
-          id: "sepolia",
-          active: 0,
-          color: "ff3a58",
-        },
-        {
-          name: "Ethereum main Network",
-          id: "kovan",
-          active: 0,
-          color: "a769ec",
-        },
-        {
-          name: "Binance Smart Chain",
-          id: "bsc",
-          active: 0,
-          color: "29d041",
-        },
-      ];
-      // get user wallet address and private key from seed phrase
-
-      const tokens = [
-        {
-          name: "Ethereum",
-          amount: 0,
-          symbol: "Ethereum",
-          address: "0x0000000000000000000000000000000000000000",
-          network: "eth",
-        },
-      ];
-
-      let wallet = {
-        walletAddress: "encryptedWalletAddress",
-        privateKey: "encryptedPrivateKey",
-      };
-
-      await AsyncStorage.setItem("wallets", JSON.stringify([wallet]));
-      await AsyncStorage.setItem("tokens", JSON.stringify(tokens));
-      await AsyncStorage.setItem("networks", JSON.stringify(networks));
-      await AsyncStorage.setItem("TXhistory", JSON.stringify([]));
-
-      _createUserAccount({
+      await _createUserAccount({
         password,
         confirmPassword,
         setErr,
@@ -117,12 +49,16 @@ const ImportSeed = ({ navigation }) => {
         passwordStrength,
         agreed: true,
         navigation,
-        route: "home",
-        seedPhrase: seedPhrase,
+        route: "",
+        seedPrase: seedPhrase,
       });
+      setLoading(false);
     } catch (error) {
       console.log(error);
-      setErr("An Error Occured");
+      _helperFunc({
+        setErr: setErr,
+        loading: setLoading,
+      });
       // Error saving data
     }
   };
@@ -202,7 +138,9 @@ const ImportSeed = ({ navigation }) => {
           }}
           onPress={() => _storeData()}
         >
-          <Text style={styles.buttonText}>Import</Text>
+          <Text style={styles.buttonText}>
+            {loading ? "Importing..." : "Import"}
+          </Text>
         </TouchableOpacity>
       </View>
     </ReusableCard>

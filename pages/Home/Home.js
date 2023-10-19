@@ -23,7 +23,6 @@ import Collectibles from "../../sections/Collectibles";
 import useHandleScrollFunc from "../../Hooks/handleScroll";
 import QRCodeReceiveToken from "../../components/QRCodeReceiveToken";
 import NameAndNetwork from "../../components/NameAndNetwork";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   _addTokens,
   _createWallet,
@@ -33,9 +32,10 @@ import {
   _getWallets,
   _setNetworks,
   _setWallets,
+  listenForTransactions,
 } from "../../constants/HelperFunctions";
-import { useDispatch, useSelector } from "react-redux";
-import { setMCMessage } from "../../features/StorageAuth/StorageAuth";
+import { useSelector } from "react-redux";
+import { ethers } from "ethers";
 
 const Home = ({ route, navigation }) => {
   const [active, setActive] = useState(1);
@@ -92,32 +92,16 @@ const Home = ({ route, navigation }) => {
     },
   ];
 
-  const data2 = [
-    {
-      name: "1inCH Token",
-      icon: "sym1",
-      amount: "10.059 1INCH",
-    },
-
-    {
-      name: "APY Gover... Token",
-      icon: "sym2",
-      amount: "9,993.32 APY",
-    },
-    {
-      name: "Basic Attention Token",
-      icon: "sym3",
-      amount: "84.444 BAT",
-    },
-  ];
-
   const func = () => {
     setshowAddToken(true);
   };
 
-  const addTokens = () => {
-    _addTokens({ addr: text });
+  const addTokens = async () => {
+    setLoading(true);
+    console.log("ddmkdkk");
+    await _addTokens({ addr: text });
     setshowAddToken(false);
+    setLoading(false);
   };
 
   console.log(text);
@@ -149,7 +133,6 @@ const Home = ({ route, navigation }) => {
   const getTokens = async () => {
     setLoading(true);
     const data3 = await _getTokens();
-    console.log(data3);
     setTokens(JSON.parse(data3));
     setLoading(false);
   };
@@ -168,15 +151,37 @@ const Home = ({ route, navigation }) => {
 
   useEffect(() => {
     getTokens();
-  }, [showAddToken, showPerson]);
+  }, [showAddToken, showPerson, show]);
 
   const [isScrolling, handleScroll] = useHandleScrollFunc();
 
+  const provider = new ethers.JsonRpcProvider(
+    "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
+  );
+
+  // Specify the wallet address you want to listen to
+  const walletAddress = "0x20b55d117bBa28cD7Eeb1687FFeA0882c5a642c5";
+
+  // Listen for new blocks
+  provider.on("block", async (blockNumber) => {
+    // Get the block details
+    const block = await provider.getBlock(blockNumber);
+
+    // Check each transaction in the block
+    for (let transaction of block.transactions) {
+      // Check if the transaction involves the wallet
+      if (
+        transaction.from === walletAddress ||
+        transaction.to === walletAddress
+      ) {
+        console.log("Transaction involving the wallet found:", transaction);
+      }
+    }
+  });
   useEffect(() => {
     console.log("isScrolling");
   }, [isScrolling]);
 
-  console.log(tokens);
   return (
     <View style={[styles.container]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -236,54 +241,71 @@ const Home = ({ route, navigation }) => {
             />
             {active == 1 ? (
               <View>
-                {tokens?.map((val, index) => (
-                  <Pressable
-                    onPress={() =>
-                      navigation.navigate("token-details", {
-                        tokenName: val.name.replace("Token", ""),
-                      })
-                    }
-                    key={index}
+                {loading ? (
+                  <Text
+                    style={{
+                      marginVertical: 20,
+                      fontSize: 16,
+                      color: "white",
+                      textAlign: "center",
+                    }}
                   >
-                    <View style={[styles.f, styles3.token]}>
-                      <View style={[styles.f]}>
-                        <View style={[styles3.border]}>
-                          <Image
-                            source={require(`../../assets/sym1.png`)}
-                            style={{ width: 30, height: 30 }}
-                          />
+                    Loading...
+                  </Text>
+                ) : (
+                  tokens?.map((val, index) => (
+                    <Pressable
+                      onPress={() =>
+                        navigation.navigate("token-details", {
+                          tokenName: val.name.replace("Token", ""),
+                        })
+                      }
+                      key={index}
+                    >
+                      <View style={[styles.f, styles3.token]}>
+                        <View style={[styles.f]}>
+                          <View style={[styles3.border]}>
+                            <Image
+                              source={require(`../../assets/sym1.png`)}
+                              style={{ width: 30, height: 30 }}
+                            />
+                          </View>
+                          <View>
+                            <Text style={[styles3.text, styles3.tokenName]}>
+                              {val.name}
+                            </Text>
+                            <Text
+                              style={([styles3.text], { color: "#948fa7" })}
+                            >
+                              $3,77
+                              <Text
+                                style={{ color: "#57ad7d", fontWeight: "500" }}
+                              >
+                                + 3.22%
+                              </Text>
+                            </Text>
+                          </View>
                         </View>
+
                         <View>
                           <Text style={[styles3.text, styles3.tokenName]}>
-                            {val.name}
-                          </Text>
-                          <Text style={([styles3.text], { color: "#948fa7" })}>
-                            $3,77
-                            <Text
-                              style={{ color: "#57ad7d", fontWeight: "500" }}
-                            >
-                              + 3.22%
-                            </Text>
+                            {val.amount.toString().length >= 18
+                              ? ethers.formatEther(val.amount.toString())
+                              : val.amount}
                           </Text>
                         </View>
                       </View>
-
-                      <View>
-                        <Text style={[styles3.text, styles3.tokenName]}>
-                          {val.amount
-                            .toString()
-                            .split("")
-                            .splice(0, 4)
-                            .join("")}
-                        </Text>
-                      </View>
-                    </View>
-                  </Pressable>
-                ))}
+                    </Pressable>
+                  ))
+                )}
               </View>
             ) : (
-              [1, 2, 3, 4].map((val) => (
-                <Collectibles navigation={navigation} ImageNo={val} />
+              [1, 2, 3, 4].map((val, index) => (
+                <Collectibles
+                  navigation={navigation}
+                  ImageNo={val}
+                  key={index}
+                />
               ))
             )}
             <ButtonGradient

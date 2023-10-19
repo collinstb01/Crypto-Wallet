@@ -85,6 +85,42 @@ const SecondPhase = ({ navigation }) => {
       walletName: "",
     };
 
+    const tokens = [
+      {
+        name: "Ethereum main Network",
+        amount: 0,
+        symbol: "Ethereum",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "eth",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Sepolia Test Network",
+        amount: 0,
+        symbol: "sepolia",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "sepolia",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Smart Chain - Testnet",
+        amount: 0,
+        symbol: "bscTestNet",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "bscTestNet",
+        walletAddress: encryptedWalletAddress,
+      },
+      {
+        name: "Binance Smart Chain",
+        amount: 0,
+        symbol: "bsc",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "bsc",
+        walletAddress: encryptedWalletAddress,
+      },
+    ];
+
+    await AsyncStorage.setItem("tokens", JSON.stringify(tokens));
     await AsyncStorage.setItem("wallets", JSON.stringify([wallet]));
     setGenerating(false);
     console.log("----------generated---------------");

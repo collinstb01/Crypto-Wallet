@@ -9,7 +9,10 @@ import ResuableModalCTN from "../../components/ResuableModalCTN";
 import Constants from "../../constants/styles";
 import ButtonGradientTwo from "../../components/ButtonGradientTwo";
 import TransactionDInDepth from "../../components/TransactionDInDepth";
-import { _getActiveNetwork } from "../../constants/HelperFunctions";
+import {
+  _getActiveNetwork,
+  _getUserTransactions,
+} from "../../constants/HelperFunctions";
 
 const Transactions = ({ route, navigation }) => {
   const [isScrolling, handleScroll] = useHandleScrollFunc();
@@ -50,6 +53,12 @@ const Transactions = ({ route, navigation }) => {
       status: "Failed",
     },
   ];
+
+  useEffect(() => {
+    _getUserTransactions({
+      walletAddress: "0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9",
+    });
+  }, []);
 
   return (
     <View style={[styles.container]}>

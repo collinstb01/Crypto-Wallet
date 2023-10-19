@@ -67,17 +67,7 @@ const Success = ({ navigation }) => {
         chainId: 56,
       },
     ];
-    const tokens = [
-      {
-        name: "Ethereum",
-        amount: 0,
-        symbol: "Ethereum",
-        address: "0x0000000000000000000000000000000000000000",
-        network: "eth",
-      },
-    ];
 
-    await AsyncStorage.setItem("tokens", JSON.stringify(tokens));
     await AsyncStorage.setItem("networks", JSON.stringify(networks));
     await AsyncStorage.setItem("TXhistory", JSON.stringify([]));
   }

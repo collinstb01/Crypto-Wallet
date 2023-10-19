@@ -1,19 +1,15 @@
 {
   "expo": {
-    "name": "CryptoWallet",
-    "slug": "CryptoWallet",
+    "name": "CryptoWalletV2",
+    "slug": "CryptoWalletV2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "your-app-scheme",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -27,8 +23,8 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "plugins": [
-      "expo-router"
-    ]
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
   }
 }
