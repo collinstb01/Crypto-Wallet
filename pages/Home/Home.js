@@ -27,12 +27,14 @@ import NameAndNetwork from "../../components/NameAndNetwork";
 import {
   _addTokens,
   _createWallet,
+  _formatAddr,
   _getActiveNetwork,
   _getNetworks,
   _getTokens,
   _getWallets,
   _setNetworks,
   _setWallets,
+  eventListening,
   listenForTransactions,
 } from "../../constants/HelperFunctions";
 import { useSelector } from "react-redux";
@@ -156,29 +158,8 @@ const Home = ({ route, navigation }) => {
 
   const [isScrolling, handleScroll] = useHandleScrollFunc();
 
-  // const provider = new ethers.JsonRpcProvider(
-  //   "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
-  // );
+  // eventListening();
 
-  // // Specify the wallet address you want to listen to
-  // const walletAddress = "0x20b55d117bBa28cD7Eeb1687FFeA0882c5a642c5";
-
-  // // Listen for new blocks
-  // provider.on("block", async (blockNumber) => {
-  //   // Get the block details
-  //   const block = await provider.getBlock(blockNumber);
-
-  //   // Check each transaction in the block
-  //   for (let transaction of block.transactions) {
-  //     // Check if the transaction involves the wallet
-  //     if (
-  //       transaction.from === walletAddress ||
-  //       transaction.to === walletAddress
-  //     ) {
-  //       console.log("Transaction involving the wallet found:", transaction);
-  //     }
-  //   }
-  // });
   useEffect(() => {
     console.log("isScrolling");
   }, [isScrolling]);
@@ -488,33 +469,45 @@ const AccountMain = ({ func2, func3, activeNetwork, wallets, setShow }) => {
         />
       </View>
       <View>
-        {wallets?.map((val, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => handleChangeAccount({ addr: val.walletAddress })}
-          >
-            <View
-              style={[styles.f, { marginTop: 10, marginBottom: 10 }]}
+        {wallets?.map((val, index) => {
+          const [addr, setAddr] = useState("");
+
+          useEffect(() => {
+            d();
+          }, []);
+
+          async function d() {
+            let d = await _formatAddr({ addr: val.walletAddress });
+            setAddr(d);
+          }
+          return (
+            <TouchableOpacity
               key={index}
+              onPress={() => handleChangeAccount({ addr: val.walletAddress })}
             >
-              <View style={[{ flexDirection: "row", alignItems: "center" }]}>
-                <Image
-                  source={require("../../assets/face1.png")}
-                  style={{ width: 30, height: 30 }}
-                />
-                <Text style={[styles.text, styles3.accountName]}>
-                  {`Account ${index + 1}`}
-                </Text>
+              <View
+                style={[styles.f, { marginTop: 10, marginBottom: 10 }]}
+                key={index}
+              >
+                <View style={[{ flexDirection: "row", alignItems: "center" }]}>
+                  <Image
+                    source={require("../../assets/face1.png")}
+                    style={{ width: 30, height: 30 }}
+                  />
+                  <Text style={[styles.text, styles3.accountName]}>
+                    {`Account ${index + 1} (${addr})`}
+                  </Text>
+                </View>
+                {val.active == 1 && (
+                  <Image
+                    source={require("../../assets/check-select.png")}
+                    style={{ width: 24, height: 24 }}
+                  />
+                )}
               </View>
-              {val.active == 1 && (
-                <Image
-                  source={require("../../assets/check-select.png")}
-                  style={{ width: 24, height: 24 }}
-                />
-              )}
-            </View>
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          );
+        })}
       </View>
       <View style={{ marginTop: 10 }}>
         <ButtonGradientTwo text={"Creat New Account"} func={func2} />

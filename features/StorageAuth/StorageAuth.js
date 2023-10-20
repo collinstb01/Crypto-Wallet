@@ -5,6 +5,10 @@ const StorageAuth = createSlice({
   initialState: {
     seedPhrase: null,
     madeChangesMessage: "",
+    sendToken: {
+      to: "",
+      from: "",
+    },
   },
   reducers: {
     setSeed(state, action) {
@@ -13,9 +17,13 @@ const StorageAuth = createSlice({
     setMCMessage(state, action) {
       state.seedPhrase = action.payload.changes;
     },
+    setSendToken(state, action) {
+      state.sendToken.to = action.payload.to;
+      state.sendToken.from = action.payload.from;
+    },
   },
 });
 
-export const { setPassword, setDate, setSeed, setMCMessage } =
+export const { setPassword, setDate, setSeed, setMCMessage, setSendToken } =
   StorageAuth.actions;
 export default StorageAuth.reducer;

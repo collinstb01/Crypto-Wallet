@@ -48,6 +48,7 @@ const Keyboard = ({ setValueArr, valueArr, navigation }) => {
           func={func}
           route={"func"}
           navigation={navigation}
+          widthSp={200}
         />
       </View>
     </View>

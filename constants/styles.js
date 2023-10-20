@@ -1,6 +1,7 @@
 import { Dimensions, Platform } from "react-native";
 
 const statusBarHeight = Platform.OS === "ios" ? 65 : 20;
+const InputHeight = Platform.OS === "ios" ? 23 : 15;
 
 export default contantStyles = {
   overlay: {
@@ -15,6 +16,7 @@ export default contantStyles = {
   input: {
     borderRadius: 10,
     padding: 15,
+    paddingVertical: InputHeight,
     backgroundColor: "#1c1924",
   },
   inputIcon: { position: "absolute", right: 50, top: 17 },

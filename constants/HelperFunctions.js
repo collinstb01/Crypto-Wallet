@@ -158,7 +158,8 @@ export const _createUserAccount = async ({
         id: "eth",
         active: 1,
         color: "6c62c5",
-        rpcURL: "https://mainnet.infura.io/v3/",
+        rpcURL:
+          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
         chainId: 1,
       },
       {
@@ -241,10 +242,10 @@ export const _createUserAccount = async ({
       },
     ];
 
-    console.log(walletPhraseData.address);
-    let historys = await _getUserTransactions({
-      WalletAddress: walletPhraseData.address,
-    });
+    // console.log(walletPhraseData.address);
+    // let historys = await _getUserTransactions({
+    //   WalletAddress: walletPhraseData.address,
+    // });
     await AsyncStorage.setItem("wallets", JSON.stringify([wallet]));
     await AsyncStorage.setItem("tokens", JSON.stringify(tokens)); //
     await AsyncStorage.setItem("networks", JSON.stringify(networks)); // done
@@ -312,9 +313,9 @@ export const _createWallet = async ({ walletName, setLoading, setError }) => {
     let parseWallets = JSON.parse(wallets);
     let parseTokens = JSON.parse(tokens);
 
-    // if (parseWallets.find((val) => val.name == walletName)) {
-    //   return setError("Name Already exist, use another Account Name.");
-    // }
+    if (parseWallets.find((val) => val.name == walletName)) {
+      return setError("Name Already exist, use another Account Name.");
+    }
 
     let activeWallet = parseWallets.find((val) => val.active == 1);
     activeWallet.active = 0;
@@ -324,7 +325,15 @@ export const _createWallet = async ({ walletName, setLoading, setError }) => {
 
     let decryptMnemonic = await _decryotData({ encryptedData: mnemonic });
 
-    const wallet = HDNodeWallet.fromPhrase(decryptMnemonic);
+    const accountIndex = Math.floor(Math.random() * 2 ** 31); // Random account index
+    const addressIndex = Math.floor(Math.random() * 2 ** 31); // Random address index
+
+    // Construct the path
+    const path = `m/44'/60'/${"0"}/${"0"}/${addressIndex}`;
+
+    // Create a wallet using the seed phrase and unique path
+
+    const wallet = HDNodeWallet.fromPhrase(decryptMnemonic, undefined, path);
 
     const encryptedWalletAddress = await _encryotData({
       data: wallet.address,
@@ -377,14 +386,13 @@ export const _createWallet = async ({ walletName, setLoading, setError }) => {
     ];
 
     let newArr = [...parseTokens, ...tokenArr];
-    parseWallets.push(walletObj);
 
-    console.log(parseTokens);
+    parseWallets.push(walletObj);
     await AsyncStorage.setItem("wallets", JSON.stringify(parseWallets));
     await AsyncStorage.setItem("tokens", JSON.stringify(newArr));
   } catch (error) {
     setLoading(false);
-    // console.log(error);
+    console.log(error);
   }
 };
 
@@ -399,7 +407,6 @@ export const _setWallets = async ({ walletAddress }) => {
     (val) => val.walletAddress == walletAddress
   );
 
-  console.log(active, soonToBeactive);
   active.active = 0;
   soonToBeactive.active = 1;
 
@@ -407,7 +414,7 @@ export const _setWallets = async ({ walletAddress }) => {
   return true;
 };
 
-const _encryotData = async ({ data }) => {
+export const _encryotData = async ({ data }) => {
   const encryptedData = CryptoJS.AES.encrypt(data, encryptionKey).toString();
 
   return encryptedData;
@@ -436,8 +443,6 @@ export const _getTokens = async () => {
   let d = JSON.parse(tokens).filter(
     (val) => val.network == parseActiveNetwork.id
   );
-  console.log(parseActiveWactiveWallet);
-  console.log(d);
 
   let final = d.filter(
     (val) => val.walletAddress == parseActiveWactiveWallet.walletAddress
@@ -446,8 +451,6 @@ export const _getTokens = async () => {
 };
 
 export const _addTokens = async ({ addr }) => {
-  console.log("adding");
-
   const activeNetwork = await _getActiveNetwork();
   const activeWallet = await _getActiveWallet();
   let parseActiveNetwork = JSON.parse(activeNetwork);
@@ -465,18 +468,10 @@ export const _addTokens = async ({ addr }) => {
     contractAddress: addr,
   });
 
-  console.log(parseActiveNetwork.rpcURL);
-
   // let API_KEY = "3d24b57ebfb8442bb83583ed476e0133";
   let provider;
-  if (parseActiveNetwork.rpcURL == "https://mainnet.infura.io/v3/") {
-    provider = new ethers.JsonRpcProvider(
-      "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
-    );
-  } else {
-    console.log("sepolia");
-    provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
-  }
+
+  provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
 
   let userWalletAddress = await _decryotData({
     encryptedData: parseActiveWallet.walletAddress,
@@ -674,18 +669,98 @@ export const _getUserTransactions = async ({ WalletAddress }) => {
   // return JSON.stringify(response.data);
 };
 
-const getBalance = async ({ rpcURL, address }) => {
-  console.log("getting");
+export const _getrecentsAddressSentTo = async () => {
+  const recentsAddressSentTo = await AsyncStorage.getItem("recents");
 
-  const provider = new ethers.JsonRpcProvider(
-    rpcURL == "https://mainnet.infura.io/v3/"
-      ? "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI"
-      : rpcURL
-  );
+  if (!recentsAddressSentTo) {
+    return false;
+  }
+
+  return JSON.stringify(recentsAddressSentTo);
+};
+
+const getBalance = async ({ rpcURL, address }) => {
+  const provider = new ethers.JsonRpcProvider(rpcURL);
   const balance = await provider.getBalance(address);
   const balanceInEth = ethers.formatEther(balance);
-  console.log(balanceInEth);
   return balanceInEth;
+};
+
+export const eventListening = async () => {
+  // Initialize a provider
+
+  const tokens = await AsyncStorage.getItem("tokens");
+  const parseTokens = JSON.parse(tokens);
+
+  const networks = await AsyncStorage.getItem("networks");
+  const parsenetworks = JSON.parse(networks);
+
+  for (let i = 0; i < parseTokens.length; i++) {
+    const element = parseTokens[i];
+    let rpcURL = parsenetworks.find((val) => val.id == element.network);
+    const provider = new ethers.JsonRpcProvider(rpcURL.rpcURL);
+
+    const walletAddress = await _decryotData({
+      encryptedData: element.walletAddress,
+    });
+
+    if (element.address == "0x0000000000000000000000000000000000000000") {
+      // Listen for new blocks
+      provider.on("block", async (blockNumber) => {
+        // Get the block details
+        console.log(`New block mined: ${blockNumber}`);
+
+        // Fetch the block
+        const block = await provider.getBlock(blockNumber);
+
+        console.log(block);
+
+        if (block && block.transactions) {
+          for (const txHash of block.transactions) {
+            const tx = await provider.getTransaction(txHash);
+
+            console.log(tx);
+            // Check if the transaction involves the specified wallet address
+            if (tx.to === walletAddress || tx.from === walletAddress) {
+              console.log(`Transaction: ${txHash}, ${tx}`);
+
+              // let data  = parseTokens
+              //   .filter((val) => val == element.walletAddress)
+              //   .filter((val) => val.network == element.network);
+              // push to TX history
+              // update user balance
+              // Process the transaction data here
+            }
+          }
+        }
+      });
+    } else {
+      // Specify the token contract address and ABI
+      const tokenAddress = element.address;
+      const tokenABI = [
+        "event Transfer(address indexed from, address indexed to, uint256 value)",
+      ]; // Simplified ABI
+
+      // Create a contract instance
+      const contract = new ethers.Contract(tokenAddress, tokenABI, provider);
+
+      // Listen for 'Transfer' events to the wallet
+      contract.on("Transfer", (from, to, amount, event) => {
+        if (to.toLowerCase() === walletAddress.toLowerCase()) {
+          console.log(`Received a transfer of ${amount} tokens from ${from}`);
+        }
+      });
+    }
+  }
+};
+
+export const _formatAddr = async ({ addr }) => {
+  let address = await _decryotData({ encryptedData: addr });
+
+  return ` ${address.split("").splice(0, 4).join("")}.....${address
+    .split("")
+    .splice(34)
+    .join("")}`;
 };
 
 // const ethers = require("ethers");

@@ -39,7 +39,8 @@ const Success = ({ navigation }) => {
         id: "eth",
         active: 1,
         color: "6c62c5",
-        rpcURL: "https://mainnet.infura.io/v3/",
+        rpcURL:
+          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
         chainId: 1,
       },
       {

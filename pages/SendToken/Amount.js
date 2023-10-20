@@ -15,7 +15,7 @@ const Amount = ({ navigation }) => {
   return (
     <ScrollView>
       <ReusableCard navigation={navigation} text={"Amount"} backFunc={backFunc}>
-        <View style={constants.container}>
+        <View style={constants.container2Home}>
           <View style={[constants.flex]}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text

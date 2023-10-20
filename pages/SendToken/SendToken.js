@@ -6,24 +6,37 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReusableCard from "../../components/ReusableCard";
 import Recent from "../../sections/SendToken/Recent";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import constantStyle from "../../constants/styles";
 import Valid from "../../components/Valid";
+import {
+  _decryotData,
+  _getWallets,
+  _setWallets,
+  _encryotData,
+} from "../../constants/HelperFunctions";
+import { Pressable } from "react-native";
 
 const SendToken = ({ navigation }) => {
   const [receiveingAddr, setReceivingAddr] = useState("");
+  const [wallets, setWallets] = useState(null);
+  const [show, setShow] = useState(false);
+  const [activeWallet, setActiveWallet] = useState({
+    WalletAddress: "",
+    WalletName: "",
+  });
   const [valid, setValid] = useState(false);
 
   const backFunc = () => {
-    console.log("go");
     navigation.goBack();
   };
-  console.log(valid);
-  const handleChange = (e) => {
-    setReceivingAddr(e);
+
+  const handleChange = async (e) => {
+    let encrypt = await _encryotData({ data: e });
+    setReceivingAddr(encrypt);
 
     if (!/^(0x)?[0-9a-fA-F]{40}$/.test(e)) {
       // Check if the address is 40 hexadecimal characters with or without the "0x" prefix.
@@ -39,31 +52,88 @@ const SendToken = ({ navigation }) => {
     return setValid(true);
   };
 
+  const getUserWallets = async () => {
+    const data = await _getWallets();
+    setWallets(JSON.parse(data));
+
+    const active = JSON.parse(data).find((val) => val.active == 1);
+    let address = await _decryotData({ encryptedData: active.walletAddress });
+
+    setActiveWallet((prev) => ({
+      ...prev,
+      WalletAddress: `${address.split("").splice(0, 4).join("")}.....${address
+        .split("")
+        .splice(34)
+        .join("")}`,
+      WalletName: active.walletName,
+    }));
+  };
+
+  const handleSetShow = () => {
+    setShow((e) => !e);
+  };
+
+  const handleChangeActive = async ({ walletAddress }) => {
+    await _setWallets({ walletAddress: walletAddress });
+    getUserWallets();
+  };
+
+  useEffect(() => {
+    getUserWallets();
+  }, []);
+
+  console.log(receiveingAddr);
   return (
     <ReusableCard navigation={navigation} text={"Send To"} backFunc={backFunc}>
       <View style={styles.container}>
-        <View style={{ marginBottom: 20 }}>
-          <TextInput
-            // placeholder="Account Name"
-            style={[styles.input]}
-            placeholderTextColor={"#a49eb9"}
-            editable={false}
-          />
-          <View style={{ position: "absolute", top: 5, left: 15 }}>
-            <Text style={{ color: "#858096", marginBottom: 5 }}>From</Text>
-            <Valid />
+        <Pressable onPress={handleSetShow}>
+          <View style={{ marginBottom: 20 }}>
+            <TextInput
+              // placeholder="Account Name"
+              style={[styles.input, constantStyle.input]}
+              placeholderTextColor={"#a49eb9"}
+              editable={false}
+            />
+            <View style={{ position: "absolute", top: 5, left: 15 }}>
+              <Text style={{ color: "#858096", marginBottom: 5 }}>From</Text>
+              <Valid addressTwo={activeWallet.WalletAddress} />
+            </View>
+            <Ionicons
+              name="chevron-down"
+              size={20}
+              color="#948fa8"
+              style={constantStyle.inputIcon}
+            />
           </View>
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color="#948fa8"
-            style={constantStyle.inputIcon}
-          />
-        </View>
+        </Pressable>
+        {show &&
+          wallets
+            // ?.filter((val) => val.active == 0)
+            ?.map((val, index) => (
+              <Pressable
+                key={index}
+                onPress={() =>
+                  handleChangeActive({ walletAddress: val.walletAddress })
+                }
+              >
+                <View style={{ marginBottom: 20 }} key={index}>
+                  <TextInput
+                    // placeholder="Account Name"
+                    style={[styles.input, constantStyle.input]}
+                    placeholderTextColor={"#a49eb9"}
+                    editable={false}
+                  />
+                  <View style={{ position: "absolute", top: 5, left: 15 }}>
+                    <Text style={{ color: "#858096", marginBottom: 5 }}></Text>
+                    <Valid address={val.walletAddress} />
+                  </View>
+                </View>
+              </Pressable>
+            ))}
         <View>
           <TextInput
             placeholder={valid ? "" : "Search, public address (0x), or ENS"}
-            style={[styles.input]}
+            style={[styles.input, constantStyle.input]}
             placeholderTextColor={"#a49eb9"}
             onChangeText={(e) => handleChange(e)}
             value={valid ? "" : receiveingAddr}
@@ -72,7 +142,7 @@ const SendToken = ({ navigation }) => {
           {valid && (
             <View style={{ position: "absolute", top: 5, left: 15 }}>
               <Text style={{ color: "#858096", marginBottom: 5 }}>To</Text>
-              <Valid />
+              <Valid address={receiveingAddr} />
             </View>
           )}
           {!receiveingAddr && (
@@ -102,7 +172,12 @@ const SendToken = ({ navigation }) => {
             <Text style={styles.txBtwAcc}>Transfer Between My Accounts</Text>
           </>
         )}
-        <Recent valid={valid} navigation={navigation} />
+        <Recent
+          valid={valid}
+          navigation={navigation}
+          to={receiveingAddr}
+          from={activeWallet.WalletAddress}
+        />
       </View>
     </ReusableCard>
   );
@@ -126,9 +201,6 @@ const styles = StyleSheet.create({
     width: 168,
   },
   input: {
-    borderRadius: 10,
-    padding: 15,
-    backgroundColor: "#1c1924",
     color: "white",
   },
   container: {

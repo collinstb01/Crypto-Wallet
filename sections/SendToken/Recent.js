@@ -1,11 +1,34 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ButtonGradient from "../../components/ButtonGradient";
+import { _getrecentsAddressSentTo } from "../../constants/HelperFunctions";
+import Empty from "../../components/Empty";
+import { useDispatch } from "react-redux";
+import { setSendToken } from "../../features/StorageAuth/StorageAuth";
 
-const Recent = ({ navigation, valid }) => {
+const Recent = ({ navigation, valid, to, from }) => {
+  const [recents, setRecents] = useState(null);
+
+  const dispatch = useDispatch();
+
   const func = () => {
     navigation.navigate("send-token/amount");
+    dispatch(setSendToken({ to, from }));
   };
+
+  const getrecentsAddressSentTo = async () => {
+    const data = await _getrecentsAddressSentTo();
+    if (data == false) {
+      return setRecents(false);
+    }
+    setRecents(JSON.parse(data));
+  };
+  useEffect(() => {
+    getrecentsAddressSentTo();
+  }, []);
+
+  console.log(recents);
+
   return (
     <View
       style={[
@@ -29,27 +52,39 @@ const Recent = ({ navigation, valid }) => {
       >
         {valid ? "Click Next to Proceed" : "Recent"}
       </Text>
-      {!valid && (
-        <View>
-          {[1, 2, 3].map((val, index) => (
-            <View style={{ flexDirection: "row", marginBottom: 20 }}>
-              <Image
-                source={require("../../assets/face1.png")}
-                style={styles.img}
-              />
-              <View>
-                <Text style={[styles.text1, { color: "white" }]}>Beexay</Text>
-                <Text style={[styles.text2, { color: "white" }]}>
-                  0x3Dc6...Dxe2
-                </Text>
-              </View>
+      {!valid &&
+        (recents == false ? (
+          <Empty text={"No Recent Data Found"} />
+        ) : (
+          <>
+            <View>
+              {[1, 2, 3].map((val, index) => (
+                <View style={{ flexDirection: "row", marginBottom: 20 }}>
+                  <Image
+                    source={require("../../assets/face1.png")}
+                    style={styles.img}
+                  />
+                  <View>
+                    <Text style={[styles.text1, { color: "white" }]}>
+                      Beexay
+                    </Text>
+                    <Text style={[styles.text2, { color: "white" }]}>
+                      0x3Dc6...Dxe2
+                    </Text>
+                  </View>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
-      )}
+          </>
+        ))}
       {valid && (
         <View style={{ marginTop: 50 }}>
-          <ButtonGradient text={"Next"} func={func} route={"func"} />
+          <ButtonGradient
+            text={"Next"}
+            func={func}
+            route={"func"}
+            widthSp={200}
+          />
         </View>
       )}
     </View>

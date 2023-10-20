@@ -1,12 +1,25 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { _formatAddr } from "../constants/HelperFunctions";
 
-const Valid = () => {
+const Valid = ({ address, addressTwo }) => {
+  const [addr, setAddr] = useState("");
+
+  const getAddress = async () => {
+    const d = await _formatAddr({ addr: address });
+    setAddr(d);
+  };
+  useEffect(() => {
+    getAddress();
+  }, []);
+
+  console.log(addressTwo);
+
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <Image source={require("../assets/face1.png")} style={styles.img} />
       <Text style={[styles.text2, { color: "white", fontWeight: "500" }]}>
-        0x3Dc6...Dxe2
+        {addressTwo ? addressTwo : addr}
       </Text>
     </View>
   );
