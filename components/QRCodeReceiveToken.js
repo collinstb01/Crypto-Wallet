@@ -1,12 +1,14 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 // import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import ButtonGradient from "./ButtonGradient";
 import ButtonGradientTwo from "./ButtonGradientTwo";
+import { _decryotData } from "../constants/HelperFunctions";
 
-const QRCodeReceiveToken = ({ navigation, setText, text }) => {
+const QRCodeReceiveToken = ({ navigation, setText, text, activeWallet }) => {
   const [copied, setCopied] = useState("");
+  const [ActiveWallet, setActiveWallet] = useState("");
 
   const copyToClipBoard = () => {
     // console.log(text);
@@ -19,6 +21,17 @@ const QRCodeReceiveToken = ({ navigation, setText, text }) => {
     // }, 4000);
   };
 
+  async function decrypt() {
+    const walletAddress = await _decryotData({
+      encryptedData: activeWallet.walletAddress,
+    });
+    setActiveWallet(walletAddress);
+  }
+  useEffect(() => {
+    decrypt();
+  }, [activeWallet]);
+
+  console.log(ActiveWallet);
   return (
     <>
       <View

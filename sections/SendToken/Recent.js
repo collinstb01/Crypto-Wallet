@@ -1,7 +1,10 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import ButtonGradient from "../../components/ButtonGradient";
-import { _getrecentsAddressSentTo } from "../../constants/HelperFunctions";
+import {
+  _encryotData,
+  _getrecentsAddressSentTo,
+} from "../../constants/HelperFunctions";
 import Empty from "../../components/Empty";
 import { useDispatch } from "react-redux";
 import { setSendToken } from "../../features/StorageAuth/StorageAuth";
@@ -11,9 +14,11 @@ const Recent = ({ navigation, valid, to, from }) => {
 
   const dispatch = useDispatch();
 
-  const func = () => {
+  const func = async () => {
     navigation.navigate("send-token/amount");
-    dispatch(setSendToken({ to, from }));
+    const _from = await _encryotData({ data: from });
+
+    dispatch(setSendToken({ to, from: _from }));
   };
 
   const getrecentsAddressSentTo = async () => {
@@ -26,8 +31,6 @@ const Recent = ({ navigation, valid, to, from }) => {
   useEffect(() => {
     getrecentsAddressSentTo();
   }, []);
-
-  console.log(recents);
 
   return (
     <View

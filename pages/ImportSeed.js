@@ -39,6 +39,7 @@ const ImportSeed = ({ navigation }) => {
 
   const _storeData = async () => {
     try {
+      return navigation.navigate("home");
       await _createUserAccount({
         password,
         confirmPassword,

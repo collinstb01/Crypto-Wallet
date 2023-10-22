@@ -8,7 +8,7 @@ import {
 import React, { useState } from "react";
 import ButtonGradient from "./ButtonGradient";
 
-const Keyboard = ({ setValueArr, valueArr, navigation }) => {
+const Keyboard = ({ setValueArr, valueArr, navigation, func }) => {
   console.log(valueArr);
 
   const handleSetValue = ({ no, i }) => {
@@ -24,13 +24,10 @@ const Keyboard = ({ setValueArr, valueArr, navigation }) => {
     setValueArr((val) => [...val, no]);
   };
 
-  function func() {
-    navigation.navigate("send-token/confirm");
-  }
   return (
     <View style={styles.ctn}>
       {[1, 2, 3, 4, 5, 6, 7, 8, 9, ".", 0, "X"].map((no, i) => (
-        <TouchableOpacity onPress={() => handleSetValue({ no, i })}>
+        <TouchableOpacity onPress={() => handleSetValue({ no, i })} key={i}>
           <View key={i} style={styles.value}>
             <Text style={styles.text}>{no}</Text>
           </View>

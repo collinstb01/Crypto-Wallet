@@ -29,6 +29,7 @@ import {
   _createWallet,
   _formatAddr,
   _getActiveNetwork,
+  _getActiveWallet,
   _getNetworks,
   _getTokens,
   _getWallets,
@@ -52,6 +53,7 @@ const Home = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [networks, setNetworks] = useState(null);
   const [tokens, setTokens] = useState(null);
+  const [activeWallet, setActiveWallet] = useState(null);
 
   const [activeCTN, setActiveCTN] = useState(1);
 
@@ -121,6 +123,14 @@ const Home = ({ route, navigation }) => {
     setWallets(JSON.parse(data));
     setLoading(false);
   };
+
+  const getActiveWalets = async () => {
+    setLoading(true);
+    const data = await _getActiveWallet();
+    setActiveWallet(JSON.parse(data));
+    setLoading(false);
+  };
+
   const getActiveNetwork = async () => {
     setLoading(true);
     const data2 = await _getActiveNetwork();
@@ -151,6 +161,10 @@ const Home = ({ route, navigation }) => {
   useEffect(() => {
     getNetworks();
   }, [showPerson]);
+
+  useEffect(() => {
+    getActiveWalets();
+  }, []);
 
   useEffect(() => {
     getTokens();
@@ -356,7 +370,11 @@ const Home = ({ route, navigation }) => {
       )}
       {showSendEth && (
         <ResuableModalCTN text={"Receive"} setShow={setshowSendEth}>
-          <QRCodeReceiveToken navigation={navigation} text={text} />
+          <QRCodeReceiveToken
+            navigation={navigation}
+            text={text}
+            activeWallet={activeWallet}
+          />
         </ResuableModalCTN>
       )}
     </View>

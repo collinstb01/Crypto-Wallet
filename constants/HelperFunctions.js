@@ -763,6 +763,237 @@ export const _formatAddr = async ({ addr }) => {
     .join("")}`;
 };
 
+export const _getTokenPrice = async () => {
+  const contractAddress = "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"; // Replace with your contract address
+
+  // Fetch current token price in USD from CoinGecko API
+  fetch(
+    `https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${contractAddress}&vs_currencies=usd`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      const tokenPriceInUsd = data[contractAddress].usd;
+
+      // Convert 1 token to USD
+      const tokenAmount = 1; // Replace with the amount of tokens you want to convert
+      const usdAmount = tokenAmount * tokenPriceInUsd;
+
+      console.log(
+        `1 token with contract address ${contractAddress} is worth ${usdAmount} USD`
+      );
+    });
+};
+
+export const _getNativePrice = async () => {
+  fetch(
+    "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      const ethPriceInUsd = data.ethereum.usd;
+
+      // Convert 1 ETH to USD
+      const ethAmount = ethers.utils.parseEther("1");
+      const usdAmount = ethAmount.mul(ethPriceInUsd);
+
+      console.log(
+        `1 ETH is worth ${ethers.utils.formatUnits(usdAmount, "ether")} USD`
+      );
+    });
+};
+
+export const _getGas = async ({ address, amount, recipient }) => {
+  try {
+    const activeNetwork = await _getActiveNetwork();
+    let parseActiveNetwork = JSON.parse(activeNetwork);
+
+    const provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL); // Replace 'rinkeby' with the name of the network you want to connect to
+
+    let _recipient = await _decryotData({ encryptedData: recipient });
+    // Estimate the gas price
+    const gasPrice = await provider.getBlock("latest");
+
+    // Estimate the gas amount
+    const gasLEstimate = await provider.estimateGas({
+      to: _recipient,
+      value: ethers.parseEther("0.5"),
+    });
+
+    return JSON.stringify({
+      gasPrice: Number(gasPrice.baseFeePerGas),
+      gasLEstimate: Number(gasLEstimate),
+    });
+  } catch (error) {
+    console.log("Error occured at Get Gas", error);
+  }
+};
+
+export const transferNativeTokens = async ({
+  gasPrice,
+  gasLEstimate,
+  recipient,
+  amount,
+}) => {
+  try {
+    const walletActive = await _getActiveWallet();
+    const parseWallet = JSON.parse(walletActive);
+    const decryptPrivateKey = await _decryotData({
+      encryptedData: parseWallet.privateKey,
+    });
+
+    const activeNetwork = await _getActiveNetwork();
+    let parseActiveNetwork = JSON.parse(activeNetwork);
+
+    const provider = ethers.JsonRpcProvider(parseActiveNetwork.rpcURL); // Replace 'rinkeby' with the name of the network you want to connect to
+
+    // The address of the recipient
+    const recipient = "recipient_address";
+
+    // Create a wallet instance
+    const wallet = new ethers.Wallet(decryptPrivateKey, provider);
+
+    // Specify the transaction details
+    const transaction = {
+      to: recipient,
+      value: ethers.utils.parseEther(amount), // Send 1 Ether
+      gasPrice: gasPrice,
+      gasLimit: gasLEstimate,
+    };
+
+    // Send the transaction
+    const tx = await wallet.sendTransaction(transaction);
+
+    let TXhistoryObj = {
+      userWalletAddress: parseWallet.walletAddress,
+      network: parseActiveNetwork.id,
+      contractAddress,
+      status: "pending",
+      from: tx.from,
+      to: tx.to,
+      value: tx.value,
+      gasUsed: "",
+      gasLimit: tx.gasLimit,
+      block: tx.block,
+      timeStamp: tx.timeStamp,
+      nonce: tx.nonce,
+    };
+    await AsyncStorage.setItem("TXhistory", JSON.stringify([TXhistoryObj]));
+    console.log(`Transaction hash: ${tx.hash}`);
+    await confirmTX({ transactionHash: tx.hash });
+  } catch (error) {
+    console.log("An error occured at transfer native token", error);
+  }
+};
+
+export const transferERC20Tokens = async ({
+  amount,
+  gasLEstimate,
+  gasPrice,
+  contractAddress,
+  recipient,
+}) => {
+  try {
+    // Connect to the network
+    const activeNetwork = await _getActiveNetwork();
+    let parseActiveNetwork = JSON.parse(activeNetwork);
+
+    const provider = ethers.JsonRpcProvider(parseActiveNetwork.rpcURL); // Replace 'rinkeby' with the name of the network you want to connect to
+
+    // The private key of the sender
+    const walletActive = await _getActiveWallet();
+    const parseWallet = JSON.parse(walletActive);
+    const decryptPrivateKey = await _decryotData({
+      encryptedData: parseWallet.privateKey,
+    });
+
+    // The ABI of the ERC-20 token
+    const abi = [
+      // Transfer function
+      "function transfer(address recipient, uint256 amount) public returns (bool)",
+      // Other functions go here
+    ];
+
+    // The amount of tokens to send (in the smallest unit of the token)
+    const amount = ethers.utils.parseUnits(amount, 18); // Replace 'tokenDecimals' with the number of decimals the token uses
+    const wallet = new ethers.Wallet(decryptPrivateKey, provider);
+    const contract = new ethers.Contract(contractAddress, abi, wallet);
+
+    // Send the transaction
+    const tx = await contract.transfer(recipient, amount, {
+      gasPrice: gasPrice,
+      gasLimit: gasLEstimate,
+    });
+
+    console.log(`Transaction hash: ${tx.hash}`);
+
+    let TXhistoryObj = {
+      userWalletAddress: parseWallet.walletAddress,
+      network: parseActiveNetwork.id,
+      contractAddress,
+      status: "pending",
+      from: tx.from,
+      to: tx.to,
+      value: tx.value,
+      gasUsed: "",
+      gasLimit: tx.gasLimit,
+      block: tx.block,
+      timeStamp: tx.timeStamp,
+      nonce: tx.nonce,
+    };
+
+    await AsyncStorage.setItem("TXhistory", JSON.stringify([TXhistoryObj]));
+    await confirmTX({
+      transactionHash: tx.hash,
+      network,
+      userWalletAddress,
+      contractAddress,
+    });
+  } catch (error) {
+    console.log("An error occured at transfer ERC 20 tokens", error);
+  }
+};
+
+export const confirmTX = async ({
+  transactionHash,
+  network,
+  userWalletAddress,
+  contractAddress,
+}) => {
+  const confirms = 6; // Number of confirmations required
+  const timeout = 120000; // Timeout in milliseconds
+
+  try {
+    const receipt = await provider.waitForTransaction(
+      transactionHash,
+      confirms,
+      timeout
+    );
+    const TXhistory = await AsyncStorage.getItem("TXhistory");
+    const parseTXhistory = JSON.parse(TXhistory);
+    let realTX = parseTXhistory
+      .filter((val) => val.userWalletAddress == userWalletAddress)
+      .filter((val) => val.network == network)
+      .filter((val) => val.contractAddress == contractAddress);
+
+    console.log(realTX);
+
+    if (receipt.status === 1) {
+      console.log("Transaction confirmed:", receipt);
+      // Transaction succeeded
+      // filering
+    } else if (receipt.status === 0) {
+      console.error("Transaction failed:", receipt);
+      // Transaction failed
+    } else {
+      console.log("Transaction is still pending:", receipt);
+      // Transaction is still pending
+    }
+  } catch (error) {
+    console.error("Error waiting for transaction:", error);
+    // then change to false
+  }
+};
+
 // const ethers = require("ethers");
 
 // const provider = new ethers.providers.WebSocketProvider("ws://localhost:8546");

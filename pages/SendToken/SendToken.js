@@ -27,6 +27,7 @@ const SendToken = ({ navigation }) => {
   const [activeWallet, setActiveWallet] = useState({
     WalletAddress: "",
     WalletName: "",
+    WalletAddressNoFormat: "",
   });
   const [valid, setValid] = useState(false);
 
@@ -65,6 +66,7 @@ const SendToken = ({ navigation }) => {
         .split("")
         .splice(34)
         .join("")}`,
+      WalletAddressNoFormat: address,
       WalletName: active.walletName,
     }));
   };
@@ -82,7 +84,6 @@ const SendToken = ({ navigation }) => {
     getUserWallets();
   }, []);
 
-  console.log(receiveingAddr);
   return (
     <ReusableCard navigation={navigation} text={"Send To"} backFunc={backFunc}>
       <View style={styles.container}>
@@ -176,7 +177,7 @@ const SendToken = ({ navigation }) => {
           valid={valid}
           navigation={navigation}
           to={receiveingAddr}
-          from={activeWallet.WalletAddress}
+          from={activeWallet.WalletAddressNoFormat}
         />
       </View>
     </ReusableCard>

@@ -26,7 +26,7 @@ export default contantStyles = {
     marginRight: 30,
     flex: 1,
     paddingTop: statusBarHeight,
-    backgroundColor: "#09080d",
+    // backgroundColor: "#09080d",
   },
   container2Home: {
     flex: 1,

@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReusableCard from "../../components/ReusableCard";
 import constants from "../../constants/styles";
 import Valid from "../../components/Valid";
@@ -15,10 +15,26 @@ import ButtonGradient from "../../components/ButtonGradient";
 import ResuableModalCTN from "../../components/ResuableModalCTN";
 import { FontAwesome } from "@expo/vector-icons";
 import TabstwoContents from "../../components/TabstwoContents";
+import { useSelector } from "react-redux";
+import { _getGas } from "../../constants/HelperFunctions";
+import { ethers } from "ethers";
 
 const Confrim = ({ navigation }) => {
+  const { sendToken } = useSelector((state) => state.storage);
   const [show, setShow] = useState(false);
   const [active, setActive] = useState(1);
+
+  const [address, setAddress] = useState("");
+  const [amount, setamount] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [totalAmount, settotalAmount] = useState("");
+  const [gasData, setGasData] = useState({
+    gasPrice: "",
+    gasLEstimate: "",
+    gasInEth: "",
+    gasSlow: "",
+    gasFast: "",
+  });
 
   const backFunc = () => {
     navigation.goBack();
@@ -27,6 +43,37 @@ const Confrim = ({ navigation }) => {
   function func() {
     navigation.navigate("token-details", { tokenName: "1INCH" });
   }
+
+  const getGas = async () => {
+    const gas = await _getGas({
+      address: sendToken.tokenAddress,
+      amount: sendToken.amount,
+      recipient: sendToken.to,
+    });
+    const parseGas = JSON.parse(gas);
+    let totalGasInEth = parseGas.gasLEstimate * parseGas.gasPrice;
+
+    setGasData((prev) => ({
+      ...prev,
+      gasPrice: parseGas.gasPrice,
+      gasLEstimate: parseGas.gasLEstimate,
+      gasInEth: ethers.formatEther(totalGasInEth),
+    }));
+
+    // let totalEth = Number(sendToken.amount) + Number(totalGasInEth);
+
+    // settotalAmount(ethers.formatUnits(totalEth));
+  };
+  useEffect(() => {
+    // getGasFee
+    // getGasLimit
+    if (sendToken) {
+      setAddress(sendToken.tokenAddress);
+      setamount(sendToken.amount);
+      setRecipient(sendToken.to);
+      getGas();
+    }
+  }, [sendToken]);
 
   return (
     <>
@@ -41,7 +88,9 @@ const Confrim = ({ navigation }) => {
           <View style={{ minHeight: Dimensions.get("window").height - 120 }}>
             <View style={constants.container}>
               <View style={styles.texts}>
-                <Text style={styles.text1}>0.125 1INCH</Text>
+                <Text style={styles.text1}>
+                  {sendToken.amount} {sendToken.symbol.toUpperCase()}
+                </Text>
                 <Text style={styles.text2}>Amount</Text>
               </View>
 
@@ -56,7 +105,7 @@ const Confrim = ({ navigation }) => {
                   <Text style={{ color: "#858096", marginBottom: 5 }}>
                     From
                   </Text>
-                  <Valid />
+                  <Valid address={sendToken.from} />
                 </View>
               </View>
               <View style={{ marginBottom: 20 }}>
@@ -68,13 +117,15 @@ const Confrim = ({ navigation }) => {
                 />
                 <View style={{ position: "absolute", top: 5, left: 15 }}>
                   <Text style={{ color: "#858096", marginBottom: 5 }}>To</Text>
-                  <Valid />
+                  <Valid address={sendToken.to} />
                 </View>
               </View>
               <View style={styles.box}>
                 <View style={styles.ctn}>
                   <Text style={[styles.amount]}>Amount</Text>
-                  <Text style={[styles.amount]}>0.125 !INCH</Text>
+                  <Text style={[styles.amount]}>
+                    {sendToken.amount} {sendToken.symbol.toUpperCase()}
+                  </Text>
                 </View>
                 <View style={styles.ctn}>
                   <Pressable onPress={() => setShow(true)}>
@@ -82,18 +133,27 @@ const Confrim = ({ navigation }) => {
                       Network Fee <Text style={styles.edit}>Edit</Text>
                     </Text>
                   </Pressable>
-                  <Text style={[styles.amount]}>0.125 !INCH</Text>
+                  <Text style={[styles.amount]}>
+                    {`${gasData.gasInEth.toString()} ${sendToken.symbol.toUpperCase()}`}
+                  </Text>
                 </View>
                 <View style={styles.ctn}>
                   <Text style={[styles.toalAmount]}>Total Amount</Text>
                   <View>
-                    <Text style={[styles.toalAmount]}>0.125 !INCH</Text>
+                    <Text style={[styles.toalAmount]}>
+                      {totalAmount} {sendToken.symbol.toUpperCase()}
+                    </Text>
                     <Text style={[styles.amount]}>$0.558432</Text>
                   </View>
                 </View>
               </View>
             </View>
-            <ButtonGradient text={"Send"} func={func} route={"func"} />
+            <ButtonGradient
+              text={"Send"}
+              func={func}
+              route={"func"}
+              widthSp={150}
+            />
           </View>
         </ReusableCard>
       </ScrollView>
