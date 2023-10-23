@@ -31,7 +31,6 @@ const QRCodeReceiveToken = ({ navigation, setText, text, activeWallet }) => {
     decrypt();
   }, [activeWallet]);
 
-  console.log(ActiveWallet);
   return (
     <>
       <View
@@ -53,9 +52,7 @@ const QRCodeReceiveToken = ({ navigation, setText, text, activeWallet }) => {
         </View>
 
         <View>
-          <Text style={styles.textAddress}>
-            0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9
-          </Text>
+          <Text style={styles.textAddress}>{ActiveWallet}</Text>
           <Pressable onPress={() => copyToClipBoard()}>
             <View
               style={{

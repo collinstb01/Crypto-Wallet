@@ -167,7 +167,8 @@ export const _createUserAccount = async ({
         id: "sepolia",
         active: 0,
         color: "ff3a58",
-        rpcURL: "https://eth-sepolia.g.alchemy.com/v2/demo",
+        rpcURL:
+          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
         chainId: 11155111,
       },
       {
@@ -661,12 +662,10 @@ async function getContractAbi({ contractAddress }) {
   }
 }
 
-export const _getUserTransactions = async ({ WalletAddress }) => {
-  // let response = await axios.get(
-  //   `https://api.etherscan.io/api?module=account&action=txlist&address=${"0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9"}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${ETHERSCAN_API_KEY}`
-  // );
-  // console.log(response.data);
-  // return JSON.stringify(response.data);
+export const _getUserTransactions = async () => {
+  const data = await AsyncStorage.getItem("TXhistory");
+
+  return data;
 };
 
 export const _getrecentsAddressSentTo = async () => {
@@ -754,8 +753,14 @@ export const eventListening = async () => {
   }
 };
 
-export const _formatAddr = async ({ addr }) => {
-  let address = await _decryotData({ encryptedData: addr });
+export const _formatAddr = async ({ addr, notEncrypted }) => {
+  let address;
+
+  if (notEncrypted == true) {
+    address = addr;
+  } else {
+    address = await _decryotData({ encryptedData: addr });
+  }
 
   return ` ${address.split("").splice(0, 4).join("")}.....${address
     .split("")
@@ -828,128 +833,99 @@ export const _getGas = async ({ address, amount, recipient }) => {
   }
 };
 
-export const transferNativeTokens = async ({
+export const transferNativeTokensOrERC20 = async ({
   gasPrice,
   gasLEstimate,
   recipient,
   amount,
-}) => {
-  try {
-    const walletActive = await _getActiveWallet();
-    const parseWallet = JSON.parse(walletActive);
-    const decryptPrivateKey = await _decryotData({
-      encryptedData: parseWallet.privateKey,
-    });
-
-    const activeNetwork = await _getActiveNetwork();
-    let parseActiveNetwork = JSON.parse(activeNetwork);
-
-    const provider = ethers.JsonRpcProvider(parseActiveNetwork.rpcURL); // Replace 'rinkeby' with the name of the network you want to connect to
-
-    // The address of the recipient
-    const recipient = "recipient_address";
-
-    // Create a wallet instance
-    const wallet = new ethers.Wallet(decryptPrivateKey, provider);
-
-    // Specify the transaction details
-    const transaction = {
-      to: recipient,
-      value: ethers.utils.parseEther(amount), // Send 1 Ether
-      gasPrice: gasPrice,
-      gasLimit: gasLEstimate,
-    };
-
-    // Send the transaction
-    const tx = await wallet.sendTransaction(transaction);
-
-    let TXhistoryObj = {
-      userWalletAddress: parseWallet.walletAddress,
-      network: parseActiveNetwork.id,
-      contractAddress,
-      status: "pending",
-      from: tx.from,
-      to: tx.to,
-      value: tx.value,
-      gasUsed: "",
-      gasLimit: tx.gasLimit,
-      block: tx.block,
-      timeStamp: tx.timeStamp,
-      nonce: tx.nonce,
-    };
-    await AsyncStorage.setItem("TXhistory", JSON.stringify([TXhistoryObj]));
-    console.log(`Transaction hash: ${tx.hash}`);
-    await confirmTX({ transactionHash: tx.hash });
-  } catch (error) {
-    console.log("An error occured at transfer native token", error);
-  }
-};
-
-export const transferERC20Tokens = async ({
-  amount,
-  gasLEstimate,
-  gasPrice,
   contractAddress,
-  recipient,
+  symbol,
 }) => {
   try {
-    // Connect to the network
-    const activeNetwork = await _getActiveNetwork();
-    let parseActiveNetwork = JSON.parse(activeNetwork);
-
-    const provider = ethers.JsonRpcProvider(parseActiveNetwork.rpcURL); // Replace 'rinkeby' with the name of the network you want to connect to
-
-    // The private key of the sender
+    const _recipient = await _decryotData({ encryptedData: recipient });
     const walletActive = await _getActiveWallet();
     const parseWallet = JSON.parse(walletActive);
-    const decryptPrivateKey = await _decryotData({
-      encryptedData: parseWallet.privateKey,
-    });
 
-    // The ABI of the ERC-20 token
-    const abi = [
-      // Transfer function
-      "function transfer(address recipient, uint256 amount) public returns (bool)",
-      // Other functions go here
-    ];
+    const activeNetwork = await _getActiveNetwork();
+    let parseActiveNetwork = JSON.parse(activeNetwork);
+    const provider = new ethers.JsonRpcProvider(
+      "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc"
+    );
 
-    // The amount of tokens to send (in the smallest unit of the token)
-    const amount = ethers.utils.parseUnits(amount, 18); // Replace 'tokenDecimals' with the number of decimals the token uses
-    const wallet = new ethers.Wallet(decryptPrivateKey, provider);
-    const contract = new ethers.Contract(contractAddress, abi, wallet);
+    let tx;
+    if (
+      sendToken.tokenAddress == "0x0000000000000000000000000000000000000000"
+    ) {
+      const decryptPrivateKey = await _decryotData({
+        encryptedData: parseWallet.privateKey,
+      });
 
-    // Send the transaction
-    const tx = await contract.transfer(recipient, amount, {
-      gasPrice: gasPrice,
-      gasLimit: gasLEstimate,
-    });
+      // Create a wallet instance
+      const wallet = new ethers.Wallet(decryptPrivateKey, provider);
+      const transaction = {
+        to: _recipient,
+        value: ethers.parseEther("0.01"), // Send 1 Ether
+      };
 
-    console.log(`Transaction hash: ${tx.hash}`);
+      // Send the transaction
+      tx = await wallet.sendTransaction(transaction);
+    } else {
+      const decryptPrivateKey = await _decryotData({
+        encryptedData: parseWallet.privateKey,
+      });
+
+      const abi = [
+        // Transfer function
+        "function transfer(address recipient, uint256 amount) public returns (bool)",
+        // Other functions go here
+      ];
+
+      // The amount of tokens to send (in the smallest unit of the token)
+      const amount = ethers.utils.parseUnits(amount, 18); // Replace 'tokenDecimals' with the number of decimals the token uses
+      const wallet = new ethers.Wallet(decryptPrivateKey, provider);
+      const contract = new ethers.Contract(contractAddress, abi, wallet);
+
+      // Send the transaction
+      tx = await contract.transfer(_recipient, amount, {
+        gasPrice: gasPrice,
+        gasLimit: gasLEstimate,
+      });
+    }
+
+    console.log("tx....", tx);
 
     let TXhistoryObj = {
       userWalletAddress: parseWallet.walletAddress,
       network: parseActiveNetwork.id,
       contractAddress,
       status: "pending",
+      statusNo: null,
       from: tx.from,
       to: tx.to,
-      value: tx.value,
+      value: Number(tx.value),
       gasUsed: "",
-      gasLimit: tx.gasLimit,
-      block: tx.block,
-      timeStamp: tx.timeStamp,
-      nonce: tx.nonce,
+      gasLimit: Number(tx.gasLimit),
+      gasPrice: null,
+      blockHash: tx.blockHash,
+      blockNumber: null,
+      timeStamp: "",
+      nonce: Number(tx.nonce),
+      hash: tx.hash,
+      chainId: Number(tx.chainId),
     };
 
     await AsyncStorage.setItem("TXhistory", JSON.stringify([TXhistoryObj]));
     await confirmTX({
       transactionHash: tx.hash,
-      network,
-      userWalletAddress,
+      network: parseActiveNetwork.id,
+      userWalletAddress: parseWallet.walletAddress,
       contractAddress,
+      provider,
+      parseWallet,
+      symbol,
     });
   } catch (error) {
-    console.log("An error occured at transfer ERC 20 tokens", error);
+    console.log("An error occured at transfer native token", error);
   }
 };
 
@@ -958,7 +934,20 @@ export const confirmTX = async ({
   network,
   userWalletAddress,
   contractAddress,
+  provider,
+  symbol,
 }) => {
+  const tokens = await AsyncStorage.getItem("tokens");
+  const parseTokens = JSON.parse(tokens);
+  let dencryptUserWalletAddr = await _decryotData({
+    encryptedData: userWalletAddress,
+  });
+
+  let userData = parseTokens
+    .filter((val) => val.walletAddress == userWalletAddress)
+    .filter((val) => val.address == contractAddress)
+    .filter((val) => val.symbol == symbol);
+
   const confirms = 6; // Number of confirmations required
   const timeout = 120000; // Timeout in milliseconds
 
@@ -977,16 +966,50 @@ export const confirmTX = async ({
 
     console.log(realTX);
 
+    const date = formatDateToCustomFormat();
     if (receipt.status === 1) {
       console.log("Transaction confirmed:", receipt);
+      realTX[0].status = "success";
+      realTX[0].gasUsed = Number(receipt.gasUsed);
+      realTX[0].gasPrice = Number(receipt.gasPrice);
+      realTX[0].statusNo = receipt.status;
+      realTX[0].blockNumber = Number(receipt.blockNumber);
+      realTX[0].date = date;
       // Transaction succeeded
       // filering
+      console.log(realTX);
+      await AsyncStorage.setItem("TXhistory", JSON.stringify(parseTXhistory));
+
+      console.log(userData);
+
+      userData[0].amount = await getBalance({
+        rpcURL:
+          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+        address: dencryptUserWalletAddr,
+      });
+      console.log(userData);
+      await AsyncStorage.setItem("tokens", JSON.stringify(userData));
     } else if (receipt.status === 0) {
+      realTX[0].status = "failed";
+      realTX[0].gasUsed = receipt.gasUsed;
+      realTX[0].gasPrice = receipt.gasPrice;
+      realTX[0].statusNo = receipt.status;
+      realTX[0].blockNumber = receipt.blockNumber;
       console.error("Transaction failed:", receipt);
+      realTX[0].date = date;
       // Transaction failed
     } else {
       console.log("Transaction is still pending:", receipt);
       // Transaction is still pending
+      setInterval(async () => {
+        await confirmTX({
+          transactionHash,
+          network,
+          userWalletAddress,
+          contractAddress,
+          provider,
+        });
+      }, 10000);
     }
   } catch (error) {
     console.error("Error waiting for transaction:", error);
@@ -1008,3 +1031,43 @@ export const confirmTX = async ({
 //     console.log(tx.hash);
 //   }
 // });
+
+function formatDateToCustomFormat() {
+  const currentDate = new Date(Date.now());
+
+  // Define arrays for month names and AM/PM labels
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const amPmLabels = ["AM", "PM"];
+
+  // Extract date components
+  const month = monthNames[currentDate.getMonth()];
+  const day = currentDate.getDate();
+  const year = currentDate.getFullYear();
+  const hours = currentDate.getHours();
+  const minutes = currentDate.getMinutes();
+  const amOrPm = amPmLabels[hours < 12 ? 0 : 1]; // Determine AM or PM
+
+  // Convert to 12-hour format
+  const formattedHours = hours % 12 || 12;
+
+  // Format the time with leading zeros
+  const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+
+  // Construct the final formatted date and time string
+  const formattedDate = `${month} ${day}, ${year} at ${formattedHours}:${formattedMinutes} ${amOrPm}`;
+
+  return formattedDate;
+}

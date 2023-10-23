@@ -18,6 +18,18 @@ const Transactions = ({ route, navigation }) => {
   const [isScrolling, handleScroll] = useHandleScrollFunc();
   const [show, setShow] = useState(false);
   const [activeNetwork, setActiveNetwork] = useState(null);
+  const [transactions, setTransactions] = useState("");
+  const [txDepth, setTXDepth] = useState({
+    status: "",
+    date: "",
+    from: "",
+    to: "",
+    nounce: "",
+    amount: "",
+    networkFee: "",
+    contractAddress: "",
+    hash: "",
+  });
 
   const getActiveNetwork = async () => {
     const data = await _getActiveNetwork();
@@ -27,38 +39,16 @@ const Transactions = ({ route, navigation }) => {
     getActiveNetwork();
   }, []);
 
-  const DATATXHistory = [
-    {
-      title: "Main dishes",
-      data: ["Pizza", "Burger", "Risotto"],
-      tx: true,
-      status: "Submitted",
-    },
-    {
-      title: "Sides",
-      data: ["French Fries", "Onion Rings", "Fried Shrimps"],
-      tx: false,
-      status: "Confirmed",
-    },
-    {
-      title: "Drinks",
-      data: ["Water", "Coke", "Beer"],
-      tx: false,
-      status: "Failed",
-    },
-    {
-      title: "Desserts",
-      data: ["Cheese Cake", "Ice Cream"],
-      tx: false,
-      status: "Failed",
-    },
-  ];
-
+  const getTransactions = async () => {
+    let txs = await _getUserTransactions();
+    let data = JSON.parse(txs);
+    setTransactions(data);
+  };
   useEffect(() => {
-    _getUserTransactions({
-      walletAddress: "0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9",
-    });
+    getTransactions();
   }, []);
+
+  console.log(transactions);
 
   return (
     <View style={[Constants.container2Home]}>
@@ -71,11 +61,19 @@ const Transactions = ({ route, navigation }) => {
         <View style={{ marginBottom: 50 }}>
           <NameAndNetwork activeNetwork={activeNetwork} />
         </View>
-        <TokenHistory DATA={DATATXHistory} setShow={setShow} />
+        {!transactions ? (
+          <Text style={Constants.loading}>Loading...</Text>
+        ) : (
+          <TokenHistory
+            DATA={transactions}
+            setShow={setShow}
+            setTXDepth={setTXDepth}
+          />
+        )}
       </ScrollView>
       {show && (
         <ResuableModalCTN text={"send 1INCH"} setShow={setShow}>
-          <TransactionDInDepth />
+          <TransactionDInDepth txDepth={txDepth} />
         </ResuableModalCTN>
       )}
     </View>

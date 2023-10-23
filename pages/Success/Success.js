@@ -48,7 +48,8 @@ const Success = ({ navigation }) => {
         id: "sepolia",
         active: 0,
         color: "ff3a58",
-        rpcURL: "https://eth-sepolia.g.alchemy.com/v2/demo",
+        rpcURL:
+          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
         chainId: 11155111,
       },
       {

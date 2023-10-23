@@ -164,7 +164,7 @@ const Home = ({ route, navigation }) => {
 
   useEffect(() => {
     getActiveWalets();
-  }, []);
+  }, [showSendEth]);
 
   useEffect(() => {
     getTokens();
@@ -256,6 +256,7 @@ const Home = ({ route, navigation }) => {
                       onPress={() =>
                         navigation.navigate("token-details", {
                           tokenName: val.name.replace("Token", ""),
+                          amount: val.amount,
                         })
                       }
                       key={index}

@@ -1,22 +1,58 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  SectionList,
-  StatusBar,
-  FlatList,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { _formatAddr } from "../../constants/HelperFunctions";
 
-const TokenHistory = ({ DATA, setShow }) => {
+const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
+  const handleShowTXDepth = async ({
+    status,
+    date,
+    from,
+    to,
+    nounce,
+    amount,
+    networkFee,
+    contractAddress,
+    hash,
+  }) => {
+    let _to = await _formatAddr({ addr: to, notEncrypted: true });
+    let _from = await _formatAddr({ addr: from, notEncrypted: true });
+
+    console.log(from, _from);
+    setTXDepth((prev) => ({
+      ...prev,
+      status,
+      date,
+      from: _from,
+      to: _to,
+      nounce,
+      amount,
+      networkFee,
+      contractAddress,
+      hash,
+    }));
+    setShow(true);
+  };
   return (
     <View>
       <View style={styles.container}>
-        {DATA.map((item, index) => (
-          <TouchableOpacity onPress={() => setShow(true)} key={index}>
+        {DATA?.map((item, index) => (
+          <TouchableOpacity
+            onPress={() =>
+              handleShowTXDepth({
+                status: item.status,
+                date: item?.data,
+                from: item.from,
+                to: item.to,
+                nounce: item.nounce,
+                amount: item.amount,
+                networkFee: item.gasPrice,
+                contractAddress: item.contractAddress,
+                hash: item.hash,
+              })
+            }
+            key={index}
+          >
             <View style={styles.item} key={index}>
               <View style={{ flexDirection: "row" }}>
                 <View style={{ marginRight: 10 }}>
@@ -28,17 +64,17 @@ const TokenHistory = ({ DATA, setShow }) => {
                   <Text
                     style={{
                       color:
-                        item.status == "Confirmed"
+                        item.status == "success"
                           ? "#58b07e"
-                          : item.status == "Failed"
+                          : item.status == "failed"
                           ? "#8a2234"
                           : "#dc9429",
                       fontWeight: "800",
                     }}
                   >
-                    {item.status}
+                    {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                   </Text>
-                  {item.tx && (
+                  {item.status == "pending" && (
                     <View style={{ flexDirection: "row", marginTop: 10 }}>
                       <View style={styles.speed}>
                         <Text style={[styles.txText]}>Speed Up</Text>

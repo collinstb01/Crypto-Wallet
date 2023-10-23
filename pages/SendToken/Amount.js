@@ -161,7 +161,7 @@ const Amount = ({ navigation }) => {
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View>
                 <Text style={[styles.text1, { color: "white" }]}>
-                  {selectedToken?.amount?.toString()?.length > 10
+                  {selectedToken?.amount?.toString()?.length > 122
                     ? ethers.formatEther(selectedToken?.amount.toString())
                     : selectedToken?.amount}
                   {selectedToken.symbol.toUpperCase()}

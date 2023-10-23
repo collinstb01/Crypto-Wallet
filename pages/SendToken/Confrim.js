@@ -15,9 +15,13 @@ import ButtonGradient from "../../components/ButtonGradient";
 import ResuableModalCTN from "../../components/ResuableModalCTN";
 import { FontAwesome } from "@expo/vector-icons";
 import TabstwoContents from "../../components/TabstwoContents";
-import { useSelector } from "react-redux";
-import { _getGas } from "../../constants/HelperFunctions";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  _getGas,
+  transferNativeTokensOrERC20,
+} from "../../constants/HelperFunctions";
 import { ethers } from "ethers";
+import { setLoadingAfterSendToken } from "../../features/StorageAuth/StorageAuth";
 
 const Confrim = ({ navigation }) => {
   const { sendToken } = useSelector((state) => state.storage);
@@ -35,13 +39,24 @@ const Confrim = ({ navigation }) => {
     gasSlow: "",
     gasFast: "",
   });
+  const dispatch = useDispatch();
 
   const backFunc = () => {
     navigation.goBack();
   };
 
-  function func() {
-    navigation.navigate("token-details", { tokenName: "1INCH" });
+  async function func() {
+    navigation.navigate("transactions", { tokenName: "1INCH" });
+    dispatch(setLoadingAfterSendToken({ loading: true }));
+    await transferNativeTokensOrERC20({
+      gasPrice: gasData.gasPrice,
+      gasLEstimate: gasData.gasLEstimate,
+      recipient: sendToken.to,
+      amount: sendToken.amount,
+      contractAddress: sendToken.tokenAddress,
+      symbol: sendToken.symbol,
+    });
+    dispatch(setLoadingAfterSendToken({ loading: false }));
   }
 
   const getGas = async () => {

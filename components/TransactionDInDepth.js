@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import ButtonGradientTwo from "./ButtonGradientTwo";
 
-const TransactionDInDepth = ({}) => {
+const TransactionDInDepth = ({ txDepth }) => {
   const routeToExplorer = () => {};
 
   return (
@@ -23,13 +23,13 @@ const TransactionDInDepth = ({}) => {
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>From</Text>
           <Text style={[styles.firstText, styles.text, styles.address]}>
-            0x763D...fdF9
+            {txDepth?.from}
           </Text>
         </View>
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>To</Text>
           <Text style={[styles.firstText, styles.text, styles.address]}>
-            0xBBB...fdF9
+            {txDepth?.to}
           </Text>
         </View>
       </View>

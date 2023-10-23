@@ -13,6 +13,7 @@ const StorageAuth = createSlice({
       id: "",
       symbol: "",
     },
+    loadingAfterSendToken: false,
   },
   reducers: {
     setSeed(state, action) {
@@ -29,9 +30,18 @@ const StorageAuth = createSlice({
       state.sendToken.tokenAddress = action.payload.tokenAddress;
       state.sendToken.symbol = action.payload.symbol;
     },
+    setLoadingAfterSendToken(state, action) {
+      state.loadingAfterSendToken = action.payload.loading;
+    },
   },
 });
 
-export const { setPassword, setDate, setSeed, setMCMessage, setSendToken } =
-  StorageAuth.actions;
+export const {
+  setPassword,
+  setDate,
+  setSeed,
+  setMCMessage,
+  setSendToken,
+  setLoadingAfterSendToken,
+} = StorageAuth.actions;
 export default StorageAuth.reducer;
