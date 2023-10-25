@@ -16,7 +16,7 @@ import { useEffect } from "react";
 const WalletSetUp = ({ navigation }) => {
   const [doesUserExist, setDoesUserExist] = useState(null);
 
-  let data = UseCheckUser();
+  let [data] = UseCheckUser();
 
   useEffect(() => {
     setDoesUserExist(data);

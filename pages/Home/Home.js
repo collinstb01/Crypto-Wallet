@@ -102,11 +102,11 @@ const Home = ({ route, navigation }) => {
   };
 
   const addTokens = async () => {
-    setLoading(true);
-    console.log("ddmkdkk");
-    await _addTokens({ addr: text });
-    setshowAddToken(false);
-    setLoading(false);
+    navigation.navigate("add-token");
+    // setLoading(true);
+    // await _addTokens({ addr: text });
+    // setshowAddToken(false);
+    // setLoading(false);
   };
 
   console.log(text);
@@ -370,7 +370,7 @@ const Home = ({ route, navigation }) => {
             }
             learnMore={"Learn more about imported Tokens "}
             header={"Add Token"}
-            buttonText={"Add Token"}
+            buttonText={"Proceed"}
             func={addTokens}
             setText={setText}
           />
@@ -606,12 +606,17 @@ const ImportAccount = ({
               {learnMore && "here."}
             </Text>
           </Text>
-          <TextInput
-            placeholder={placeholder}
-            style={[createAccountImportAccountStyle.input, { color: "white" }]}
-            placeholderTextColor={"#a49eb9"}
-            onChangeText={(text) => setText(text)}
-          />
+          {buttonText == "Import Account" && (
+            <TextInput
+              placeholder={placeholder}
+              style={[
+                createAccountImportAccountStyle.input,
+                { color: "white" },
+              ]}
+              placeholderTextColor={"#a49eb9"}
+              onChangeText={(text) => setText(text)}
+            />
+          )}
         </View>
         <View
           style={{

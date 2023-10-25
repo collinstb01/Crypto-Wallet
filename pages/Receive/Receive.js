@@ -10,8 +10,11 @@ const Receive = ({ navigation }) => {
   const [show, setShow] = useState(false);
   const [text, setText] = useState("");
 
+  const backFunc = () => {
+    navigation.goBack();
+  };
   return (
-    <ReusableCard text={"Request Payment"} show={show}>
+    <ReusableCard text={"Request Payment"} show={show} backFunc={backFunc}>
       {show == true && <View style={contantStyles.overlay}></View>}
 
       <View style={styles.container}>

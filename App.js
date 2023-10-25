@@ -21,6 +21,7 @@ import Swap from "./pages/Swap/SwapTokens";
 import { Provider } from "react-redux";
 import { store } from "./features/store";
 import Settings from "./pages/Settings/Settings";
+import AddTokens from "./pages/AddTokens/AddTokens";
 
 const Stack = createNativeStackNavigator();
 
@@ -115,6 +116,11 @@ export default function App() {
           <Stack.Screen
             name="settings"
             component={Settings}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="add-token"
+            component={AddTokens}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>
