@@ -69,5 +69,6 @@ const styles = StyleSheet.create({
   ctn: {
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "center",
   },
 });

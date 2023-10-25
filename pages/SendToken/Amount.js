@@ -31,7 +31,7 @@ const Amount = ({ navigation }) => {
   const handleRoute = () => {
     dispatch(
       setSendToken({
-        amount: valueArr.join(" "),
+        amount: parseFloat(valueArr.join("")),
         tokenAddress: selectedToken.address,
         id: selectedToken.network,
         to: sendToken.to,
@@ -40,6 +40,7 @@ const Amount = ({ navigation }) => {
       })
     );
     navigation.navigate("send-token/confirm");
+    setValueArr([0]);
   };
 
   async function getUserTokens() {
@@ -161,9 +162,9 @@ const Amount = ({ navigation }) => {
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View>
                 <Text style={[styles.text1, { color: "white" }]}>
-                  {selectedToken?.amount?.toString()?.length > 122
-                    ? ethers.formatEther(selectedToken?.amount.toString())
-                    : selectedToken?.amount}
+                  {selectedToken?.amount?.toString()?.length > 10
+                    ? selectedToken?.amount.toString().slice(0, 4)
+                    : selectedToken?.amount}{" "}
                   {selectedToken.symbol.toUpperCase()}
                 </Text>
                 <Text style={[styles.text2, { color: "white" }]}>$121,330</Text>
@@ -190,8 +191,14 @@ const Amount = ({ navigation }) => {
             ]}
           >
             <Text style={[styles.ethAmt, { color: "white" }]}>
-              {valueArr.length == 0 ? 0 : parseFloat(valueArr.join(""))}
-              <Text style={[{ color: "#8124e6" }]}>|</Text>{" "}
+              {valueArr.length == 0
+                ? 0
+                : parseFloat(
+                    valueArr.join("").length > 10
+                      ? valueArr.join("").slice(0, 4)
+                      : valueArr.join("")
+                  )}
+              <Text style={[{ color: "#8124e6" }]}>|</Text>
               {selectedToken.symbol.toUpperCase()}
             </Text>
             <View
@@ -199,6 +206,7 @@ const Amount = ({ navigation }) => {
                 flexDirection: "row",
                 alignItems: "center",
                 marginTop: 20,
+                justifyContent: "center",
               }}
             >
               <Ionicons name="swap-vertical" size={24} color="#8124e6" />

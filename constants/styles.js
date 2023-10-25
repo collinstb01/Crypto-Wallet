@@ -50,4 +50,10 @@ export default contantStyles = {
     fontSize: 16,
     marginTop: 20,
   },
+  loading: {
+    textAlign: "center",
+    color: "white",
+    fontWeight: "700",
+    fontSize: 16,
+  },
 };

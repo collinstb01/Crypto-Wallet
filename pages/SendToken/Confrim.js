@@ -32,6 +32,8 @@ const Confrim = ({ navigation }) => {
   const [amount, setamount] = useState("");
   const [recipient, setRecipient] = useState("");
   const [totalAmount, settotalAmount] = useState("");
+
+  const [loading, setLoading] = useState(false);
   const [gasData, setGasData] = useState({
     gasPrice: "",
     gasLEstimate: "",
@@ -46,8 +48,8 @@ const Confrim = ({ navigation }) => {
   };
 
   async function func() {
-    navigation.navigate("transactions", { tokenName: "1INCH" });
     dispatch(setLoadingAfterSendToken({ loading: true }));
+    setLoading(true);
     await transferNativeTokensOrERC20({
       gasPrice: gasData.gasPrice,
       gasLEstimate: gasData.gasLEstimate,
@@ -55,8 +57,10 @@ const Confrim = ({ navigation }) => {
       amount: sendToken.amount,
       contractAddress: sendToken.tokenAddress,
       symbol: sendToken.symbol,
+      navigation: navigation,
     });
     dispatch(setLoadingAfterSendToken({ loading: false }));
+    setLoading(false);
   }
 
   const getGas = async () => {
@@ -90,6 +94,7 @@ const Confrim = ({ navigation }) => {
     }
   }, [sendToken]);
 
+  console.log(amount);
   return (
     <>
       <ScrollView>
@@ -104,7 +109,10 @@ const Confrim = ({ navigation }) => {
             <View style={constants.container}>
               <View style={styles.texts}>
                 <Text style={styles.text1}>
-                  {sendToken.amount} {sendToken.symbol.toUpperCase()}
+                  {sendToken.amount.length > 10
+                    ? sendToken.amount.slice(0, 4)
+                    : sendToken.amount}{" "}
+                  {sendToken.symbol.toUpperCase()}
                 </Text>
                 <Text style={styles.text2}>Amount</Text>
               </View>
@@ -164,7 +172,7 @@ const Confrim = ({ navigation }) => {
               </View>
             </View>
             <ButtonGradient
-              text={"Send"}
+              text={loading ? "Sending" : "Send"}
               func={func}
               route={"func"}
               widthSp={150}

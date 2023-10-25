@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import ButtonGradientTwo from "./ButtonGradientTwo";
+import { ethers } from "ethers";
 
 const TransactionDInDepth = ({ txDepth }) => {
   const routeToExplorer = () => {};
@@ -11,13 +12,13 @@ const TransactionDInDepth = ({ txDepth }) => {
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>Status</Text>
           <Text style={[styles.firstText, styles.text, styles.confirmed]}>
-            Confirmed
+            {txDepth.status}
           </Text>
         </View>
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>Date</Text>
           <Text style={[styles.firstText, styles.text, styles.date]}>
-            Mar 7,2021 at 12:14AM
+            {txDepth.date}
           </Text>
         </View>
         <View style={[styles.first, styles.flex]}>
@@ -36,21 +37,30 @@ const TransactionDInDepth = ({ txDepth }) => {
       <View style={styles.box}>
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>Nounce</Text>
-          <Text style={[styles.firstText, styles.text]}>#1</Text>
+          <Text style={[styles.firstText, styles.text]}>#{txDepth.nounce}</Text>
         </View>
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>Amount</Text>
-          <Text style={[styles.firstText, styles.text]}>2.5388 1INCH</Text>
+          <Text style={[styles.firstText, styles.text]}>
+            {txDepth.amount} {txDepth.symbol}
+          </Text>
         </View>
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>Network Fee</Text>
-          <Text style={[styles.firstText, styles.text]}>0.0012 1INCH</Text>
+          <Text style={[styles.firstText, styles.text]}>
+            {txDepth.networkFee}{" "}
+            {txDepth.network.charAt(0).toUpperCase() + txDepth.network.slice(1)}
+          </Text>
         </View>
         <View style={[styles.first, styles.flex2]}>
           <Text style={[styles.text, styles.TA]}>Total Amount</Text>
           <View style={{ flexDirection: "column", alignItems: "flex-end" }}>
-            <Text style={[styles.TA, styles.text]}>Confirmed</Text>
-            <Text style={[styles.firstText, styles.text]}>$23.00</Text>
+            <Text style={[styles.TA, styles.text, { color: "green" }]}>
+              {txDepth.status == "success" ? "Confirmed" : "Faile"}
+            </Text>
+            <Text style={[styles.firstText, styles.text]}>
+              {ethers.formatEther(txDepth.total.toString())}
+            </Text>
           </View>
         </View>
       </View>

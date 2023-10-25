@@ -13,8 +13,13 @@ import {
   _getActiveNetwork,
   _getUserTransactions,
 } from "../../constants/HelperFunctions";
+import { useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Empty from "../../components/Empty";
 
 const Transactions = ({ route, navigation }) => {
+  const { loadingAfterSendToken } = useSelector((state) => state.storage);
+
   const [isScrolling, handleScroll] = useHandleScrollFunc();
   const [show, setShow] = useState(false);
   const [activeNetwork, setActiveNetwork] = useState(null);
@@ -31,6 +36,8 @@ const Transactions = ({ route, navigation }) => {
     hash: "",
   });
 
+  // AsyncStorage.setItem("TXhistory", JSON.stringify([]));
+
   const getActiveNetwork = async () => {
     const data = await _getActiveNetwork();
     setActiveNetwork(JSON.parse(data));
@@ -46,7 +53,7 @@ const Transactions = ({ route, navigation }) => {
   };
   useEffect(() => {
     getTransactions();
-  }, []);
+  }, [loadingAfterSendToken]);
 
   console.log(transactions);
 
@@ -61,8 +68,8 @@ const Transactions = ({ route, navigation }) => {
         <View style={{ marginBottom: 50 }}>
           <NameAndNetwork activeNetwork={activeNetwork} />
         </View>
-        {!transactions ? (
-          <Text style={Constants.loading}>Loading...</Text>
+        {transactions.length == 0 ? (
+          <Empty text={"No Transaction Data"} />
         ) : (
           <TokenHistory
             DATA={transactions}

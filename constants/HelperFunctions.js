@@ -258,10 +258,6 @@ export const _createUserAccount = async ({
   }
 };
 
-export const _importUserAcount = async () => {
-  // request for the user private key
-};
-
 export const _getActiveNetwork = async () => {
   const activeNetwork = await AsyncStorage.getItem("networks");
   const parseNetwork = JSON.parse(activeNetwork);
@@ -307,41 +303,49 @@ export const _getWallets = async () => {
   return _wallet;
 };
 
-export const _createWallet = async ({ walletName, setLoading, setError }) => {
+export const _createWallet = async ({
+  walletName,
+  setLoading,
+  setError,
+  privateKey,
+}) => {
   try {
     let wallets = await AsyncStorage.getItem("wallets");
     let tokens = await AsyncStorage.getItem("tokens");
     let parseWallets = JSON.parse(wallets);
     let parseTokens = JSON.parse(tokens);
 
+    let activeWallet = parseWallets.find((val) => val.active == 1);
+    activeWallet.active = 0;
+
     if (parseWallets.find((val) => val.name == walletName)) {
       return setError("Name Already exist, use another Account Name.");
     }
 
-    let activeWallet = parseWallets.find((val) => val.active == 1);
-    activeWallet.active = 0;
+    let encryptedWalletAddress, encryptedPrivateKey;
+    if (privateKey) {
+      let wallet = new ethers.Wallet(privateKey);
+      let address = wallet.address;
 
-    let user = await AsyncStorage.getItem("user");
-    let mnemonic = JSON.parse(user).seedPrase;
+      encryptedWalletAddress = await _encryotData({ data: address });
+      encryptedPrivateKey = await _encryotData({ data: privateKey });
+    } else {
+      let user = await AsyncStorage.getItem("user");
+      let mnemonic = JSON.parse(user).seedPrase;
 
-    let decryptMnemonic = await _decryotData({ encryptedData: mnemonic });
+      let decryptMnemonic = await _decryotData({ encryptedData: mnemonic });
 
-    const accountIndex = Math.floor(Math.random() * 2 ** 31); // Random account index
-    const addressIndex = Math.floor(Math.random() * 2 ** 31); // Random address index
+      const addressIndex = Math.floor(Math.random() * 2 ** 31); // Random address index
+      const path = `m/44'/60'/${"0"}/${"0"}/${addressIndex}`;
+      const wallet = HDNodeWallet.fromPhrase(decryptMnemonic, undefined, path);
 
-    // Construct the path
-    const path = `m/44'/60'/${"0"}/${"0"}/${addressIndex}`;
-
-    // Create a wallet using the seed phrase and unique path
-
-    const wallet = HDNodeWallet.fromPhrase(decryptMnemonic, undefined, path);
-
-    const encryptedWalletAddress = await _encryotData({
-      data: wallet.address,
-    });
-    const encryptedPrivateKey = await _encryotData({
-      data: wallet.privateKey,
-    });
+      encryptedWalletAddress = await _encryotData({
+        data: wallet.address,
+      });
+      encryptedPrivateKey = await _encryotData({
+        data: wallet.privateKey,
+      });
+    }
 
     let walletObj = {
       walletAddress: encryptedWalletAddress,
@@ -840,6 +844,7 @@ export const transferNativeTokensOrERC20 = async ({
   amount,
   contractAddress,
   symbol,
+  navigation,
 }) => {
   try {
     const _recipient = await _decryotData({ encryptedData: recipient });
@@ -853,9 +858,7 @@ export const transferNativeTokensOrERC20 = async ({
     );
 
     let tx;
-    if (
-      sendToken.tokenAddress == "0x0000000000000000000000000000000000000000"
-    ) {
+    if (contractAddress == "0x0000000000000000000000000000000000000000") {
       const decryptPrivateKey = await _decryotData({
         encryptedData: parseWallet.privateKey,
       });
@@ -864,7 +867,7 @@ export const transferNativeTokensOrERC20 = async ({
       const wallet = new ethers.Wallet(decryptPrivateKey, provider);
       const transaction = {
         to: _recipient,
-        value: ethers.parseEther("0.01"), // Send 1 Ether
+        value: ethers.parseEther(amount.toString()), // Send 1 Ether
       };
 
       // Send the transaction
@@ -891,8 +894,7 @@ export const transferNativeTokensOrERC20 = async ({
         gasLimit: gasLEstimate,
       });
     }
-
-    console.log("tx....", tx);
+    const date = formatDateToCustomFormat();
 
     let TXhistoryObj = {
       userWalletAddress: parseWallet.walletAddress,
@@ -900,6 +902,9 @@ export const transferNativeTokensOrERC20 = async ({
       contractAddress,
       status: "pending",
       statusNo: null,
+      symbol: symbol,
+      date: date,
+      type: "Send",
       from: tx.from,
       to: tx.to,
       value: Number(tx.value),
@@ -914,7 +919,13 @@ export const transferNativeTokensOrERC20 = async ({
       chainId: Number(tx.chainId),
     };
 
-    await AsyncStorage.setItem("TXhistory", JSON.stringify([TXhistoryObj]));
+    const TXhistory = await AsyncStorage.getItem("TXhistory");
+    const parseTXhistory = JSON.parse(TXhistory);
+    parseTXhistory.push(TXhistoryObj);
+
+    await AsyncStorage.setItem("TXhistory", JSON.stringify(parseTXhistory));
+    navigation.navigate("transactions", { tokenName: "1INCH" });
+
     await confirmTX({
       transactionHash: tx.hash,
       network: parseActiveNetwork.id,
@@ -923,6 +934,7 @@ export const transferNativeTokensOrERC20 = async ({
       provider,
       parseWallet,
       symbol,
+      rpcURL: activeNetwork.rpcURL,
     });
   } catch (error) {
     console.log("An error occured at transfer native token", error);
@@ -936,6 +948,7 @@ export const confirmTX = async ({
   contractAddress,
   provider,
   symbol,
+  rpcURL,
 }) => {
   const tokens = await AsyncStorage.getItem("tokens");
   const parseTokens = JSON.parse(tokens);
@@ -959,45 +972,35 @@ export const confirmTX = async ({
     );
     const TXhistory = await AsyncStorage.getItem("TXhistory");
     const parseTXhistory = JSON.parse(TXhistory);
-    let realTX = parseTXhistory
-      .filter((val) => val.userWalletAddress == userWalletAddress)
-      .filter((val) => val.network == network)
-      .filter((val) => val.contractAddress == contractAddress);
+    let realTX = parseTXhistory[parseTXhistory.length - 1];
 
-    console.log(realTX);
-
-    const date = formatDateToCustomFormat();
     if (receipt.status === 1) {
-      console.log("Transaction confirmed:", receipt);
-      realTX[0].status = "success";
-      realTX[0].gasUsed = Number(receipt.gasUsed);
-      realTX[0].gasPrice = Number(receipt.gasPrice);
-      realTX[0].statusNo = receipt.status;
-      realTX[0].blockNumber = Number(receipt.blockNumber);
-      realTX[0].date = date;
+      realTX.status = "success";
+      realTX.gasUsed = Number(receipt.gasUsed);
+      realTX.gasPrice = Number(receipt.gasPrice);
+      realTX.statusNo = receipt.status;
+      realTX.blockNumber = Number(receipt.blockNumber);
       // Transaction succeeded
       // filering
-      console.log(realTX);
+      console.log("real TX.....................", realTX);
+
       await AsyncStorage.setItem("TXhistory", JSON.stringify(parseTXhistory));
 
-      console.log(userData);
-
       userData[0].amount = await getBalance({
-        rpcURL:
-          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+        rpcURL,
         address: dencryptUserWalletAddr,
       });
-      console.log(userData);
       await AsyncStorage.setItem("tokens", JSON.stringify(userData));
     } else if (receipt.status === 0) {
-      realTX[0].status = "failed";
-      realTX[0].gasUsed = receipt.gasUsed;
-      realTX[0].gasPrice = receipt.gasPrice;
-      realTX[0].statusNo = receipt.status;
-      realTX[0].blockNumber = receipt.blockNumber;
+      realTX.status = "failed";
+      realTX.gasUsed = receipt.gasUsed;
+      realTX.gasPrice = receipt.gasPrice;
+      realTX.statusNo = receipt.status;
+      realTX.blockNumber = receipt.blockNumber;
       console.error("Transaction failed:", receipt);
-      realTX[0].date = date;
       // Transaction failed
+
+      await AsyncStorage.setItem("TXhistory", JSON.stringify(parseTXhistory));
     } else {
       console.log("Transaction is still pending:", receipt);
       // Transaction is still pending

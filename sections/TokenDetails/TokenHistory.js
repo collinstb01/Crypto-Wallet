@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { _formatAddr } from "../../constants/HelperFunctions";
+import { ethers } from "ethers";
 
 const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
   const handleShowTXDepth = async ({
@@ -14,6 +15,10 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
     networkFee,
     contractAddress,
     hash,
+    symbol,
+    type,
+    network,
+    total,
   }) => {
     let _to = await _formatAddr({ addr: to, notEncrypted: true });
     let _from = await _formatAddr({ addr: from, notEncrypted: true });
@@ -30,6 +35,10 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
       networkFee,
       contractAddress,
       hash,
+      symbol,
+      type,
+      network,
+      total,
     }));
     setShow(true);
   };
@@ -41,14 +50,18 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
             onPress={() =>
               handleShowTXDepth({
                 status: item.status,
-                date: item?.data,
+                date: item?.date,
                 from: item.from,
                 to: item.to,
-                nounce: item.nounce,
-                amount: item.amount,
-                networkFee: item.gasPrice,
+                nounce: item.nonce,
+                amount: ethers.formatEther(item.value.toString()),
+                networkFee: ethers.formatEther(item.gasPrice),
+                total: item.value + item.gasPrice,
                 contractAddress: item.contractAddress,
                 hash: item.hash,
+                symbol: item.symbol,
+                type: item.type,
+                network: item.network,
               })
             }
             key={index}
@@ -59,8 +72,12 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
                   <FontAwesome name="send-o" size={24} color="white" />
                 </View>
                 <View>
-                  <Text style={[styles.text1]}>#4 Mar 8,2921 at 06:11AM</Text>
-                  <Text style={[styles.text2, styles.text]}>Send 1INCH</Text>
+                  <Text style={[styles.text1]}>
+                    #{item.nonce} {item.date}
+                  </Text>
+                  <Text style={[styles.text2, styles.text]}>
+                    {item.type} {item.symbol.toUpperCase()}
+                  </Text>
                   <Text
                     style={{
                       color:
@@ -87,7 +104,10 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
                 </View>
               </View>
               <View style={{ alignItems: "flex-end", flexDirection: "column" }}>
-                <Text style={[styles.text4, styles.text]}>0.127496 1INCH</Text>
+                <Text style={[styles.text4, styles.text]}>
+                  {ethers.formatEther(item.value.toString())}
+                  {item.symbol.toUpperCase()}
+                </Text>
                 <Text style={[styles.text5, styles.text]}>$0.5588432</Text>
               </View>
             </View>

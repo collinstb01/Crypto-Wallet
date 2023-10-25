@@ -288,8 +288,8 @@ const Home = ({ route, navigation }) => {
 
                         <View>
                           <Text style={[styles3.text, styles3.tokenName]}>
-                            {val.amount.toString().length >= 18
-                              ? ethers.formatEther(val.amount.toString())
+                            {val.amount.toString().length > 10
+                              ? val.amount.toString().slice(0, 4)
                               : val.amount}
                           </Text>
                         </View>
