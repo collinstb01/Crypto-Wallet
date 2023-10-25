@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Constants from "../constants/styles";
 
 const Input = ({ text, setText }) => {
   const [showText, setShowText] = useState(false);
@@ -19,7 +20,7 @@ const Input = ({ text, setText }) => {
   return (
     <>
       <TextInput
-        style={styles.input}
+        style={Constants.input}
         onChangeText={(value) => setText(value)}
         placeholder={text}
         placeholderTextColor={"#948fa8"}

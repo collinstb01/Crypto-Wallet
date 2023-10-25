@@ -178,6 +178,7 @@ const Home = ({ route, navigation }) => {
     console.log("isScrolling");
   }, [isScrolling]);
 
+  console.log(tokens);
   return (
     <View style={[contantStyles.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -264,10 +265,16 @@ const Home = ({ route, navigation }) => {
                       <View style={[styles.f, styles3.token]}>
                         <View style={[styles.f]}>
                           <View style={[styles3.border]}>
-                            <Image
-                              source={require(`../../assets/sym1.png`)}
-                              style={{ width: 30, height: 30 }}
-                            />
+                            <View style={styles.box}>
+                              <Text style={styles.boxText}>
+                                {val.name.charAt(0).toUpperCase()}
+                              </Text>
+                              <View style={styles.boxoverlay}>
+                                <Text style={styles.boxoverlayText}>
+                                  {val.name.charAt(0).toUpperCase()}
+                                </Text>
+                              </View>
+                            </View>
                           </View>
                           <View>
                             <Text style={[styles3.text, styles3.tokenName]}>
@@ -288,9 +295,9 @@ const Home = ({ route, navigation }) => {
 
                         <View>
                           <Text style={[styles3.text, styles3.tokenName]}>
-                            {val.amount.toString().length > 10
-                              ? val.amount.toString().slice(0, 4)
-                              : val.amount}
+                            {val.amount.toString().length >= 18
+                              ? ethers.formatEther(val.amount.toString())
+                              : val.amount.toString().slice(0, 4)}
                           </Text>
                         </View>
                       </View>
@@ -779,5 +786,35 @@ const styles = StyleSheet.create({
     backgroundColor: "#09080d",
     padding: 15,
     paddingTop: 20,
+  },
+  boxText: {
+    color: "black",
+  },
+  box: {
+    backgroundColor: "#f2f4f6",
+    height: 30,
+    width: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: "gray",
+  },
+  boxoverlay: {
+    position: "absolute",
+    left: 17,
+    top: -11,
+    fontWeight: "800",
+    backgroundColor: "#cdb6ec",
+    borderRadius: 50,
+    height: 20,
+    width: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  boxoverlayText: {
+    fontWeight: "300",
+    color: "white",
+    fontSize: 13,
   },
 });

@@ -30,6 +30,37 @@ export const _helperFunc = ({ error, loading, setErr, setLoading }) => {
   }, 5000);
 };
 
+export const _login = async ({ password, setErr, setLoading, navigation }) => {
+  //compare with the one in the backedn
+  setLoading(true);
+
+  const user = await AsyncStorage.getItem("user");
+  let parsedUser = JSON.parse(user);
+
+  const decryptPassword = await _decryotData({
+    encryptedData: parsedUser.password,
+  });
+  if (password == "") {
+    return _helperFunc({
+      setErr,
+      setLoading,
+      error: "Password field can not be empty",
+      loading: false,
+    });
+  }
+
+  if (password !== decryptPassword) {
+    return _helperFunc({
+      setErr,
+      setLoading,
+      error: "Password is not correct",
+      loading: false,
+    });
+  }
+
+  navigation.navigate("home");
+};
+
 export const _createUserAccount = async ({
   password,
   confirmPassword,
@@ -682,7 +713,7 @@ export const _getrecentsAddressSentTo = async () => {
   return JSON.stringify(recentsAddressSentTo);
 };
 
-const getBalance = async ({ rpcURL, address }) => {
+export const getBalance = async ({ rpcURL, address }) => {
   const provider = new ethers.JsonRpcProvider(rpcURL);
   const balance = await provider.getBalance(address);
   const balanceInEth = ethers.formatEther(balance);
@@ -853,11 +884,16 @@ export const transferNativeTokensOrERC20 = async ({
 
     const activeNetwork = await _getActiveNetwork();
     let parseActiveNetwork = JSON.parse(activeNetwork);
-    const provider = new ethers.JsonRpcProvider(
-      "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc"
+    console.log(
+      "sending...................Eth",
+      _recipient,
+      parseActiveNetwork.rpcURL
     );
 
+    const provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
+
     let tx;
+
     if (contractAddress == "0x0000000000000000000000000000000000000000") {
       const decryptPrivateKey = await _decryotData({
         encryptedData: parseWallet.privateKey,
@@ -865,6 +901,7 @@ export const transferNativeTokensOrERC20 = async ({
 
       // Create a wallet instance
       const wallet = new ethers.Wallet(decryptPrivateKey, provider);
+
       const transaction = {
         to: _recipient,
         value: ethers.parseEther(amount.toString()), // Send 1 Ether
@@ -894,8 +931,8 @@ export const transferNativeTokensOrERC20 = async ({
         gasLimit: gasLEstimate,
       });
     }
-    const date = formatDateToCustomFormat();
 
+    const date = formatDateToCustomFormat();
     let TXhistoryObj = {
       userWalletAddress: parseWallet.walletAddress,
       network: parseActiveNetwork.id,
@@ -934,7 +971,7 @@ export const transferNativeTokensOrERC20 = async ({
       provider,
       parseWallet,
       symbol,
-      rpcURL: activeNetwork.rpcURL,
+      rpcURL: parseActiveNetwork.rpcURL,
     });
   } catch (error) {
     console.log("An error occured at transfer native token", error);

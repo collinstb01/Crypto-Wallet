@@ -43,7 +43,11 @@ const ButtonGradient = ({
           }}
         >
           <LinearGradient
-            colors={["#85FFC4", "#5CC6FF", "#BC85FF"]}
+            colors={[
+              disabled ? "gray" : "#85FFC4",
+              disabled ? "gray" : "#5CC6FF",
+              disabled ? "gray" : "#BC85FF",
+            ]}
             end={{ x: 0.1, y: 0.2 }}
             start={{ x: 1, y: 0 }}
             style={styles.button}

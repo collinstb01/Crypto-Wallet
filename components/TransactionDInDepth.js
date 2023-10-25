@@ -64,7 +64,7 @@ const TransactionDInDepth = ({ txDepth }) => {
           </View>
         </View>
       </View>
-      <ButtonGradientTwo text={"View On Ethersca"} func={routeToExplorer} />
+      <ButtonGradientTwo text={"View On Etherscan"} func={routeToExplorer} />
     </>
   );
 };

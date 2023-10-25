@@ -1,11 +1,4 @@
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  View,
-  Navigation,
-  Pressable,
-} from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -50,13 +43,21 @@ const ReusableCard = ({
             alignItems: "center",
           }}
         >
-          <Ionicons
-            name="chevron-back"
-            size={20}
-            color="#948fa8"
-            style={{ marginTop: 20, marginLeft: 0 }}
-            onPress={backFunc}
-          />
+          <Pressable onPress={backFunc}>
+            <Ionicons
+              name="chevron-back"
+              size={20}
+              color="#948fa8"
+              style={{
+                marginTop: 0,
+                marginLeft: 0,
+                position: "relative",
+                left: 20,
+                top: 13,
+              }}
+            />
+          </Pressable>
+
           <View
             style={{ flexDirection: "row", justifyContent: "center", flex: 1 }}
           >

@@ -82,7 +82,7 @@ const Amount = ({ navigation }) => {
     setShow((e) => !e);
   }
   return (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor: "#131118" }}>
       <ReusableCard navigation={navigation} text={"Amount"} backFunc={backFunc}>
         <View style={constants.container}>
           <View style={[constants.flex]}>

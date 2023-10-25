@@ -17,7 +17,10 @@ import { FontAwesome } from "@expo/vector-icons";
 import TabstwoContents from "../../components/TabstwoContents";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  _decryotData,
+  _getActiveNetwork,
   _getGas,
+  getBalance,
   transferNativeTokensOrERC20,
 } from "../../constants/HelperFunctions";
 import { ethers } from "ethers";
@@ -94,7 +97,37 @@ const Confrim = ({ navigation }) => {
     }
   }, [sendToken]);
 
-  console.log(amount);
+  const [disabled, setDisabled] = useState(false);
+  const [err, setError] = useState("");
+  const [balance, setBalance] = useState(null);
+
+  const getUserBalance = async () => {
+    const decryptAddress = await _decryotData({
+      encryptedData: sendToken.from,
+    });
+
+    const activeNetwork = await _getActiveNetwork();
+    const parseActiveNetwork = JSON.parse(activeNetwork);
+
+    const balanceData = await getBalance({
+      rpcURL: parseActiveNetwork.rpcURL,
+      address: decryptAddress,
+    });
+    setBalance(balanceData);
+    if (balanceData) {
+      if (Number(balanceData) <= sendToken.amount) {
+        setDisabled(true);
+        setError("Insufficient Balance for this TX");
+      } else {
+        setDisabled(false);
+        setError("");
+      }
+    }
+  };
+
+  useEffect(() => {
+    getUserBalance();
+  }, [balance]);
   return (
     <>
       <ScrollView>
@@ -170,12 +203,16 @@ const Confrim = ({ navigation }) => {
                   </View>
                 </View>
               </View>
+              <Text style={[constants.error, { textAlign: "center" }]}>
+                {err}
+              </Text>
             </View>
             <ButtonGradient
               text={loading ? "Sending" : "Send"}
               func={func}
               route={"func"}
               widthSp={150}
+              disabled={disabled}
             />
           </View>
         </ReusableCard>

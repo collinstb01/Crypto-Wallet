@@ -18,6 +18,7 @@ export default contantStyles = {
     padding: 15,
     paddingVertical: InputHeight,
     backgroundColor: "#1c1924",
+    color: "#948fa8",
   },
   inputIcon: { position: "absolute", right: 50, top: 17 },
   container: {

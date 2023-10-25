@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginVertical: 15,
+    marginVertical: 20,
   },
   title: {
     fontSize: 24,

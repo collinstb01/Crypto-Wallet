@@ -22,6 +22,7 @@ const Receive = ({ navigation }) => {
               setShow(true);
               setText("0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9");
             }}
+            key={index}
           >
             <View key={index}>
               <AssestPrice />

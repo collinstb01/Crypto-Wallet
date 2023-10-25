@@ -7,7 +7,6 @@ import NameAndNetwork from "../../components/NameAndNetwork";
 import TokenHistory from "../../sections/TokenDetails/TokenHistory";
 import ResuableModalCTN from "../../components/ResuableModalCTN";
 import Constants from "../../constants/styles";
-import ButtonGradientTwo from "../../components/ButtonGradientTwo";
 import TransactionDInDepth from "../../components/TransactionDInDepth";
 import {
   _getActiveNetwork,
@@ -65,7 +64,7 @@ const Transactions = ({ route, navigation }) => {
       <StatusBarForScreens />
 
       <ScrollView onScroll={handleScroll}>
-        <View style={{ marginBottom: 50 }}>
+        <View style={{ marginBottom: 40 }}>
           <NameAndNetwork activeNetwork={activeNetwork} />
         </View>
         {transactions.length == 0 ? (

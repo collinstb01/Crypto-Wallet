@@ -9,8 +9,19 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import ButtonGradient from "../components/ButtonGradient";
 import StatusBarForScreens from "../components/StatusBarForScreens";
+import { useState } from "react";
+import UseCheckUser from "../Hooks/UseCheckUser";
+import { useEffect } from "react";
 
 const WalletSetUp = ({ navigation }) => {
+  const [doesUserExist, setDoesUserExist] = useState(null);
+
+  let data = UseCheckUser();
+
+  useEffect(() => {
+    setDoesUserExist(data);
+  }, [data]);
+
   return (
     <View style={styles.container}>
       <StatusBarForScreens />
@@ -33,7 +44,9 @@ const WalletSetUp = ({ navigation }) => {
           }}
           onPress={() => navigation.navigate("ImportSeed")}
         >
-          <Text style={styles.buttonText}>Import Using Seed Phrase</Text>
+          <Text style={styles.buttonText}>
+            {doesUserExist ? "Login Account" : "Import Using Seed Phrase"}
+          </Text>
         </TouchableOpacity>
         <ButtonGradient
           navigation={navigation}

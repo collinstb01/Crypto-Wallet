@@ -60,15 +60,23 @@ const Tabs = ({ route, navigation }) => {
           <Text style={[styles.text]}>Transaction</Text>
         </View>
       </TouchableOpacity>
-      <View style={{ alignItems: "center" }}>
-        <Ionicons
-          name="md-settings"
-          size={20}
-          color={index == 4 ? "white" : "#ffffff3d"}
-          style={[styles.icon]}
-        />
-        <Text style={[styles.text]}>Wallet</Text>
-      </View>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("settings", {
+            index: 4,
+          })
+        }
+      >
+        <View style={{ alignItems: "center" }}>
+          <Ionicons
+            name="md-settings"
+            size={20}
+            color={index == 4 ? "white" : "#ffffff3d"}
+            style={[styles.icon]}
+          />
+          <Text style={[styles.text]}>Settings</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
