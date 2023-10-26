@@ -21,6 +21,7 @@ const Transactions = ({ route, navigation }) => {
 
   const [isScrolling, handleScroll] = useHandleScrollFunc();
   const [show, setShow] = useState(false);
+  const [showPerson, setShowPerson] = useState(false);
   const [activeNetwork, setActiveNetwork] = useState(null);
   const [transactions, setTransactions] = useState("");
   const [txDepth, setTXDepth] = useState({
@@ -54,8 +55,6 @@ const Transactions = ({ route, navigation }) => {
     getTransactions();
   }, [loadingAfterSendToken]);
 
-  console.log(transactions);
-
   return (
     <View style={[Constants.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -65,7 +64,12 @@ const Transactions = ({ route, navigation }) => {
 
       <ScrollView onScroll={handleScroll}>
         <View style={{ marginBottom: 40 }}>
-          <NameAndNetwork activeNetwork={activeNetwork} />
+          <NameAndNetwork
+            activeNetwork={activeNetwork}
+            setShow={() => console.log("")}
+            setShowPerson={() => console.log("")}
+            show={false}
+          />
         </View>
         {transactions.length == 0 ? (
           <Empty text={"No Transaction Data"} />

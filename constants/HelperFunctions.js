@@ -486,28 +486,17 @@ export const _getTokens = async () => {
   return JSON.stringify(final);
 };
 
-export const _addTokens = async ({ addr }) => {
+export const _getTokenDetail = async ({ addr }) => {
   const activeNetwork = await _getActiveNetwork();
   const activeWallet = await _getActiveWallet();
   let parseActiveNetwork = JSON.parse(activeNetwork);
   let parseActiveWallet = JSON.parse(activeWallet);
 
-  const tokens = await AsyncStorage.getItem("tokens");
-
-  // if (JSON.parse(tokens).find((val) => val.address == addr)) {
-  //   return console.log("Already Listed");
-  // }
-
-  const parseTokens = JSON.parse(tokens);
-
   let abi = await getContractAbi({
     contractAddress: addr,
   });
 
-  // let API_KEY = "3d24b57ebfb8442bb83583ed476e0133";
-  let provider;
-
-  provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
+  let provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
 
   let userWalletAddress = await _decryotData({
     encryptedData: parseActiveWallet.walletAddress,
@@ -516,18 +505,58 @@ export const _addTokens = async ({ addr }) => {
   const contract = new ethers.Contract(addr, abi, provider);
   const userTokenBalance = await contract.balanceOf(userWalletAddress);
 
+  let name = await contract.name();
+  let decimals = Number(await contract.decimals());
+  let symbol = await contract.symbol();
+  let balance = Number(userTokenBalance);
+  let id = parseActiveNetwork.id;
+  let walletAddress = parseActiveWallet.walletAddress;
+
+  return JSON.stringify({
+    name,
+    decimals,
+    symbol,
+    balance,
+    addr,
+    id,
+    walletAddress,
+  });
+};
+
+export const _addTokens = async ({
+  addr,
+  symbol,
+  balance,
+  name,
+  decimals,
+  id,
+  setErr,
+  walletAddress,
+  navigation,
+}) => {
+  const tokens = await AsyncStorage.getItem("tokens");
+  const parseTokens = JSON.parse(tokens);
+
+  if (JSON.parse(tokens).find((val) => val.address == addr)) {
+    console.log("lise");
+    return setErr("Already Listed");
+  }
+
+  // let API_KEY = "3d24b57ebfb8442bb83583ed476e0133";
+
   const token = {
-    name: await contract.name(),
-    amount: Number(userTokenBalance),
-    symbol: await contract.symbol(),
+    name: name,
+    amount: balance,
+    symbol: symbol,
     address: addr,
-    network: parseActiveNetwork.id,
-    walletAddress: parseActiveWallet.walletAddress,
-    // decimals: await contract.decimals(),
+    network: id,
+    walletAddress: walletAddress,
+    decimals: decimals,
   };
 
   parseTokens.push(token);
   await AsyncStorage.setItem("tokens", JSON.stringify(parseTokens));
+  navigation.navigate("home");
 };
 
 export const removeToken = async () => {};

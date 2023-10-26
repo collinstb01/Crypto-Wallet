@@ -17,24 +17,46 @@ import {
   _getWallets,
   _setWallets,
   _encryotData,
+  _getTokenDetail,
+  _addTokens,
 } from "../../constants/HelperFunctions";
 import { Pressable } from "react-native";
 import ButtonGradient from "../../components/ButtonGradient";
+import TabstwoContents from "../../components/TabstwoContents";
 
 const AddTokens = ({ navigation }) => {
   const [receiveingAddr, setReceivingAddr] = useState("");
   const [show, setShow] = useState(false);
   const [valid, setValid] = useState(false);
+  const [active, setActive] = useState(1);
+  const [data, setData] = useState({
+    name: "",
+    decimals: null,
+    symbol: "",
+    balance: "",
+    addr: "",
+    id: "",
+    walletAddress: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [disabled, setdisabled] = useState(true);
+  const [err, setErr] = useState("");
 
   const backFunc = () => {
     navigation.goBack();
   };
 
   const handleChange = async (e) => {
-    let encrypt = await _encryotData({ data: e });
-    setReceivingAddr(encrypt);
+    setLoading(true);
+    setdisabled(true);
+    // let encrypt = await _encryotData({ data: e });
+    // setReceivingAddr(encrypt);
 
     if (!/^(0x)?[0-9a-fA-F]{40}$/.test(e)) {
+      setErr("Enter Value Address");
+      setTimeout(() => {
+        setErr("");
+      }, 5000);
       // Check if the address is 40 hexadecimal characters with or without the "0x" prefix.
       return setValid(false);
     }
@@ -45,13 +67,41 @@ const AddTokens = ({ navigation }) => {
     }
 
     Keyboard.dismiss(); // Close the keyboard
+
+    const data = await _getTokenDetail({ addr: e });
+    let parseData = JSON.parse(data);
+
+    setData((prev) => ({
+      ...prev,
+      name: parseData.name,
+      decimals: parseData.decimals.toString(),
+      symbol: parseData.symbol,
+      balance: parseData.balance,
+      addr: parseData.addr,
+      id: parseData.id,
+      walletAddress: parseData.walletAddress,
+    }));
+
+    setdisabled(false);
+    setLoading(false);
+
     return setValid(true);
   };
 
-  const func = () => {};
+  const func = async () => {
+    if (data.addr == "") {
+      setErr("Enter Value Address");
+      setTimeout(() => {
+        setErr("");
+      }, 5000);
+      return setErr("Pleae Enter Token Address");
+    }
+    setLoading(true);
+    await _addTokens({ ...data, setErr, navigation });
+    setLoading(false);
+  };
 
   useEffect(() => {}, []);
-
   return (
     <ReusableCard
       navigation={navigation}
@@ -59,21 +109,110 @@ const AddTokens = ({ navigation }) => {
       backFunc={backFunc}
     >
       <View style={styles.container}>
-        <TextInput
-          placeholder={valid ? "" : "Search, public address (0x), or ENS"}
-          style={[styles.input, constantStyle.input]}
-          placeholderTextColor={"#a49eb9"}
-          onChangeText={(e) => handleChange(e)}
-          value={valid ? "" : receiveingAddr}
-          editable={valid == false && true}
+        <TabstwoContents
+          active={active}
+          setActive={setActive}
+          text1={"Search"}
+          text2={"Custom Tokens"}
         />
-        <View style={{ marginTop: 50 }}>
-          <ButtonGradient
-            text={"Next"}
-            func={func}
-            route={"func"}
-            widthSp={200}
-          />
+        <View
+          style={{
+            flex: 1,
+            marginTop: 40,
+          }}
+        >
+          {active == 1 ? (
+            <View
+              style={{
+                justifyContent: "space-between",
+                flex: 1,
+                flexDirection: "column",
+              }}
+            >
+              <TextInput
+                placeholder={valid ? "" : "Search, public address (0x), or ENS"}
+                style={[styles.input, constantStyle.input]}
+                placeholderTextColor={"#a49eb9"}
+                onChangeText={(e) => handleChange(e)}
+                value={valid ? "" : receiveingAddr}
+                // editable={valid == false && true}
+              />
+              <View style={{ marginTop: 50 }}>
+                <ButtonGradient
+                  text={"Next"}
+                  func={func}
+                  route={"func"}
+                  widthSp={200}
+                />
+              </View>
+            </View>
+          ) : (
+            <View
+              style={{
+                justifyContent: "space-between",
+                flex: 1,
+                flexDirection: "column",
+              }}
+            >
+              <View>
+                <TextInput
+                  placeholder={valid ? "" : "Token Address"}
+                  style={[styles.input, constantStyle.input]}
+                  placeholderTextColor={"#a49eb9"}
+                  onChangeText={(e) => handleChange(e)}
+                  //   value={valid ? "" : receiveingAddr}
+                  editable={valid == false && true}
+                />
+                <Text
+                  style={{
+                    color: "red",
+                    fontSize: 13,
+                    position: "absolute",
+                    top: 64,
+                    left: 20,
+                    fontWeight: "700",
+                  }}
+                >
+                  {err}
+                </Text>
+                <TextInput
+                  placeholder={valid ? "" : "Token Symbol"}
+                  style={[styles.input, constantStyle.input]}
+                  placeholderTextColor={"#a49eb9"}
+                  onChangeText={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      symbol: e,
+                    }))
+                  }
+                  value={data.symbol}
+                  // editable={data == false && true}
+                />
+                <TextInput
+                  placeholder={valid ? "" : "Token Decimal"}
+                  style={[styles.input, constantStyle.input]}
+                  placeholderTextColor={"#a49eb9"}
+                  onChangeText={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      decimals: e,
+                    }))
+                  }
+                  value={data.decimals}
+                  //   editable={valid == false && true}
+                />
+              </View>
+              <View style={{ marginTop: 50 }}>
+                <ButtonGradient
+                  text={loading ? "Importing..." : "Import Token"}
+                  func={func}
+                  route={"func"}
+                  disabled={disabled}
+                  widthSp={200}
+                />
+              </View>
+            </View>
+          )}
         </View>
       </View>
     </ReusableCard>
@@ -98,6 +237,7 @@ const styles = StyleSheet.create({
     width: 168,
   },
   input: {
+    marginBottom: 30,
     color: "white",
   },
   container: {

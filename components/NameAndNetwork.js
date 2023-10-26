@@ -3,7 +3,7 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import Network from "./Network";
 
-const NameAndNetwork = ({ setShow, setShowPerson, activeNetwork }) => {
+const NameAndNetwork = ({ setShow, setShowPerson, activeNetwork, show }) => {
   const func = () => {};
   return (
     <>
@@ -13,7 +13,7 @@ const NameAndNetwork = ({ setShow, setShowPerson, activeNetwork }) => {
           <Pressable onPress={() => setShow((e) => !e)}>
             <View style={[styles.f, { justifyContent: "flex-start" }]}>
               <Text style={[styles.text, styles.name]}>Account</Text>
-              <Ionicons name="caret-down" size={10} color="white" />
+              {show && <Ionicons name="caret-down" size={10} color="white" />}
             </View>
           </Pressable>
           <Pressable onPress={() => setShowPerson((e) => !e)}>

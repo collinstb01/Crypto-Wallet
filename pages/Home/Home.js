@@ -105,7 +105,7 @@ const Home = ({ route, navigation }) => {
     navigation.navigate("add-token");
     // setLoading(true);
     // await _addTokens({ addr: text });
-    // setshowAddToken(false);
+    setshowAddToken(false);
     // setLoading(false);
   };
 
@@ -196,6 +196,7 @@ const Home = ({ route, navigation }) => {
               setShow={setShow}
               setShowPerson={setShowPerson}
               activeNetwork={activeNetwork}
+              show={true}
             />
             <View>
               <Ionicons name="md-scan" size={20} color="white" />

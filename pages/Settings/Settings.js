@@ -10,9 +10,18 @@ import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Share } from "react-native";
+import { Alert } from "react-native";
+import {
+  _decryotData,
+  _getActiveWallet,
+} from "../../constants/HelperFunctions";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const Settings = ({ route, navigation }) => {
   const [isScrolling, handleScroll] = useHandleScrollFunc();
+  const [activeWallet, setActiveWallet] = useState(null);
 
   const settings = [
     {
@@ -25,7 +34,7 @@ const Settings = ({ route, navigation }) => {
       icon: FontAwesome,
       iconname: "share-square-o",
       name: "Share My Public Address",
-      route: "",
+      route: "share",
     },
     {
       icon: MaterialCommunityIcons,
@@ -47,9 +56,49 @@ const Settings = ({ route, navigation }) => {
     },
   ];
 
+  const getActiveWalets = async () => {
+    const data = await _getActiveWallet();
+    let parseData = JSON.parse(data);
+    let decryptDataWalletAddress = await _decryotData({
+      encryptedData: parseData.walletAddress,
+    });
+    setActiveWallet(decryptDataWalletAddress);
+  };
+
+  console.log(activeWallet);
   const handleRoute = async ({ route }) => {
+    if (route == "") return;
+    if (route == "share") {
+      onShare();
+      return;
+    }
     navigation.navigate(route);
   };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: activeWallet,
+        title: "Wallet Address",
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    getActiveWalets();
+  }, []);
+
   return (
     <View style={[Constants.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
