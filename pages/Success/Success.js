@@ -72,6 +72,7 @@ const Success = ({ navigation }) => {
 
     await AsyncStorage.setItem("networks", JSON.stringify(networks));
     await AsyncStorage.setItem("TXhistory", JSON.stringify([]));
+    await AsyncStorage.setItem("recents", JSON.stringify([]));
   }
 
   return (

@@ -18,6 +18,7 @@ import {
 } from "../../constants/HelperFunctions";
 import { useState } from "react";
 import { useEffect } from "react";
+import { Linking } from "react-native";
 
 const Settings = ({ route, navigation }) => {
   const [isScrolling, handleScroll] = useHandleScrollFunc();
@@ -40,7 +41,7 @@ const Settings = ({ route, navigation }) => {
       icon: MaterialCommunityIcons,
       iconname: "eye-settings",
       name: "View on Etherscan",
-      route: "",
+      route: "expolorer",
     },
     {
       icon: MaterialIcons,
@@ -72,6 +73,10 @@ const Settings = ({ route, navigation }) => {
       onShare();
       return;
     }
+    if (route == "expolorer") {
+      await handlePress();
+      return;
+    }
     navigation.navigate(route);
   };
 
@@ -92,6 +97,18 @@ const Settings = ({ route, navigation }) => {
       }
     } catch (error) {
       Alert.alert(error.message);
+    }
+  };
+
+  const handlePress = async () => {
+    // Checking if the link is supported for links with custom URL scheme.
+    const url = `https://etherscan.io/address/${activeWallet}`;
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      // Opening the link with some app, if the URL scheme is "http" the web link should be opened by some browser in the mobile
+      await Linking.openURL(url);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${url}`);
     }
   };
 

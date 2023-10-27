@@ -203,7 +203,11 @@ const Home = ({ route, navigation }) => {
             </View>
           </View>
           <View style={[styles2.container]}>
-            <Text style={[styles2.text, styles2.textEth]}>70.42 ETH</Text>
+            <Text style={[styles2.text, styles2.textEth]}>
+              {!tokens
+                ? "0"
+                : tokens[0]?.amount?.toString()?.slice(0, 5) + " ETH"}
+            </Text>
             <Text style={[styles2.text, styles2.textTwo]}>
               $121,330 <Text style={styles2.textThree}> + 5,42%</Text>
             </Text>
@@ -259,6 +263,8 @@ const Home = ({ route, navigation }) => {
                         navigation.navigate("token-details", {
                           tokenName: val.name.replace("Token", ""),
                           amount: val.amount,
+                          contractAddress: val.address,
+                          symbol: val.symbol,
                         })
                       }
                       key={index}

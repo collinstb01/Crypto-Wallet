@@ -282,6 +282,7 @@ export const _createUserAccount = async ({
     await AsyncStorage.setItem("tokens", JSON.stringify(tokens)); //
     await AsyncStorage.setItem("networks", JSON.stringify(networks)); // done
     await AsyncStorage.setItem("TXhistory", JSON.stringify([])); // done
+    await AsyncStorage.setItem("recents", JSON.stringify([]));
 
     navigation.navigate("home");
   } else {
@@ -732,6 +733,21 @@ export const _getUserTransactions = async () => {
   return data;
 };
 
+export const _getUserTokenTransactions = async ({
+  contractAddress,
+  symbol,
+}) => {
+  const data = await AsyncStorage.getItem("TXhistory");
+  const parseData = JSON.parse(data);
+
+  console.log(parseData);
+  let TokenHistory = parseData.filter(
+    (item) => item.contractAddress == contractAddress
+  );
+
+  return JSON.stringify(TokenHistory);
+};
+
 export const _getrecentsAddressSentTo = async () => {
   const recentsAddressSentTo = await AsyncStorage.getItem("recents");
 
@@ -1039,6 +1055,12 @@ export const confirmTX = async ({
     const TXhistory = await AsyncStorage.getItem("TXhistory");
     const parseTXhistory = JSON.parse(TXhistory);
     let realTX = parseTXhistory[parseTXhistory.length - 1];
+
+    let recents = await AsyncStorage.getItem("recents");
+    let ParseRecents = JSON.parse(recents);
+    ParseRecents.push(`${realTX.to}`);
+
+    await AsyncStorage.setItem("recents", JSON.stringify(ParseRecents));
 
     if (receipt.status === 1) {
       realTX.status = "success";

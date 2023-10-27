@@ -17,14 +17,29 @@ import ResuableModalCTN from "../../components/ResuableModalCTN";
 import TransactionDInDepth from "../../components/TransactionDInDepth";
 import { TouchableOpacity } from "react-native";
 import QRCodeReceiveToken from "../../components/QRCodeReceiveToken";
-import { _getActiveWallet } from "../../constants/HelperFunctions";
+import {
+  _getActiveWallet,
+  _getUserTokenTransactions,
+} from "../../constants/HelperFunctions";
+import Empty from "../../components/Empty";
 
 const TokenDetails = ({ route, navigation }) => {
   const [show, setShow] = useState(false);
   const [QRCode, setShowQRCode] = useState(false);
   const [activeWallet, setActiveWallet] = useState(null);
-
-  const { tokenName, amount } = route.params;
+  const [tokenHistory, setTokenHistory] = useState(null);
+  const [txDepth, setTXDepth] = useState({
+    status: "",
+    date: "",
+    from: "",
+    to: "",
+    nounce: "",
+    amount: "",
+    networkFee: "",
+    contractAddress: "",
+    hash: "",
+  });
+  const { tokenName, amount, contractAddress, symbol } = route.params;
 
   // BackHandler.addEventListener("hardwareBackPress", () => {
   //   navigation.navigate("home");
@@ -35,8 +50,19 @@ const TokenDetails = ({ route, navigation }) => {
     setActiveWallet(JSON.parse(data));
   };
 
+  const getTokenHistory = async () => {
+    const data = await _getUserTokenTransactions({
+      contractAddress: contractAddress,
+      symbol,
+    });
+    setTokenHistory(JSON.parse(data));
+  };
   useEffect(() => {
     getActiveWalets();
+  }, [QRCode]);
+
+  useEffect(() => {
+    getTokenHistory();
   }, [QRCode]);
 
   const DATATXHistory = [
@@ -66,10 +92,22 @@ const TokenDetails = ({ route, navigation }) => {
     },
   ];
 
+  const backFunc = () => {
+    navigation.goBack();
+  };
+
+  console.log(tokenHistory, contractAddress, "ddddddddddddddddd");
+  if (!tokenHistory) {
+    return;
+  }
   return (
     <>
       <ScrollView>
-        <ReusableCard text={tokenName} show={show || QRCode}>
+        <ReusableCard
+          text={tokenName}
+          show={show || QRCode}
+          backFunc={backFunc}
+        >
           {show && <View style={constants.overlay}></View>}
 
           <View style={{ minHeight: Dimensions.get("window").height - 130 }}>
@@ -86,7 +124,8 @@ const TokenDetails = ({ route, navigation }) => {
             <View style={[styles.container]}>
               <View style={styles.prices}>
                 <Text style={styles.priceText1}>
-                  {amount} {tokenName.split(" ")[0].toUpperCase()}
+                  {amount.toString().slice(0, 5)}{" "}
+                  {tokenName.split(" ")[0].toUpperCase()}
                 </Text>
                 <Text style={styles.priceText2}>$39.63</Text>
               </View>
@@ -110,7 +149,15 @@ const TokenDetails = ({ route, navigation }) => {
                   </View>
                 </TouchableOpacity>
               </View>
-              <TokenHistory DATA={DATATXHistory} setShow={setShow} />
+              {!tokenHistory ? (
+                <Empty text={"No Transaction Data"} />
+              ) : (
+                <TokenHistory
+                  DATA={tokenHistory}
+                  setShow={setShow}
+                  setTXDepth={setTXDepth}
+                />
+              )}
               <LoadingBanner
                 text1={"Transaction Submitted"}
                 text2={"Waiting for confirmation"}
@@ -120,9 +167,9 @@ const TokenDetails = ({ route, navigation }) => {
           </View>
         </ReusableCard>
       </ScrollView>
-      {show && (
+      {txDepth && (
         <ResuableModalCTN text={"send 1INCH"} setShow={setShow}>
-          <TransactionDInDepth />
+          <TransactionDInDepth txDepth={txDepth} />
         </ResuableModalCTN>
       )}
       {QRCode && (
