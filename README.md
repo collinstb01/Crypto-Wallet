@@ -1,5 +1,5 @@
 # Crypto Wallet App
-
+<img src="https://i.ibb.co/nwZHKNT/Whats-App-Image-2023-10-28-at-03-39-42.jpg" alt="Whats-App-Image-2023-10-28-at-03-39-42" style="max-width: 20px; max-height: 20px;">
 Welcome to the Crypto Wallet App, a user-friendly cryptocurrency wallet built with React Native Expo that offers a wide range of functionalities to manage your digital assets securely. Whether you're sending tokens, creating accounts, importing with seed phrases or private keys, or simply checking your transaction history, this wallet has you covered.
 
 ## Table of Contents
