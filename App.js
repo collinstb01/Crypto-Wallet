@@ -23,6 +23,7 @@ import { store } from "./features/store";
 import Settings from "./pages/Settings/Settings";
 import AddTokens from "./pages/AddTokens/AddTokens";
 import Preferences from "./pages/Preferences/Preferences";
+import GeneralSettings from "./pages/GeneralSettings/GeneralSettings";
 
 const Stack = createNativeStackNavigator();
 
@@ -127,6 +128,11 @@ export default function App() {
           <Stack.Screen
             name="preferences"
             component={Preferences}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="settings/general"
+            component={GeneralSettings}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

@@ -378,8 +378,10 @@ export const _createWallet = async ({
 
       const addressIndex = Math.floor(Math.random() * 2 ** 31); // Random address index
       const path = `m/44'/60'/${"0"}/${"0"}/${addressIndex}`;
+
       const wallet = HDNodeWallet.fromPhrase(decryptMnemonic, undefined, path);
 
+      address = wallet.address;
       encryptedWalletAddress = await _encryotData({
         data: wallet.address,
       });

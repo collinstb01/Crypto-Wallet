@@ -46,8 +46,8 @@ const Settings = ({ route, navigation }) => {
     {
       icon: MaterialIcons,
       iconname: "room-preferences",
-      name: "Peferences",
-      route: "",
+      name: "Preferences",
+      route: "preferences",
     },
     {
       icon: AntDesign,
