@@ -78,6 +78,7 @@ const SendToken = ({ navigation }) => {
 
   const handleChangeActive = async ({ walletAddress }) => {
     await _setWallets({ walletAddress: walletAddress });
+    setShow(false);
     getUserWallets();
   };
 
@@ -180,6 +181,7 @@ const SendToken = ({ navigation }) => {
           navigation={navigation}
           to={receiveingAddr}
           from={activeWallet.WalletAddressNoFormat}
+          handleChange={handleChange}
         />
       </ScrollView>
     </ReusableCard>

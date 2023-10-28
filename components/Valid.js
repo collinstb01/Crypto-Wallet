@@ -10,10 +10,11 @@ const Valid = ({ address, addressTwo }) => {
     setAddr(d);
   };
   useEffect(() => {
+    if (!address) return;
     getAddress();
-  }, []);
+  }, [address]);
 
-  console.log(addressTwo);
+  console.log(address);
 
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>

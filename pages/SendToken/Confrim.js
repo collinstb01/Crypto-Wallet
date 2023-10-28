@@ -81,11 +81,8 @@ const Confrim = ({ navigation }) => {
       gasLEstimate: parseGas.gasLEstimate,
       gasInEth: ethers.formatEther(totalGasInEth),
     }));
-
-    // let totalEth = Number(sendToken.amount) + Number(totalGasInEth);
-
-    // settotalAmount(ethers.formatUnits(totalEth));
   };
+
   useEffect(() => {
     // getGasFee
     // getGasLimit

@@ -1097,23 +1097,21 @@ export const confirmTX = async ({
 
     let recents = await AsyncStorage.getItem("recents");
     let ParseRecents = JSON.parse(recents);
-    ParseRecents.push(
-      `${{
-        to: realTX.to,
-      }}`
-    );
+    ParseRecents.push({
+      to: realTX.to,
+      from: realTX.from,
+      hash: realTX.hash,
+    });
 
     await AsyncStorage.setItem("recents", JSON.stringify(ParseRecents));
-
+    console.log(ParseRecents);
     if (receipt.status === 1) {
+      // Transaction succeeded
       realTX.status = "success";
       realTX.gasUsed = Number(receipt.gasUsed);
       realTX.gasPrice = Number(receipt.gasPrice);
       realTX.statusNo = receipt.status;
       realTX.blockNumber = Number(receipt.blockNumber);
-      // Transaction succeeded
-      // filering
-      console.log("real TX.....................", realTX);
 
       await AsyncStorage.setItem("TXhistory", JSON.stringify(parseTXhistory));
 

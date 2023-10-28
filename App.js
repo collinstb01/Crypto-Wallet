@@ -22,6 +22,7 @@ import { Provider } from "react-redux";
 import { store } from "./features/store";
 import Settings from "./pages/Settings/Settings";
 import AddTokens from "./pages/AddTokens/AddTokens";
+import Preferences from "./pages/Preferences/Preferences";
 
 const Stack = createNativeStackNavigator();
 
@@ -121,6 +122,11 @@ export default function App() {
           <Stack.Screen
             name="add-token"
             component={AddTokens}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="preferences"
+            component={Preferences}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

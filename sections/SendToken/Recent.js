@@ -8,9 +8,10 @@ import {
 import Empty from "../../components/Empty";
 import { useDispatch } from "react-redux";
 import { setSendToken } from "../../features/StorageAuth/StorageAuth";
+import { Pressable } from "react-native";
 
-const Recent = ({ navigation, valid, to, from }) => {
-  const [recents, setRecents] = useState([]);
+const Recent = ({ navigation, valid, to, from, handleChange }) => {
+  const [recents, setRecents] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -23,20 +24,17 @@ const Recent = ({ navigation, valid, to, from }) => {
 
   const getrecentsAddressSentTo = async () => {
     const data = await _getrecentsAddressSentTo();
-    if (data == false) {
+    if (!data) {
       return setRecents(false);
     }
-    setRecents(data);
+    let parseData = JSON.parse(data);
+    setRecents(parseData);
   };
   useEffect(() => {
     getrecentsAddressSentTo();
   }, []);
 
-  console.log(
-    Array.isArray(recents),
-    typeof JSON.parse(recents),
-    "this is recents"
-  );
+  console.log(Array.isArray(recents), JSON.parse(recents), " is recents");
   return (
     <View
       style={[
@@ -66,21 +64,24 @@ const Recent = ({ navigation, valid, to, from }) => {
         ) : (
           <>
             <View>
-              {[1, 2, 3].map((val, index) => (
-                <View style={{ flexDirection: "row", marginBottom: 20 }}>
-                  <Image
-                    source={require("../../assets/face1.png")}
-                    style={styles.img}
-                  />
-                  <View>
-                    <Text style={[styles.text1, { color: "white" }]}>
-                      Beexay
-                    </Text>
-                    <Text style={[styles.text2, { color: "white" }]}>
-                      0x3Dc6...Dxe2
-                    </Text>
+              {JSON.parse(recents)?.map((val, index) => (
+                <Pressable onPress={() => handleChange(val.to)} key={index}>
+                  <View style={{ flexDirection: "row", marginBottom: 20 }}>
+                    <Image
+                      source={require("../../assets/face1.png")}
+                      style={styles.img}
+                    />
+                    <View>
+                      <Text style={[styles.text1, { color: "white" }]}>
+                        {"Account: "}
+                        {`${val.from.slice(0, 4)}...${val.from.slice(-5)}`}
+                      </Text>
+                      <Text style={[styles.text2, { color: "white" }]}>
+                        {`To: ${val.to.slice(0, 4)}...${val.to.slice(-5)}`}
+                      </Text>
+                    </View>
                   </View>
-                </View>
+                </Pressable>
               ))}
             </View>
           </>
