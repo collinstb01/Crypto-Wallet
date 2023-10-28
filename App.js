@@ -24,6 +24,8 @@ import Settings from "./pages/Settings/Settings";
 import AddTokens from "./pages/AddTokens/AddTokens";
 import Preferences from "./pages/Preferences/Preferences";
 import GeneralSettings from "./pages/GeneralSettings/GeneralSettings";
+import SecurityPrivacy from "./pages/SecurityPrivacy/SecurityPrivacy";
+import RevealSeedPhrase from "./pages/RevealSeedPhrase/RevealSeedPhrase";
 
 const Stack = createNativeStackNavigator();
 
@@ -133,6 +135,16 @@ export default function App() {
           <Stack.Screen
             name="settings/general"
             component={GeneralSettings}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="settings/security-privacy"
+            component={SecurityPrivacy}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="settings/reveal-seed-phrase"
+            component={RevealSeedPhrase}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

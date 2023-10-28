@@ -1,5 +1,6 @@
 import {
   Dimensions,
+  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -13,10 +14,14 @@ import useHandleScrollFunc from "../../Hooks/handleScroll";
 import { ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import TextAndBackIcon from "../../components/TextAndBackIcon";
+import ResuableModalCTN from "../../components/ResuableModalCTN";
 
 const GeneralSettings = ({ navigation }) => {
   const [isScrolling, handleScroll] = useHandleScrollFunc();
+  const [showModal, setshowModal] = useState(false);
   const [show, setShow] = useState(null);
+  const [arr, setArr] = useState([]);
+  const [dropDownTitle, setdropDownTitle] = useState("...");
 
   const data = [
     {
@@ -25,22 +30,27 @@ const GeneralSettings = ({ navigation }) => {
       route: "settings/general",
       array: [
         {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
+          text: "USD - United State Dollar",
           active: 1,
         },
+        {
+          text: "XLM - Stellar Lumen",
+          active: 0,
+        },
+        {
+          text: "PAY - TenX",
+          active: 0,
+        },
+        {
+          text: "TKN - TokenCard",
+          active: 0,
+        },
+        {
+          text: "ZEC - Zcash",
+          active: 0,
+        },
       ],
+      dropDownTitle: "Base Currency",
     },
     {
       title: "Privacy Currency",
@@ -48,22 +58,15 @@ const GeneralSettings = ({ navigation }) => {
       route: "",
       array: [
         {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " NGN - Niggeria Naira",
+          text: " Native",
           active: 1,
         },
+        {
+          text: "Fiat",
+          active: 0,
+        },
       ],
+      dropDownTitle: "Base Currency",
     },
     {
       title: "Current Language",
@@ -71,22 +74,27 @@ const GeneralSettings = ({ navigation }) => {
       route: "",
       array: [
         {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
+          text: "English",
           active: 1,
         },
+        {
+          text: "French",
+          active: 0,
+        },
+        {
+          text: "Dansk",
+          active: 0,
+        },
+        {
+          text: "Filipino",
+          active: 0,
+        },
+        {
+          text: "Estonian",
+          active: 0,
+        },
       ],
+      dropDownTitle: "Language",
     },
     {
       title: "Search Engine",
@@ -94,61 +102,53 @@ const GeneralSettings = ({ navigation }) => {
       route: "",
       array: [
         {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
+          text: " Google",
           active: 1,
         },
+        {
+          text: "DuckDuckGo",
+          active: 0,
+        },
       ],
+      dropDownTitle: "Search Engine",
     },
     {
       title: "Account Identification",
-      desc: "Add and edit custom RPC networks",
+      desc: "You can customize your account",
       route: "",
       array: [
         {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
-          active: 0,
-        },
-        {
-          text: " USD - United State Dollar",
+          text: "Custom Account",
           active: 1,
         },
+        {
+          text: "USD - United State Dollar",
+          active: 0,
+        },
       ],
+      dropDownTitle: "Base Currency",
     },
   ];
 
   const boxHeigght = Platform.OS === "ios" ? 23 : 15;
 
-  const handleSetShowDropDown = ({ index }) => {
+  const handleSetShowDropDown = ({ index, arr, title }) => {
     if (index == show) {
+      setshowModal(false);
+      setArr([]);
+      setdropDownTitle("");
       return setShow(null);
     }
+    setArr(arr);
     setShow(index);
+    setshowModal(true);
+    setdropDownTitle(title);
   };
 
-  console.log(show);
   return (
     <View style={[Constants.container2Home]}>
       <StatusBarForScreens />
+      {showModal == true && <View style={Constants.overlay}></View>}
 
       <ScrollView onScroll={handleScroll}>
         <TextAndBackIcon text={"Preferences"} navigation={navigation} />
@@ -164,15 +164,23 @@ const GeneralSettings = ({ navigation }) => {
                   <Text style={styles.desc}>{val.desc}</Text>
                   <Pressable
                     style={{ marginTop: 20 }}
-                    onPress={() => handleSetShowDropDown({ index: index })}
+                    onPress={() =>
+                      handleSetShowDropDown({
+                        index: index,
+                        arr: val.array,
+                        title: val.dropDownTitle,
+                      })
+                    }
                   >
                     <View
                       style={[styles.input, { paddingVertical: boxHeigght }]}
                     >
                       {val.array
                         .filter((item) => item.active == 1)
-                        .map((active) => (
-                          <Text style={styles.selectText}>{active.text}</Text>
+                        .map((active, index) => (
+                          <Text key={index} style={styles.selectText}>
+                            {active.text}
+                          </Text>
                         ))}
                       <View>
                         <MaterialIcons
@@ -183,26 +191,6 @@ const GeneralSettings = ({ navigation }) => {
                         />
                       </View>
                     </View>
-                    {show == index && (
-                      <View style={{ backgroundColor: "gray" }}>
-                        {val.array.map((val, index) => (
-                          <View
-                            style={[
-                              styles.inputDropDown,
-                              {
-                                paddingVertical: boxHeigght,
-                                marginTop: 10,
-                              },
-                            ]}
-                            key={index}
-                          >
-                            <Text style={styles.selectText}>
-                              USD - United State Dollar
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
-                    )}
                   </Pressable>
                 </View>
               </View>
@@ -210,6 +198,33 @@ const GeneralSettings = ({ navigation }) => {
           ))}
         </View>
       </ScrollView>
+      {showModal && (
+        <ResuableModalCTN text={dropDownTitle} setShow={setshowModal}>
+          {Array.isArray(arr) &&
+            arr.map((val, index) => (
+              <View
+                style={[
+                  {
+                    paddingVertical: boxHeigght,
+                    marginTop: 2,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  },
+                ]}
+                key={index}
+              >
+                <Text style={styles.selectText}>{val.text}</Text>
+                {val.active == 1 && (
+                  <Image
+                    source={require("../../assets/check-select.png")}
+                    style={{ width: 24, height: 24 }}
+                  />
+                )}
+              </View>
+            ))}
+        </ResuableModalCTN>
+      )}
     </View>
   );
 };
@@ -223,6 +238,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   inputDropDown: {
+    width: Dimensions.get("window").width - 50,
     padding: 15,
     backgroundColor: "#1c1924",
     color: "#948fa8",
@@ -238,6 +254,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    width: Dimensions.get("window").width - 50,
   },
   desc: {
     color: "white",

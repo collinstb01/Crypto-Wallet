@@ -19,7 +19,7 @@ const Preferences = ({ navigation }) => {
     {
       title: "Security & Privacy",
       desc: "Privacy settings,private key and wallet seed phrase",
-      route: "",
+      route: "settings/security-privacy",
     },
     ,
     {
