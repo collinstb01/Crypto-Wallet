@@ -13,12 +13,13 @@ import Input from "../components/Input";
 import FaceId from "../components/FaceId";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ButtonGradient from "../components/ButtonGradient";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Contants from "../constants/styles";
 import {
   _checkPasswordStrength,
   _createUserAccount,
 } from "../constants/HelperFunctions";
+import { setPasswordForNewWallet } from "../features/StorageAuth/StorageAuth";
 
 const CreateNewWallet = ({ navigation }) => {
   const { message } = useSelector((state) => state.storage);
@@ -27,7 +28,7 @@ const CreateNewWallet = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loding, setLoading] = useState(false);
   const [agreed, setAgreedMent] = useState(false);
-
+  const dispatch = useDispatch();
   const _changeAgreedment = () => {
     setAgreedMent((e) => !e);
   };
@@ -42,6 +43,7 @@ const CreateNewWallet = ({ navigation }) => {
 
   const _storeData = async () => {
     try {
+      // return navigation.navigate("SecureYourWallet");
       _createUserAccount({
         password,
         confirmPassword,
@@ -52,6 +54,7 @@ const CreateNewWallet = ({ navigation }) => {
         navigation,
         route: "SecureYourWallet",
       });
+      dispatch(setPasswordForNewWallet({ password: password }));
     } catch (error) {
       console.log(error);
       setErr("An Error Occured");
@@ -60,7 +63,7 @@ const CreateNewWallet = ({ navigation }) => {
   };
 
   return (
-    <View style={Contants.container}>
+    <View style={Contants.container2Home}>
       <StatusBar
         animated={true}
         // barStyle=""
@@ -70,7 +73,7 @@ const CreateNewWallet = ({ navigation }) => {
         backgroundColor="white"
         barStyle="dark-content"
       />
-      <Step one={1} />
+      <Step one={1} navigation={navigation} />
       <View style={styles.containerTwo}>
         <Text style={styles.createPass}>Create Passowrd</Text>
         <Text style={[styles.desc]}>
@@ -125,6 +128,7 @@ const CreateNewWallet = ({ navigation }) => {
           func={_storeData}
           text={"Next"}
           navigation={navigation}
+          widthSp={200}
         />
       </View>
     </View>

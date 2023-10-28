@@ -139,10 +139,10 @@ export const _createUserAccount = async ({
       JSON.stringify({ password: encryptedData, seedPrase: encryptedseedPrase })
     );
   } else {
-    await AsyncStorage.setItem(
-      "user",
-      JSON.stringify({ password: encryptedData, seedPrase: "" })
-    );
+    // await AsyncStorage.setItem(
+    //   "user",
+    //   JSON.stringify({ password: encryptedData, seedPrase: "" })
+    // );
   }
   if (route == "") {
     if (seedPrase == "") {
@@ -334,11 +334,11 @@ export const _getWallets = async () => {
 
   return _wallet;
 };
-
 export const _createWallet = async ({
   walletName,
   setLoading,
   setError,
+  setShow,
   privateKey,
 }) => {
   try {
@@ -351,13 +351,22 @@ export const _createWallet = async ({
     activeWallet.active = 0;
 
     if (parseWallets.find((val) => val.name == walletName)) {
-      return setError("Name Already exist, use another Account Name.");
+      _helperFunc({
+        error: "Name Already exist, use another Account Name.",
+        loading: false,
+        setErr: setError,
+        setLoading: setLoading,
+      });
+
+      return;
     }
 
-    let encryptedWalletAddress, encryptedPrivateKey;
-    if (privateKey) {
-      let wallet = new ethers.Wallet(privateKey);
-      let address = wallet.address;
+    let encryptedWalletAddress, encryptedPrivateKey, address;
+    if (privateKey !== "") {
+      console.log(privateKey, "This is the private key");
+      let wallet = new ethers.Wallet(privateKey.toString());
+      address = wallet.address;
+      console.log(wallet, "Reached");
 
       encryptedWalletAddress = await _encryotData({ data: address });
       encryptedPrivateKey = await _encryotData({ data: privateKey });
@@ -390,7 +399,13 @@ export const _createWallet = async ({
     const tokenArr = [
       {
         name: "Ethereum main Network",
-        amount: 0,
+        amount: Number(
+          await getBalance({
+            rpcURL:
+              "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
+            address: address,
+          })
+        ),
         symbol: "Ethereum",
         address: "0x0000000000000000000000000000000000000000",
         network: "eth",
@@ -398,7 +413,13 @@ export const _createWallet = async ({
       },
       {
         name: "Sepolia Test Network",
-        amount: 0,
+        amount: Number(
+          await getBalance({
+            rpcURL:
+              "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+            address: address,
+          })
+        ),
         symbol: "sepolia",
         address: "0x0000000000000000000000000000000000000000",
         network: "sepolia",
@@ -406,7 +427,12 @@ export const _createWallet = async ({
       },
       {
         name: "Smart Chain - Testnet",
-        amount: 0,
+        amount: Number(
+          await getBalance({
+            rpcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+            address: address,
+          })
+        ),
         symbol: "bscTestNet",
         address: "0x0000000000000000000000000000000000000000",
         network: "bscTestNet",
@@ -414,7 +440,12 @@ export const _createWallet = async ({
       },
       {
         name: "Binance Smart Chain",
-        amount: 0,
+        amount: Number(
+          await getBalance({
+            rpcURL: "https://bsc-dataseed.binance.org/",
+            address: address,
+          })
+        ),
         symbol: "bsc",
         address: "0x0000000000000000000000000000000000000000",
         network: "bsc",
@@ -427,8 +458,16 @@ export const _createWallet = async ({
     parseWallets.push(walletObj);
     await AsyncStorage.setItem("wallets", JSON.stringify(parseWallets));
     await AsyncStorage.setItem("tokens", JSON.stringify(newArr));
+
+    setShow(false);
   } catch (error) {
-    setLoading(false);
+    _helperFunc({
+      error: "Something went wrong, Please try again.",
+      loading: false,
+      setErr: setError,
+      setLoading: setLoading,
+    });
+
     console.log(error);
   }
 };
@@ -1058,7 +1097,11 @@ export const confirmTX = async ({
 
     let recents = await AsyncStorage.getItem("recents");
     let ParseRecents = JSON.parse(recents);
-    ParseRecents.push(`${realTX.to}`);
+    ParseRecents.push(
+      `${{
+        to: realTX.to,
+      }}`
+    );
 
     await AsyncStorage.setItem("recents", JSON.stringify(ParseRecents));
 

@@ -40,6 +40,7 @@ import {
 } from "../../constants/HelperFunctions";
 import { useSelector } from "react-redux";
 import { ethers } from "ethers";
+import Constants from "../../constants/styles";
 
 const Home = ({ route, navigation }) => {
   const [active, setActive] = useState(1);
@@ -54,6 +55,8 @@ const Home = ({ route, navigation }) => {
   const [networks, setNetworks] = useState(null);
   const [tokens, setTokens] = useState(null);
   const [activeWallet, setActiveWallet] = useState(null);
+  const [walletName, setWalletName] = useState("");
+  const [error, setError] = useState("");
 
   const [activeCTN, setActiveCTN] = useState(1);
 
@@ -109,7 +112,6 @@ const Home = ({ route, navigation }) => {
     // setLoading(false);
   };
 
-  console.log(text);
   const importAccount = () => {};
 
   const setNetworkToBeActiveFunc = async ({ id }) => {
@@ -150,6 +152,18 @@ const Home = ({ route, navigation }) => {
     setLoading(false);
   };
 
+  const createNewWallet = async () => {
+    setLoading(true);
+    await _createWallet({
+      walletName: walletName,
+      setLoading,
+      setError,
+      setShow,
+      privateKey: text,
+    });
+    setText("");
+  };
+
   useEffect(() => {
     getWalets();
   }, [show]);
@@ -178,7 +192,6 @@ const Home = ({ route, navigation }) => {
     console.log("isScrolling");
   }, [isScrolling]);
 
-  console.log(tokens);
   return (
     <View style={[contantStyles.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -206,7 +219,7 @@ const Home = ({ route, navigation }) => {
             <Text style={[styles2.text, styles2.textEth]}>
               {!tokens
                 ? "0"
-                : tokens[0]?.amount?.toString()?.slice(0, 5) + " ETH"}
+                : tokens[0]?.amount?.toString()?.slice(0, 6) + " ETH"}
             </Text>
             <Text style={[styles2.text, styles2.textTwo]}>
               $121,330 <Text style={styles2.textThree}> + 5,42%</Text>
@@ -302,7 +315,7 @@ const Home = ({ route, navigation }) => {
 
                         <View>
                           <Text style={[styles3.text, styles3.tokenName]}>
-                            {val.amount.toString().length >= 18
+                            {val.amount.toString().length >= 222
                               ? ethers.formatEther(val.amount.toString())
                               : val.amount.toString().slice(0, 4)}
                           </Text>
@@ -347,6 +360,10 @@ const Home = ({ route, navigation }) => {
             loading={loading}
             importAccount={importAccount}
             setText={setText}
+            createNewWallet={createNewWallet}
+            setWalletName={setWalletName}
+            error={error}
+            text={text}
           />
         </ResuableModalCTN>
       )}
@@ -380,6 +397,9 @@ const Home = ({ route, navigation }) => {
             buttonText={"Proceed"}
             func={addTokens}
             setText={setText}
+            createNewWallet={createNewWallet}
+            setWalletName={setWalletName}
+            error={error}
           />
         </ResuableModalCTN>
       )}
@@ -452,6 +472,12 @@ const Account = ({
   wallets,
   setShow,
   importAccount,
+  setText,
+  createNewWallet,
+  setWalletName,
+  error,
+  loading,
+  text,
 }) => {
   return (
     <>
@@ -464,7 +490,12 @@ const Account = ({
           setShow={setShow}
         />
       ) : activeCTN == 2 ? (
-        <CreatAccount setShow={setShow} />
+        <CreatAccount
+          setShow={setShow}
+          createNewWallet={createNewWallet}
+          setWalletName={setWalletName}
+          loading={loading}
+        />
       ) : activeCTN == 3 ? (
         <ImportAccount
           setShow={setShow}
@@ -476,9 +507,13 @@ const Account = ({
           }
           learnMore={"Learn more about imported accounts"}
           header={"Import Account"}
-          buttonText={"Import"}
+          buttonText={loading ? "Importing..." : "Import Account"}
           func={importAccount}
           setText={setText}
+          createNewWallet={createNewWallet}
+          setWalletName={setWalletName}
+          text={text}
+          error={error}
         />
       ) : (
         ""
@@ -487,7 +522,7 @@ const Account = ({
   );
 };
 
-const AccountMain = ({ func2, func3, activeNetwork, wallets, setShow }) => {
+const AccountMain = ({ func2, func3, activeNetwork, wallets, setShow, z }) => {
   const handleChangeAccount = ({ addr }) => {
     setShow(false);
     _setWallets({ walletAddress: addr });
@@ -550,17 +585,13 @@ const AccountMain = ({ func2, func3, activeNetwork, wallets, setShow }) => {
   );
 };
 
-const CreatAccount = ({ setShow }) => {
-  const [walletName, setWalletName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const createNewWallet = async () => {
-    setLoading(true);
-    await _createWallet({ walletName: walletName, setLoading, setError });
-    setLoading(false);
-    setShow(false);
-  };
+const CreatAccount = ({
+  setShow,
+  createNewWallet,
+  setWalletName,
+  loading,
+  error,
+}) => {
   return (
     <>
       <Text style={[createAccountImportAccountStyle.text]}>
@@ -591,6 +622,11 @@ const ImportAccount = ({
   buttonText,
   func,
   setText,
+  createNewWallet,
+  setWalletName,
+  loading,
+  error,
+  text,
 }) => {
   return (
     <>
@@ -614,15 +650,21 @@ const ImportAccount = ({
             </Text>
           </Text>
           {buttonText == "Import Account" && (
-            <TextInput
-              placeholder={placeholder}
-              style={[
-                createAccountImportAccountStyle.input,
-                { color: "white" },
-              ]}
-              placeholderTextColor={"#a49eb9"}
-              onChangeText={(text) => setText(text)}
-            />
+            <>
+              <TextInput
+                placeholder={placeholder}
+                style={[contantStyles.input, { color: "white" }]}
+                placeholderTextColor={"#a49eb9"}
+                onChangeText={(text) => setText(text)}
+              />
+              <TextInput
+                placeholder="Account Name"
+                style={[contantStyles.input, { color: "white", marginTop: 20 }]}
+                placeholderTextColor={"#a49eb9"}
+                onChangeText={(text) => setWalletName(text)}
+              />
+              <Text style={Constants.error}>{error}</Text>
+            </>
           )}
         </View>
         <View
@@ -638,7 +680,18 @@ const ImportAccount = ({
             Or Scan a QR Code
           </Text>
         </View>
-        <ButtonGradient route={"func"} text={buttonText} func={func} />
+        <ButtonGradient
+          disabled={
+            buttonText == "Import Account"
+              ? text == ""
+                ? true
+                : false
+              : loading
+          }
+          route={"func"}
+          text={buttonText}
+          func={buttonText == "Import Account" ? createNewWallet : func}
+        />
       </>
     </>
   );

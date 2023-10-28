@@ -10,6 +10,7 @@ import React, { useEffect } from "react";
 import Step from "../../components/Step";
 import ButtonGradient from "../../components/ButtonGradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "../../constants/styles";
 
 const Success = ({ navigation }) => {
   const func = () => {
@@ -76,7 +77,7 @@ const Success = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.continer}>
+    <View style={Constants.container2Home}>
       <Step one={3} />
       <Image source={require("../../assets/line4.png")} style={styles.line} />
       <StatusBar translucent={false} />
@@ -99,7 +100,12 @@ const Success = ({ navigation }) => {
           </Text>
         </View>
         <View>
-          <ButtonGradient text={"Done"} route={"func"} func={func} />
+          <ButtonGradient
+            text={"Done"}
+            route={"func"}
+            func={func}
+            widthSp={200}
+          />
         </View>
       </View>
     </View>

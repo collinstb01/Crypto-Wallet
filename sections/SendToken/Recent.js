@@ -10,7 +10,7 @@ import { useDispatch } from "react-redux";
 import { setSendToken } from "../../features/StorageAuth/StorageAuth";
 
 const Recent = ({ navigation, valid, to, from }) => {
-  const [recents, setRecents] = useState(null);
+  const [recents, setRecents] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -26,12 +26,17 @@ const Recent = ({ navigation, valid, to, from }) => {
     if (data == false) {
       return setRecents(false);
     }
-    setRecents(JSON.parse(data));
+    setRecents(data);
   };
   useEffect(() => {
     getrecentsAddressSentTo();
   }, []);
 
+  console.log(
+    Array.isArray(recents),
+    typeof JSON.parse(recents),
+    "this is recents"
+  );
   return (
     <View
       style={[
@@ -56,7 +61,7 @@ const Recent = ({ navigation, valid, to, from }) => {
         {valid ? "Click Next to Proceed" : "Recent"}
       </Text>
       {!valid &&
-        (recents == false ? (
+        (!recents ? (
           <Empty text={"No Recent Data Found"} />
         ) : (
           <>

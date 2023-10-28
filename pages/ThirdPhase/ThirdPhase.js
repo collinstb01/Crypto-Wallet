@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Step from "../../components/Step";
 import ButtonGradient from "../../components/ButtonGradient";
 import { useSelector } from "react-redux";
+import Constants from "../../constants/styles";
 
 export default function ThirdPhase({ navigation }) {
   const [values, setValues] = useState([]);
@@ -76,7 +77,6 @@ export default function ThirdPhase({ navigation }) {
     setthreeValArr(newArr);
   };
 
-  // USE EFFECT
   useEffect(() => {
     gen();
   }, []);
@@ -92,8 +92,8 @@ export default function ThirdPhase({ navigation }) {
   }, [values]);
 
   return (
-    <View style={styles.container}>
-      <Step one={3} />
+    <View style={Constants.container2Home}>
+      <Step one={3} navigation={navigation} />
       <Text style={styles.confirm}>Confirm Seed Phrase</Text>
       <View style={styles.container2}>
         <Text style={styles.select}>
@@ -102,7 +102,10 @@ export default function ThirdPhase({ navigation }) {
         <View style={styles.options1}>
           {threeValArr.length > 0
             ? threeValArr.map((val, index) => (
-                <TouchableOpacity onPress={removeLastValueFromArray}>
+                <TouchableOpacity
+                  onPress={removeLastValueFromArray}
+                  key={index}
+                >
                   <Text style={styles.optiontext}>
                     <Text>{parseInt(no[parseInt(index)]) + 1}. </Text>
                     {val ? val : ""}
@@ -110,7 +113,10 @@ export default function ThirdPhase({ navigation }) {
                 </TouchableOpacity>
               ))
             : no?.map((val, index) => (
-                <Text style={[styles.optiontext, { paddingRight: 40 }]}>
+                <Text
+                  style={[styles.optiontext, { paddingRight: 40 }]}
+                  key={index}
+                >
                   <Text>{parseInt(val) + 1}. </Text>
                 </Text>
               ))}
@@ -118,7 +124,10 @@ export default function ThirdPhase({ navigation }) {
       </View>
       <View style={styles.options2}>
         {fiveValArr?.map((val, index) => (
-          <TouchableOpacity onPress={() => inputChange({ val, index })}>
+          <TouchableOpacity
+            onPress={() => inputChange({ val, index })}
+            key={index}
+          >
             <Text style={styles.optiontext}>{val}</Text>
           </TouchableOpacity>
         ))}
@@ -135,6 +144,7 @@ export default function ThirdPhase({ navigation }) {
             navigation={navigation}
             route={"func"}
             func={func}
+            widthSp={200}
           />
         ) : (
           ""

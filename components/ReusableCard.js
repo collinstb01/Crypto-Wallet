@@ -46,14 +46,14 @@ const ReusableCard = ({
           <Pressable onPress={backFunc}>
             <Ionicons
               name="chevron-back"
-              size={20}
+              size={22}
               color="#948fa8"
               style={{
                 marginTop: 0,
                 marginLeft: 0,
                 position: "relative",
                 left: 20,
-                top: 13,
+                top: 12,
               }}
             />
           </Pressable>

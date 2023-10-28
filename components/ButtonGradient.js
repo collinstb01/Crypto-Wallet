@@ -22,22 +22,6 @@ const ButtonGradient = ({
               func();
               return;
             }
-            if (route == "modal") {
-              if (active == 2) {
-                setShow((e) => ({
-                  ...e,
-                  show: false,
-                  active: 0,
-                }));
-                navigation.navigate("secure-your-wallet-two");
-              } else {
-                return setShow((e) => ({
-                  ...e,
-                  show: true,
-                  active: active + 1,
-                }));
-              }
-            }
             navigation.navigate(route);
             // setShow(true);
           }}

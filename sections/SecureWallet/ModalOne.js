@@ -9,13 +9,23 @@ import React from "react";
 import ButtonGradient from "../../components/ButtonGradient";
 import ResuableModalCTN from "../../components/ResuableModalCTN";
 
-const ModalOne = ({ navigation, active, setShow }) => {
+const ModalOne = ({ navigation, active, setShowPU, setActiveFunc }) => {
   return (
-    <ResuableModalCTN>
+    <ResuableModalCTN setShow={setShowPU}>
       {active == 1 ? (
-        <Content1 navigation={navigation} setShow={setShow} active={active} />
+        <Content1
+          navigation={navigation}
+          setShow={setShowPU}
+          active={active}
+          setActiveFunc={setActiveFunc}
+        />
       ) : active == 2 ? (
-        <Content2 navigation={navigation} setShow={setShow} active={active} />
+        <Content2
+          navigation={navigation}
+          setShow={setShowPU}
+          active={active}
+          setActiveFunc={setActiveFunc}
+        />
       ) : (
         ""
       )}
@@ -25,7 +35,7 @@ const ModalOne = ({ navigation, active, setShow }) => {
 
 export default ModalOne;
 
-const Content1 = ({ navigation, setShow, active }) => {
+const Content1 = ({ navigation, setShow, active, setActiveFunc }) => {
   return (
     <>
       <Text style={styles.text}>What is a "Seed Phrase"</Text>
@@ -45,7 +55,8 @@ const Content1 = ({ navigation, setShow, active }) => {
       <View style={{ marginTop: 10 }}>
         <ButtonGradient
           text={"Understood"}
-          route={"modal"}
+          route={"func"}
+          func={setActiveFunc}
           setShow={setShow}
           navigation={navigation}
           active={active}
@@ -54,7 +65,7 @@ const Content1 = ({ navigation, setShow, active }) => {
     </>
   );
 };
-const Content2 = ({ navigation, setShow, active }) => {
+const Content2 = ({ navigation, setShow, active, setActiveFunc }) => {
   return (
     <>
       <Text style={styles.text}>Skip Account Security?</Text>
@@ -97,7 +108,8 @@ const Content2 = ({ navigation, setShow, active }) => {
           </TouchableOpacity>
           <ButtonGradient
             text={"Skip"}
-            route={"second-phase"}
+            route={"func"}
+            func={setActiveFunc}
             navigation={navigation}
             setShow={setShow}
             active={active}

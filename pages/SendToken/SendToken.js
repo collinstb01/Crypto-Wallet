@@ -1,6 +1,7 @@
 import {
   Image,
   Keyboard,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -84,9 +85,10 @@ const SendToken = ({ navigation }) => {
     getUserWallets();
   }, []);
 
+  // console.log(re)
   return (
     <ReusableCard navigation={navigation} text={"Send To"} backFunc={backFunc}>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Pressable onPress={handleSetShow}>
           <View style={{ marginBottom: 20 }}>
             <TextInput
@@ -109,7 +111,7 @@ const SendToken = ({ navigation }) => {
         </Pressable>
         {show &&
           wallets
-            // ?.filter((val) => val.active == 0)
+            ?.filter((val) => val.active == 0)
             ?.map((val, index) => (
               <Pressable
                 key={index}
@@ -179,7 +181,7 @@ const SendToken = ({ navigation }) => {
           to={receiveingAddr}
           from={activeWallet.WalletAddressNoFormat}
         />
-      </View>
+      </ScrollView>
     </ReusableCard>
   );
 };

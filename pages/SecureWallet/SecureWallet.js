@@ -11,12 +11,11 @@ import ReusableCard from "../../components/ReusableCard";
 import ButtonGradient from "../../components/ButtonGradient";
 import ModalOne from "../../sections/SecureWallet/ModalOne";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import StatusBarForScreens from "../../components/StatusBarForScreens";
 
 const SecureWallet = ({ navigation }) => {
-  const [show, setShow] = useState({
-    show: false,
-    active: 0,
-  });
+  const [active, setActive] = useState(0);
+  const [showPU, setShowPU] = useState(false);
 
   // const _retrieveData = async () => {
   //   try {
@@ -30,9 +29,32 @@ const SecureWallet = ({ navigation }) => {
   //   _retrieveData();
   // }, []);
 
+  useEffect(() => {
+    if (showPU == false) {
+      setActive(0);
+    }
+  }, [showPU]);
+
+  const setActiveFunc = () => {
+    if (active == 2) {
+      setShowPU(false);
+      setActive(0);
+      navigation.navigate("secure-your-wallet-two");
+    } else if (active == 1) {
+      return setActive(2);
+    } else {
+      setShowPU(true);
+      return setActive(1);
+    }
+  };
+
+  const backFunc = () => {
+    navigation.goBack();
+  };
   return (
-    <ReusableCard text={"Secure Your Wallet"} show={show.show}>
-      {show.show && <View style={styles.overlay}></View>}
+    <ReusableCard text={"Secure Your Wallet"} show={showPU} backFunc={backFunc}>
+      {showPU && <View style={styles.overlay}></View>}
+      <StatusBarForScreens />
       <View style={styles.img}>
         <Image
           style={styles.tinyLogo}
@@ -63,20 +85,22 @@ const SecureWallet = ({ navigation }) => {
           }}
         >
           <ButtonGradient
-            setShow={setShow}
             text={"Next"}
-            route={"modal"}
-            active={show.active}
+            route={"func"}
+            func={setActiveFunc}
+            widthSp={200}
             navigation={navigation}
           />
         </View>
       </View>
-      {show.show && (
+      {showPU && (
         <ModalOne
           navigation={navigation}
-          active={show.active}
-          show={show.show}
-          setShow={setShow}
+          active={active}
+          setActive={setActive}
+          showPU={showPU}
+          setShowPU={setShowPU}
+          setActiveFunc={setActiveFunc}
         />
       )}
     </ReusableCard>

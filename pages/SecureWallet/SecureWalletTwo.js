@@ -11,6 +11,7 @@ import ReusableCard from "../../components/ReusableCard";
 import ButtonGradient from "../../components/ButtonGradient";
 import ResuableModalCTN from "../../components/ResuableModalCTN";
 import contantStyles from "../../constants/styles";
+import StatusBarForScreens from "../../components/StatusBarForScreens";
 
 const SecureWalletTwo = ({ navigation }) => {
   const [show, setShow] = useState(false);
@@ -31,14 +32,27 @@ const SecureWalletTwo = ({ navigation }) => {
   //     };
   //   }, []);
 
+  const backFunc = () => {
+    navigation.goBack();
+  };
+
+  const func = () => {
+    setShow(true);
+  };
+
+  const funcTwo = () => {
+    navigation.navigate("second-phase");
+  };
   return (
     <ReusableCard
       text={"Secure Your Wallet"}
       show={show}
       navigation={navigation}
       route="SecureYourWallet"
+      backFunc={backFunc}
     >
       {show && <View style={contantStyles.overlay}></View>}
+      <StatusBarForScreens />
       <View style={styles.container}>
         <View>
           <Text style={styles.text}>
@@ -101,14 +115,16 @@ const SecureWalletTwo = ({ navigation }) => {
         >
           <ButtonGradient
             text={"Next"}
-            route={"modal"}
+            route={"func"}
             setShow={setShow}
+            func={func}
             navigation={navigation}
+            widthSp={200}
           />
         </View>
       </View>
       {show && (
-        <ResuableModalCTN>
+        <ResuableModalCTN setShow={setShow}>
           <Text style={styles.desc1}>Why is it important</Text>
           <Text style={styles.desc2}>
             Dont’t risk losing your funds. Protect your wallet by saving your
@@ -121,6 +137,7 @@ const SecureWalletTwo = ({ navigation }) => {
           <View style={{ marginTop: 10 }}>
             <ButtonGradient
               text={"Understood"}
+              func={funcTwo}
               route={"second-phase"}
               setShow={setShow}
               navigation={navigation}

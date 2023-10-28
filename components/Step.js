@@ -3,21 +3,27 @@ import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
+import { Pressable } from "react-native";
 
-const Step = ({ one }) => {
+const Step = ({ one, navigation }) => {
+  const handleBack = () => {
+    navigation.goBack();
+  };
   return (
     <View style={styles.container}>
       {/* <StatusBar /> */}
-      <Text style={{ marginRight: 30 }}>
-        <Ionicons
-          name="md-arrow-back"
-          size={20}
-          color="#948fa8"
-          style={{
-            fontWeight: "800",
-          }}
-        />
-      </Text>
+      <Pressable style={{ justifyContent: "center" }} onPress={handleBack}>
+        <Text style={{ marginRight: 30, marginTop: 2 }}>
+          <Ionicons
+            name="md-arrow-back"
+            size={20}
+            color="#948fa8"
+            style={{
+              fontWeight: "800",
+            }}
+          />
+        </Text>
+      </Pressable>
       <View
         style={{
           flexDirection: "row",

@@ -16,11 +16,13 @@ import CryptoJS from "react-native-crypto-js";
 import "@ethersproject/shims";
 import { useDispatch, useSelector } from "react-redux";
 import { setSeed } from "../../features/StorageAuth/StorageAuth";
+import Constants from "../../constants/styles";
+import { _encryotData } from "../../constants/HelperFunctions";
 
 const SecondPhase = ({ navigation }) => {
   const [show, setshow] = useState(false);
   const [generating, setGenerating] = useState(true);
-  const { seedPhrase } = useSelector((state) => state.storage);
+  const { seedPhrase, password } = useSelector((state) => state.storage);
 
   const dispatch = useDispatch();
 
@@ -60,10 +62,15 @@ const SecondPhase = ({ navigation }) => {
       encryptionKey
     ).toString();
 
+    const encryptPassword = await _encryotData({ data: password });
     let user = await AsyncStorage.getItem("user");
-
     let parseUser = JSON.parse(user);
-    let newUser = { ...parseUser, seedPrase: encryptedPhrase };
+
+    let newUser = {
+      ...parseUser,
+      password: encryptPassword,
+      seedPrase: encryptedPhrase,
+    };
 
     await AsyncStorage.setItem("user", JSON.stringify(newUser));
 
@@ -131,9 +138,9 @@ const SecondPhase = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={Constants.container2Home}>
       <StatusBar translucent={false} />
-      <Step one={2} />
+      <Step one={2} navigation={navigation} />
       <Text style={styles.textOne}>Write Down Your Seed Phrase</Text>
       <Text style={styles.textTwo}>
         This is your seed phrase. Write it down on a paper and keep it in a safe

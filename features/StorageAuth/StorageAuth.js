@@ -4,6 +4,7 @@ const StorageAuth = createSlice({
   name: "storage",
   initialState: {
     seedPhrase: null,
+    password: null,
     madeChangesMessage: "",
     sendToken: {
       to: "",
@@ -33,6 +34,9 @@ const StorageAuth = createSlice({
     setLoadingAfterSendToken(state, action) {
       state.loadingAfterSendToken = action.payload.loading;
     },
+    setPasswordForNewWallet(state, action) {
+      state.password = action.payload.password;
+    },
   },
 });
 
@@ -43,5 +47,6 @@ export const {
   setMCMessage,
   setSendToken,
   setLoadingAfterSendToken,
+  setPasswordForNewWallet,
 } = StorageAuth.actions;
 export default StorageAuth.reducer;
