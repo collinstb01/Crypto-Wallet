@@ -1160,21 +1160,6 @@ export const confirmTX = async ({
   }
 };
 
-// const ethers = require("ethers");
-
-// const provider = new ethers.providers.WebSocketProvider("ws://localhost:8546");
-
-// const filter = {
-//   to: "0x1234567890abcdef1234567890abcdef12345678",
-// };
-
-// provider.on("pending", async (txHash, event) => {
-//   if (event.filter(filter)) {
-//     const tx = await provider.getTransaction(txHash);
-//     console.log(tx.hash);
-//   }
-// });
-
 function formatDateToCustomFormat() {
   const currentDate = new Date(Date.now());
 
@@ -1214,3 +1199,34 @@ function formatDateToCustomFormat() {
 
   return formattedDate;
 }
+
+const provider = new ethers.JsonRpcProvider(
+  "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc"
+); // Set your provider
+const userAddress = "0x20b55d117bBa28cD7Eeb1687FFeA0882c5a642c5"; // The address of the user's wallet
+
+provider.on("block", async (blockNumber) => {
+  // Get the block details
+  const block = await provider.getBlock(blockNumber, true);
+
+  // Check each transaction in the block
+  for (const transaction of block.prefetchedTransactions) {
+    // If the transaction is to the user's address, log it and update the user's balance
+
+    console.log("new blocked added");
+    if (
+      transaction.to &&
+      transaction.to.toLowerCase() === userAddress.toLowerCase()
+    ) {
+      // console.log(
+      //   `Received transaction of ${ethers.utils.formatEther(
+      //     transaction.value
+      //   )} ETH from ${transaction.from}`
+      // );
+      console.log(`Transaction hash: ${transaction.hash}`);
+      console.log(`Transaction details: `, transaction);
+
+      // Update the user's balance here
+    }
+  }
+});
