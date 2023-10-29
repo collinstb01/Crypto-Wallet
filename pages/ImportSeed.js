@@ -72,7 +72,7 @@ const ImportSeed = ({ navigation }) => {
   };
 
   const _loginUser = async () => {
-    _login({ password, setErr, setLoading, navigation });
+    _login({ password, setErr, setLoading, navigation, route: "home" });
     setLoading(false);
   };
 

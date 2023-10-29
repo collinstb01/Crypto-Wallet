@@ -27,15 +27,17 @@ export default TextAndBackIcon;
 const styles = StyleSheet.create({
   icon: {
     position: "relative",
-    top: 5,
-    right: 100,
+    top: 0,
+    left: -100,
   },
   top: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 10,
   },
   text: {
+    textAlign: "center",
     color: "white",
     fontSize: 20,
     fontWeight: "700",

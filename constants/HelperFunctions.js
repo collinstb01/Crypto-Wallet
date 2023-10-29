@@ -30,7 +30,13 @@ export const _helperFunc = ({ error, loading, setErr, setLoading }) => {
   }, 5000);
 };
 
-export const _login = async ({ password, setErr, setLoading, navigation }) => {
+export const _login = async ({
+  password,
+  setErr,
+  setLoading,
+  navigation,
+  route,
+}) => {
   //compare with the one in the backedn
   setLoading(true);
 
@@ -58,7 +64,10 @@ export const _login = async ({ password, setErr, setLoading, navigation }) => {
     });
   }
 
-  navigation.navigate("home");
+  if (route == "show") {
+    return;
+  }
+  navigation.navigate(route);
 };
 
 export const _createUserAccount = async ({

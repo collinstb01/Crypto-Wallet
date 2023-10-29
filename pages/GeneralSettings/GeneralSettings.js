@@ -151,7 +151,7 @@ const GeneralSettings = ({ navigation }) => {
       {showModal == true && <View style={Constants.overlay}></View>}
 
       <ScrollView onScroll={handleScroll}>
-        <TextAndBackIcon text={"Preferences"} navigation={navigation} />
+        <TextAndBackIcon text={"General"} navigation={navigation} />
         <View style={{ marginTop: 40 }}>
           {data.map((val, index) => (
             <Pressable
