@@ -241,6 +241,7 @@ export const _createUserAccount = async ({
         address: "0x0000000000000000000000000000000000000000",
         network: "eth",
         walletAddress: encryptedWalletAddress,
+        chaindId: 1,
       },
       {
         name: "Sepolia Test Network",
@@ -254,6 +255,7 @@ export const _createUserAccount = async ({
         address: "0x0000000000000000000000000000000000000000",
         network: "sepolia",
         walletAddress: encryptedWalletAddress,
+        chainId: 11155111,
       },
       {
         name: "Smart Chain - Testnet",
@@ -267,6 +269,7 @@ export const _createUserAccount = async ({
         address: "0x0000000000000000000000000000000000000000",
         network: "bscTestNet",
         walletAddress: encryptedWalletAddress,
+        chainId: 97,
       },
       {
         name: "Binance Smart Chain",
@@ -280,6 +283,7 @@ export const _createUserAccount = async ({
         address: "0x0000000000000000000000000000000000000000",
         network: "bsc",
         walletAddress: encryptedWalletAddress,
+        chainId: 56,
       },
     ];
 
@@ -421,6 +425,9 @@ export const _createWallet = async ({
         address: "0x0000000000000000000000000000000000000000",
         network: "eth",
         walletAddress: encryptedWalletAddress,
+        chaindId: 1,
+        rpcURL:
+          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
       },
       {
         name: "Sepolia Test Network",
@@ -435,6 +442,9 @@ export const _createWallet = async ({
         address: "0x0000000000000000000000000000000000000000",
         network: "sepolia",
         walletAddress: encryptedWalletAddress,
+        chainId: 11155111,
+        rpcURL:
+          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
       },
       {
         name: "Smart Chain - Testnet",
@@ -448,6 +458,8 @@ export const _createWallet = async ({
         address: "0x0000000000000000000000000000000000000000",
         network: "bscTestNet",
         walletAddress: encryptedWalletAddress,
+        chaindId: 97,
+        rpcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
       },
       {
         name: "Binance Smart Chain",
@@ -461,6 +473,8 @@ export const _createWallet = async ({
         address: "0x0000000000000000000000000000000000000000",
         network: "bsc",
         walletAddress: encryptedWalletAddress,
+        chaindId: 56,
+        rpcURL: "https://bsc-dataseed.binance.org/",
       },
     ];
 
@@ -586,6 +600,9 @@ export const _addTokens = async ({
   navigation,
 }) => {
   const tokens = await AsyncStorage.getItem("tokens");
+  const activeNetwork = await _getActiveNetwork();
+  let parseActiveNetwork = JSON.parse(activeNetwork);
+
   const parseTokens = JSON.parse(tokens);
 
   if (JSON.parse(tokens).find((val) => val.address == addr)) {
@@ -603,6 +620,8 @@ export const _addTokens = async ({
     network: id,
     walletAddress: walletAddress,
     decimals: decimals,
+    chaindId: parseActiveNetwork.chainId,
+    rpcURL: parseActiveNetwork.rpcURL,
   };
 
   parseTokens.push(token);
@@ -971,6 +990,8 @@ export const transferNativeTokensOrERC20 = async ({
   contractAddress,
   symbol,
   navigation,
+  setErr,
+  setLoading,
 }) => {
   try {
     const _recipient = await _decryotData({ encryptedData: recipient });
@@ -1003,7 +1024,14 @@ export const transferNativeTokensOrERC20 = async ({
       };
 
       // Send the transaction
-      tx = await wallet.sendTransaction(transaction);
+      tx = await wallet.sendTransaction(transaction).catch((err) => {
+        _helperFunc({
+          setErr,
+          setLoading,
+          error: "An Error Occured, Gas Fee might be too low",
+          loading: false,
+        });
+      });
     } else {
       const decryptPrivateKey = await _decryotData({
         encryptedData: parseWallet.privateKey,
@@ -1016,15 +1044,24 @@ export const transferNativeTokensOrERC20 = async ({
       ];
 
       // The amount of tokens to send (in the smallest unit of the token)
-      const amount = ethers.utils.parseUnits(amount, 18); // Replace 'tokenDecimals' with the number of decimals the token uses
+      const amountInWei = ethers.parseEther(amount.toString()); // Replace 'tokenDecimals' with the number of decimals the token uses
       const wallet = new ethers.Wallet(decryptPrivateKey, provider);
       const contract = new ethers.Contract(contractAddress, abi, wallet);
 
       // Send the transaction
-      tx = await contract.transfer(_recipient, amount, {
-        gasPrice: gasPrice,
-        gasLimit: gasLEstimate,
-      });
+      tx = await contract
+        .transfer(_recipient, amountInWei, {
+          // gasPrice: gasPrice,
+          // gasLimit: gasLEstimate,
+        })
+        .catch((err) => {
+          _helperFunc({
+            setErr,
+            setLoading,
+            error: "An Error Occured, Gas Fee might be too low",
+            loading: false,
+          });
+        });
     }
 
     const date = formatDateToCustomFormat();
@@ -1200,33 +1237,133 @@ function formatDateToCustomFormat() {
   return formattedDate;
 }
 
-const provider = new ethers.JsonRpcProvider(
-  "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc"
-); // Set your provider
-const userAddress = "0x20b55d117bBa28cD7Eeb1687FFeA0882c5a642c5"; // The address of the user's wallet
+const listenForEthAndERC20Transfer = async () => {
+  const networks = await AsyncStorage.getItem("networks");
+  const wallets = await AsyncStorage.getItem("wallets");
+  const tokens = await AsyncStorage.getItem("tokens");
+  const parseTokens = JSON.parse(tokens);
 
-provider.on("block", async (blockNumber) => {
-  // Get the block details
-  const block = await provider.getBlock(blockNumber, true);
-
-  // Check each transaction in the block
-  for (const transaction of block.prefetchedTransactions) {
-    // If the transaction is to the user's address, log it and update the user's balance
-
-    console.log("new blocked added");
-    if (
-      transaction.to &&
-      transaction.to.toLowerCase() === userAddress.toLowerCase()
-    ) {
-      // console.log(
-      //   `Received transaction of ${ethers.utils.formatEther(
-      //     transaction.value
-      //   )} ETH from ${transaction.from}`
-      // );
-      console.log(`Transaction hash: ${transaction.hash}`);
-      console.log(`Transaction details: `, transaction);
-
-      // Update the user's balance here
-    }
+  const filterTokens = parseTokens.filter(
+    (item) => item.address != "0x0000000000000000000000000000000000000000"
+  );
+  const parsenetworks = JSON.parse(networks);
+  const parseWallets = JSON.parse(wallets);
+  const walletArray = [];
+  for (const parseWallet of parseWallets) {
+    const decryptWalletAddress = await _decryotData({
+      encryptedData: parseWallet.walletAddress,
+    });
+    walletArray.push(decryptWalletAddress.toLowerCase());
   }
-});
+
+  for (const filterToken of filterTokens) {
+    const provider = new ethers.JsonRpcProvider(filterToken.rpcURL); // Set your provider
+    let abi = await getContractAbi({
+      contractAddress: "addr",
+    });
+    const contract = new ethers.Contract(filterToken.address, abi, provider);
+
+    contract.on("Transfer", (from, to, amount, event) => {
+      console.log("calling..........");
+      if (walletArray.includes(to.toLowerCase())) {
+        console.log(`Transaction details: `, event);
+        console.log(`Received transfer of ${amount} tokens from ${from}`);
+
+        // provider.getTransaction(event.transactionHash).then((transaction) => {
+        //   console.log(`Transaction details: `, transaction);
+        // });
+        // Update the user's balance here
+      }
+    });
+  }
+
+  for (const network of parsenetworks) {
+    const provider = new ethers.JsonRpcProvider(network.rpcURL); // Set your provider
+
+    provider.on("block", async (blockNumber) => {
+      // Get the block details
+      const block = await provider.getBlock(blockNumber, true);
+
+      // Check each transaction in the block
+      for (const tx of block.prefetchedTransactions) {
+        // If the transaction is to the user's address, log it and update the user's balance
+        if (tx.to && walletArray.includes(tx.to.toLowerCase())) {
+          const date = formatDateToCustomFormat();
+
+          console.log("calledddddddddddddddddddddddddddddd");
+
+          let encryptedWalletAddress = await _encryotData({ data: tx.to });
+          let userData = parseTokens
+            .filter(
+              async (val) =>
+                (
+                  await _decryotData({ encryptedData: val.walletAddress })
+                ).toLowerCase() == tx.to.toLowerCase()
+            )
+            .filter(
+              (val) =>
+                val.address == "0x0000000000000000000000000000000000000000"
+            )
+            .filter((val) => val.chainId == Number(tx.chainId));
+          console.log(userData, "userData");
+          let TXhistoryObj = {
+            userWalletAddress: tx.to,
+            network: userData[0].network,
+            contractAddress: "0x0000000000000000000000000000000000000000",
+            status: "success",
+            statusNo: null,
+            symbol: userData[0].symbol,
+            date: date,
+            type: "Receive",
+            from: tx.from,
+            to: tx.to,
+            value: Number(tx.value),
+            gasUsed: Number(tx.gasUsed),
+            gasLimit: Number(tx.gasLimit),
+            gasPrice: Number(tx.gasPrice),
+            blockHash: tx.blockHash,
+            blockNumber: null,
+            timeStamp: "",
+            nonce: Number(tx.nonce),
+            hash: tx.hash,
+            chainId: Number(tx.chainId),
+          };
+
+          const TXhistory = await AsyncStorage.getItem("TXhistory");
+          const parseTXhistory = JSON.parse(TXhistory);
+          parseTXhistory.push(TXhistoryObj);
+
+          await AsyncStorage.setItem(
+            "TXhistory",
+            JSON.stringify(parseTXhistory)
+          );
+
+          console.log(`Transaction hash: ${tx.hash}`);
+          console.log(`Transaction details: `, tx);
+
+          // Update the user's balance here
+          userData[0].amount = await getBalance({
+            address: network.rpcURL,
+            address: tx.to,
+          });
+
+          await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+        }
+      }
+    });
+  }
+};
+
+listenForEthAndERC20Transfer();
+
+export const getSeedPhrase = async () => {
+  const user = await AsyncStorage.getItem("user");
+  const parseUser = JSON.parse(user);
+  console.log(parseUser);
+
+  const decryptedSeedPhrase = await _decryotData({
+    encryptedData: parseUser.seedPrase,
+  });
+
+  return JSON.stringify(decryptedSeedPhrase);
+};

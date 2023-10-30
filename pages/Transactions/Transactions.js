@@ -34,6 +34,10 @@ const Transactions = ({ route, navigation }) => {
     networkFee: "",
     contractAddress: "",
     hash: "",
+    symbol: "",
+    type: "",
+    network: "",
+    total: "",
   });
 
   // AsyncStorage.setItem("TXhistory", JSON.stringify([]));
@@ -55,6 +59,7 @@ const Transactions = ({ route, navigation }) => {
     getTransactions();
   }, [loadingAfterSendToken]);
 
+  console.log(transactions);
   return (
     <View style={[Constants.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -82,7 +87,10 @@ const Transactions = ({ route, navigation }) => {
         )}
       </ScrollView>
       {show && (
-        <ResuableModalCTN text={"send 1INCH"} setShow={setShow}>
+        <ResuableModalCTN
+          text={`${txDepth.type} ${txDepth.symbol.toUpperCase()}`}
+          setShow={setShow}
+        >
           <TransactionDInDepth txDepth={txDepth} />
         </ResuableModalCTN>
       )}

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { _formatAddr } from "../../constants/HelperFunctions";
 import { ethers } from "ethers";
+import { Fontisto } from "@expo/vector-icons";
 
 const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
   const handleShowTXDepth = async ({
@@ -47,7 +48,8 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
       <View style={styles.container}>
         {DATA?.map((item, index) => (
           <TouchableOpacity
-            onPress={() =>
+            onPress={() => {
+              if (item.status == "pending") return;
               handleShowTXDepth({
                 status: item.status,
                 date: item?.date,
@@ -62,14 +64,18 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
                 symbol: item.symbol,
                 type: item.type,
                 network: item.network,
-              })
-            }
+              });
+            }}
             key={index}
           >
             <View style={styles.item} key={index}>
               <View style={{ flexDirection: "row" }}>
                 <View style={{ marginRight: 10 }}>
-                  <FontAwesome name="send-o" size={24} color="white" />
+                  {item.type != "Receive" ? (
+                    <FontAwesome name="send-o" size={24} color="white" />
+                  ) : (
+                    <Fontisto name="wallet" size={24} color="white" />
+                  )}
                 </View>
                 <View>
                   <Text style={[styles.text1]}>

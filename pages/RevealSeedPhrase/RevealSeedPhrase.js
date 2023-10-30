@@ -1,8 +1,8 @@
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Constants from "../../constants/styles";
 import ReusableCard from "../../components/ReusableCard";
-import { _login } from "../../constants/HelperFunctions";
+import { _login, getSeedPhrase } from "../../constants/HelperFunctions";
 import ButtonGradient from "../../components/ButtonGradient";
 import TabstwoContents from "../../components/TabstwoContents";
 
@@ -11,7 +11,7 @@ const RevealSeedPhrase = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [showSeedPhrase, setShowSeedPhrase] = useState(false);
-
+  const [seedPhrase, setSeedPhrase] = useState("");
   const backFunc = () => {
     navigation.goBack();
   };
@@ -30,6 +30,17 @@ const RevealSeedPhrase = ({ navigation }) => {
     //   setShowSeedPhrase(false);
     // }, 10000);
   };
+
+  const getSP = async () => {
+    const seedPhraseData = await getSeedPhrase();
+    const seed = JSON.parse(seedPhraseData);
+    setSeedPhrase(seed);
+  };
+  useEffect(() => {
+    getSP();
+  }, []);
+
+  console.log(seedPhrase);
   return (
     <ReusableCard
       navigation={navigation}

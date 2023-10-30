@@ -100,6 +100,9 @@ const SecondPhase = ({ navigation }) => {
         address: "0x0000000000000000000000000000000000000000",
         network: "eth",
         walletAddress: encryptedWalletAddress,
+        chainId: 1,
+        rpcURL:
+          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
       },
       {
         name: "Sepolia Test Network",
@@ -108,6 +111,9 @@ const SecondPhase = ({ navigation }) => {
         address: "0x0000000000000000000000000000000000000000",
         network: "sepolia",
         walletAddress: encryptedWalletAddress,
+        chainId: 11155111,
+        rpcURL:
+          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
       },
       {
         name: "Smart Chain - Testnet",
@@ -116,6 +122,8 @@ const SecondPhase = ({ navigation }) => {
         address: "0x0000000000000000000000000000000000000000",
         network: "bscTestNet",
         walletAddress: encryptedWalletAddress,
+        chainId: 97,
+        pcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
       },
       {
         name: "Binance Smart Chain",
@@ -124,6 +132,8 @@ const SecondPhase = ({ navigation }) => {
         address: "0x0000000000000000000000000000000000000000",
         network: "bsc",
         walletAddress: encryptedWalletAddress,
+        chainId: 56,
+        rpcURL: "https://bsc-dataseed.binance.org/",
       },
     ];
 

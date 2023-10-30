@@ -35,6 +35,9 @@ const Confrim = ({ navigation }) => {
   const [amount, setamount] = useState("");
   const [recipient, setRecipient] = useState("");
   const [totalAmount, settotalAmount] = useState("");
+  const [disabled, setDisabled] = useState(false);
+  const [err, setError] = useState("");
+  const [balance, setBalance] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [gasData, setGasData] = useState({
@@ -61,6 +64,8 @@ const Confrim = ({ navigation }) => {
       contractAddress: sendToken.tokenAddress,
       symbol: sendToken.symbol,
       navigation: navigation,
+      setErr: setError,
+      setLoading: setLoading,
     });
     dispatch(setLoadingAfterSendToken({ loading: false }));
     setLoading(false);
@@ -93,10 +98,6 @@ const Confrim = ({ navigation }) => {
       getGas();
     }
   }, [sendToken]);
-
-  const [disabled, setDisabled] = useState(false);
-  const [err, setError] = useState("");
-  const [balance, setBalance] = useState(null);
 
   const getUserBalance = async () => {
     const decryptAddress = await _decryotData({

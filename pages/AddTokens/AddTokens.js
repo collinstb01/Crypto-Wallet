@@ -23,6 +23,8 @@ import {
 import { Pressable } from "react-native";
 import ButtonGradient from "../../components/ButtonGradient";
 import TabstwoContents from "../../components/TabstwoContents";
+import { setMCMessage } from "../../features/StorageAuth/StorageAuth";
+import { useDispatch } from "react-redux";
 
 const AddTokens = ({ navigation }) => {
   const [receiveingAddr, setReceivingAddr] = useState("");
@@ -41,7 +43,7 @@ const AddTokens = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [disabled, setdisabled] = useState(true);
   const [err, setErr] = useState("");
-
+  const dispatch = useDispatch();
   const backFunc = () => {
     navigation.goBack();
   };
@@ -98,6 +100,7 @@ const AddTokens = ({ navigation }) => {
     }
     setLoading(true);
     await _addTokens({ ...data, setErr, navigation });
+    dispatch(setMCMessage({ changes: "Added token" }));
     setLoading(false);
   };
 
