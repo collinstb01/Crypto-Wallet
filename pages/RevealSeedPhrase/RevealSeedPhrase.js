@@ -5,6 +5,8 @@ import ReusableCard from "../../components/ReusableCard";
 import { _login, getSeedPhrase } from "../../constants/HelperFunctions";
 import ButtonGradient from "../../components/ButtonGradient";
 import TabstwoContents from "../../components/TabstwoContents";
+import QRCodeReceiveToken from "../../components/QRCodeReceiveToken";
+import QRcode from "../../components/QRcode";
 
 const RevealSeedPhrase = ({ navigation }) => {
   const [password, setPassword] = useState("");
@@ -26,9 +28,9 @@ const RevealSeedPhrase = ({ navigation }) => {
     });
     setLoading(false);
     setShowSeedPhrase(true);
-    // setTimeout(() => {
-    //   setShowSeedPhrase(false);
-    // }, 10000);
+    setTimeout(() => {
+      setShowSeedPhrase(false);
+    }, 10000);
   };
 
   const getSP = async () => {
@@ -60,7 +62,7 @@ const RevealSeedPhrase = ({ navigation }) => {
           </Text>
         </View>
         {showSeedPhrase ? (
-          <ShowSeedPhrase />
+          <ShowSeedPhrase seedPhrase={seedPhrase} />
         ) : (
           <>
             <View style={{ marginTop: 60 }}>
@@ -70,6 +72,7 @@ const RevealSeedPhrase = ({ navigation }) => {
                 placeholderTextColor={"#666276"}
                 onChangeText={(e) => setPassword(e)}
                 textContentType="password"
+                secureTextEntry={true}
               />
               <Text style={Constants.error}>{err}</Text>
             </View>
@@ -91,9 +94,8 @@ const RevealSeedPhrase = ({ navigation }) => {
 
 export default RevealSeedPhrase;
 
-const ShowSeedPhrase = () => {
+const ShowSeedPhrase = ({ seedPhrase }) => {
   const [active, setActive] = useState(1);
-  const [seedPhrase, setSeedPhrase] = useState("");
 
   return (
     <View style={{ marginTop: 60 }}>
@@ -106,12 +108,12 @@ const ShowSeedPhrase = () => {
       {active == 1 ? (
         <View style={styles.seedPhraseBox}>
           <Text style={styles.seedPhraseMsg}>Your Seed Phrase</Text>
-          <Text style={styles.seedPhrase}>
-            then goat happen happen happen happen alien cross dog goat
-          </Text>
+          <Text style={styles.seedPhrase}>{seedPhrase}</Text>
         </View>
       ) : (
-        <Text>jdjdj</Text>
+        <View style={{ marginTop: 40 }}>
+          <QRcode />
+        </View>
       )}
     </View>
   );

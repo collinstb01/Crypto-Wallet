@@ -4,8 +4,6 @@ import { encryptionKey } from "../constants/DATA";
 import { ethers, Wallet, HDNodeWallet } from "ethers";
 import axios from "axios";
 
-let ETHERSCAN_API_KEY = "95GKUEVKANAKHD1J994RT2Z3415D4UI6ZY";
-
 export const _checkPasswordStrength = ({ password, setPS }) => {
   if (password.length <= 6) {
     return setPS((e) => ({ ...e, color: "red", stength: "Poor" }));
@@ -68,6 +66,71 @@ export const _login = async ({
     return;
   }
   navigation.navigate(route);
+};
+
+export const _changePassword = async ({
+  password,
+  newPassword,
+  setSuccessMsg,
+  setErr,
+  setLoading,
+  navigation,
+  route,
+}) => {
+  //compare with the one in the backedn
+  setLoading(true);
+
+  const user = await AsyncStorage.getItem("user");
+  let parsedUser = JSON.parse(user);
+
+  const decryptPassword = await _decryotData({
+    encryptedData: parsedUser.password,
+  });
+  if (password == "" || newPassword == "") {
+    return _helperFunc({
+      setErr,
+      setLoading,
+      error: "Fields can not be empty",
+      loading: false,
+    });
+  }
+
+  if (password !== decryptPassword) {
+    return _helperFunc({
+      setErr,
+      setLoading,
+      error: "Password is not correct",
+      loading: false,
+    });
+  }
+
+  if (decryptPassword == newPassword) {
+    return _helperFunc({
+      setErr,
+      setLoading,
+      error: "Please enter a different password",
+      loading: false,
+    });
+  }
+
+  if (newPassword.length < 6) {
+    return _helperFunc({
+      setErr,
+      setLoading,
+      error: "Password Length must be more than 6 characters",
+      loading: false,
+    });
+  }
+
+  parsedUser.password = await _encryotData({ data: newPassword });
+  await AsyncStorage.setItem("user", JSON.stringify(parsedUser));
+
+  _helperFunc({
+    error: "Successfully Changed your password",
+    loading: false,
+    setErr: setSuccessMsg,
+    setLoading: setLoading,
+  });
 };
 
 export const _createUserAccount = async ({
@@ -1238,119 +1301,168 @@ function formatDateToCustomFormat() {
 }
 
 const listenForEthAndERC20Transfer = async () => {
-  const networks = await AsyncStorage.getItem("networks");
-  const wallets = await AsyncStorage.getItem("wallets");
-  const tokens = await AsyncStorage.getItem("tokens");
-  const parseTokens = JSON.parse(tokens);
+  try {
+    const networks = await AsyncStorage.getItem("networks");
+    const wallets = await AsyncStorage.getItem("wallets");
+    const tokens = await AsyncStorage.getItem("tokens");
+    const parseTokens = JSON.parse(tokens);
 
-  const filterTokens = parseTokens.filter(
-    (item) => item.address != "0x0000000000000000000000000000000000000000"
-  );
-  const parsenetworks = JSON.parse(networks);
-  const parseWallets = JSON.parse(wallets);
-  const walletArray = [];
-  for (const parseWallet of parseWallets) {
-    const decryptWalletAddress = await _decryotData({
-      encryptedData: parseWallet.walletAddress,
-    });
-    walletArray.push(decryptWalletAddress.toLowerCase());
-  }
+    const filterTokens = parseTokens.filter(
+      (item) => item.address != "0x0000000000000000000000000000000000000000"
+    );
+    const parsenetworks = JSON.parse(networks);
+    const parseWallets = JSON.parse(wallets);
+    const walletArray = [];
+    for (const parseWallet of parseWallets) {
+      const decryptWalletAddress = await _decryotData({
+        encryptedData: parseWallet.walletAddress,
+      });
+      walletArray.push(decryptWalletAddress.toLowerCase());
+    }
 
-  for (const filterToken of filterTokens) {
-    const provider = new ethers.JsonRpcProvider(filterToken.rpcURL); // Set your provider
-    let abi = await getContractAbi({
-      contractAddress: "addr",
-    });
-    const contract = new ethers.Contract(filterToken.address, abi, provider);
+    for (const filterToken of filterTokens) {
+      const provider = new ethers.JsonRpcProvider(filterToken.rpcURL); // Set your provider
+      let abi = await getContractAbi({
+        contractAddress: "addr",
+      });
+      const contract = new ethers.Contract(filterToken.address, abi, provider);
 
-    contract.on("Transfer", (from, to, amount, event) => {
-      console.log("calling..........");
-      if (walletArray.includes(to.toLowerCase())) {
-        console.log(`Transaction details: `, event);
-        console.log(`Received transfer of ${amount} tokens from ${from}`);
+      contract
+        .on("Transfer", async (from, to, amount, event) => {
+          console.log("calling..........");
 
-        // provider.getTransaction(event.transactionHash).then((transaction) => {
-        //   console.log(`Transaction details: `, transaction);
-        // });
-        // Update the user's balance here
-      }
-    });
-  }
+          if (walletArray.includes(to.toLowerCase())) {
+            let userData = parseTokens
+              .filter(
+                async (val) =>
+                  (
+                    await _decryotData({
+                      encryptedData: val.walletAddress,
+                    })
+                  ).toLowerCase() == filterToken.walletAddress.toLowerCase()
+              )
+              .filter((val) => val.address == filterToken.address)
+              .filter((val) => val.chainId == filterToken.chainId);
+            const date = formatDateToCustomFormat();
 
-  for (const network of parsenetworks) {
-    const provider = new ethers.JsonRpcProvider(network.rpcURL); // Set your provider
+            console.log(userData, "userData");
+            let TXhistoryObj = {
+              userWalletAddress: to,
+              network: userData[0].network,
+              contractAddress: filterToken.address,
+              status: "success",
+              statusNo: 1,
+              symbol: userData[0].symbol,
+              date: date,
+              type: "Receive",
+              from: from,
+              to: to,
+              value: Number(amount),
+              gasUsed: 0,
+              gasLimit: 0,
+              gasPrice: 0,
+              blockHash: null,
+              blockNumber: null,
+              timeStamp: "",
+              nonce: null,
+              hash: null,
+              chainId: Number(userData[0].chainId),
+            };
 
-    provider.on("block", async (blockNumber) => {
-      // Get the block details
-      const block = await provider.getBlock(blockNumber, true);
+            const TXhistory = await AsyncStorage.getItem("TXhistory");
+            const parseTXhistory = JSON.parse(TXhistory);
+            parseTXhistory.push(TXhistoryObj);
 
-      // Check each transaction in the block
-      for (const tx of block.prefetchedTransactions) {
-        // If the transaction is to the user's address, log it and update the user's balance
-        if (tx.to && walletArray.includes(tx.to.toLowerCase())) {
-          const date = formatDateToCustomFormat();
+            await AsyncStorage.setItem(
+              "TXhistory",
+              JSON.stringify(parseTXhistory)
+            );
+            // Update the user's balance here
+            userData[0].amount = await getBalance({
+              address: userData[0].rpcURL,
+              address: to,
+            });
 
-          console.log("calledddddddddddddddddddddddddddddd");
+            await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+          }
+        })
+        .catch((err) => {
+          console.log("something went wrong");
+        });
+    }
 
-          let encryptedWalletAddress = await _encryotData({ data: tx.to });
-          let userData = parseTokens
-            .filter(
-              async (val) =>
-                (
-                  await _decryotData({ encryptedData: val.walletAddress })
-                ).toLowerCase() == tx.to.toLowerCase()
-            )
-            .filter(
-              (val) =>
-                val.address == "0x0000000000000000000000000000000000000000"
-            )
-            .filter((val) => val.chainId == Number(tx.chainId));
-          console.log(userData, "userData");
-          let TXhistoryObj = {
-            userWalletAddress: tx.to,
-            network: userData[0].network,
-            contractAddress: "0x0000000000000000000000000000000000000000",
-            status: "success",
-            statusNo: null,
-            symbol: userData[0].symbol,
-            date: date,
-            type: "Receive",
-            from: tx.from,
-            to: tx.to,
-            value: Number(tx.value),
-            gasUsed: Number(tx.gasUsed),
-            gasLimit: Number(tx.gasLimit),
-            gasPrice: Number(tx.gasPrice),
-            blockHash: tx.blockHash,
-            blockNumber: null,
-            timeStamp: "",
-            nonce: Number(tx.nonce),
-            hash: tx.hash,
-            chainId: Number(tx.chainId),
-          };
+    for (const network of parsenetworks) {
+      const provider = new ethers.JsonRpcProvider(network.rpcURL); // Set your provider
 
-          const TXhistory = await AsyncStorage.getItem("TXhistory");
-          const parseTXhistory = JSON.parse(TXhistory);
-          parseTXhistory.push(TXhistoryObj);
+      provider.on("block", async (blockNumber) => {
+        // Get the block details
+        const block = await provider.getBlock(blockNumber, true);
 
-          await AsyncStorage.setItem(
-            "TXhistory",
-            JSON.stringify(parseTXhistory)
-          );
+        // Check each transaction in the block
+        for (const tx of block.prefetchedTransactions) {
+          // If the transaction is to the user's address, log it and update the user's balance
+          if (tx.to && walletArray.includes(tx.to.toLowerCase())) {
+            console.log("calling.............");
 
-          console.log(`Transaction hash: ${tx.hash}`);
-          console.log(`Transaction details: `, tx);
+            const date = formatDateToCustomFormat();
+            let userData = parseTokens
+              .filter(
+                async (val) =>
+                  (
+                    await _decryotData({ encryptedData: val.walletAddress })
+                  ).toLowerCase() == tx.to.toLowerCase()
+              )
+              .filter(
+                (val) =>
+                  val.address == "0x0000000000000000000000000000000000000000"
+              )
+              .filter((val) => val.chainId == Number(tx.chainId));
+            console.log(userData, "userData");
+            let TXhistoryObj = {
+              userWalletAddress: tx.to,
+              network: userData[0].network,
+              contractAddress: "0x0000000000000000000000000000000000000000",
+              status: "success",
+              statusNo: 1,
+              symbol: userData[0].symbol,
+              date: date,
+              type: "Receive",
+              from: tx.from,
+              to: tx.to,
+              value: Number(tx.value),
+              gasUsed: Number(tx.gasUsed),
+              gasLimit: Number(tx.gasLimit),
+              gasPrice: Number(tx.gasPrice),
+              blockHash: tx.blockHash,
+              blockNumber: null,
+              timeStamp: "",
+              nonce: Number(tx.nonce),
+              hash: tx.hash,
+              chainId: Number(tx.chainId),
+            };
 
-          // Update the user's balance here
-          userData[0].amount = await getBalance({
-            address: network.rpcURL,
-            address: tx.to,
-          });
+            const TXhistory = await AsyncStorage.getItem("TXhistory");
+            const parseTXhistory = JSON.parse(TXhistory);
+            parseTXhistory.push(TXhistoryObj);
 
-          await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+            await AsyncStorage.setItem(
+              "TXhistory",
+              JSON.stringify(parseTXhistory)
+            );
+            // Update the user's balance here
+            userData[0].amount = await getBalance({
+              address: network.rpcURL,
+              address: tx.to,
+            });
+
+            await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+          }
         }
-      }
-    });
+      });
+    }
+  } catch (error) {
+    console.log("An error occured");
+    console.log(error);
   }
 };
 
@@ -1366,4 +1478,17 @@ export const getSeedPhrase = async () => {
   });
 
   return JSON.stringify(decryptedSeedPhrase);
+};
+
+export const _getAllTokens = async () => {
+  try {
+    const response = await axios.get(
+      "https://api.coingecko.com/api/v3/coins/list"
+    );
+
+    // if (!response) return
+    return response.data;
+  } catch (error) {
+    console.log("Something went wrong while trying to get tokens", error);
+  }
 };

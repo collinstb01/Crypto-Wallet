@@ -22,8 +22,8 @@ const SettingPrivacy = ({ navigation }) => {
   const [isScrolling, handleScroll] = useHandleScrollFunc();
   const boxHeigght = Platform.OS === "ios" ? 23 : 15;
 
-  const handleRoute = () => {
-    navigation.navigate("settings/reveal-seed-phrase");
+  const handleRoute = ({ route }) => {
+    navigation.navigate(route);
   };
   return (
     <View style={[Constants.container2Home]}>
@@ -64,14 +64,18 @@ const SettingPrivacy = ({ navigation }) => {
               <ButtonGradientTwo
                 text={"Backup Again"}
                 route={"func"}
-                func={handleRoute}
+                func={() =>
+                  handleRoute({ route: "settings/reveal-seed-phrase" })
+                }
               />
             </View>
             <View style={{ marginLeft: 10 }}>
               <ButtonGradient
                 text={"Reveal Seed Phrase"}
                 route={"func"}
-                func={handleRoute}
+                func={() =>
+                  handleRoute({ route: "settings/reveal-seed-phrase" })
+                }
               />
             </View>
           </View>
@@ -86,7 +90,10 @@ const SettingPrivacy = ({ navigation }) => {
             </Text>
           </View>
           <View style={{ marginTop: 20 }}>
-            <ButtonGradientTwo text={"Change Password"} />
+            <ButtonGradientTwo
+              text={"Change Password"}
+              func={() => handleRoute({ route: "settings/change-password" })}
+            />
           </View>
         </View>
         <View style={styles.settingBox}>

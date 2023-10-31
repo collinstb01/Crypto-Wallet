@@ -2,10 +2,14 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Fontisto } from "@expo/vector-icons";
 
-export default function LoadingBanner({ bg, text1, text2 }) {
+export default function LoadingBanner({ bg, text1, text2, type }) {
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
-      <Fontisto name="spinner" size={38} color={"#feaa2e"} />
+      <Fontisto
+        name={type == "success" ? "check" : "spinner"}
+        size={38}
+        color={"#feaa2e"}
+      />
       <View style={{ marginLeft: 15 }}>
         <Text style={styles.text1}>{text1}</Text>
         <Text style={styles.text2}>{text2}</Text>

@@ -57,4 +57,11 @@ export default contantStyles = {
     fontWeight: "700",
     fontSize: 16,
   },
+  success: {
+    color: "green",
+    textAlign: "center",
+    fontWeight: "700",
+    fontSize: 19,
+    marginTop: 10,
+  },
 };

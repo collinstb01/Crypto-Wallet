@@ -26,6 +26,7 @@ import Preferences from "./pages/Preferences/Preferences";
 import GeneralSettings from "./pages/GeneralSettings/GeneralSettings";
 import SecurityPrivacy from "./pages/SecurityPrivacy/SecurityPrivacy";
 import RevealSeedPhrase from "./pages/RevealSeedPhrase/RevealSeedPhrase";
+import chnagePassword from "./pages/chnagePassword/chnagePassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -145,6 +146,11 @@ export default function App() {
           <Stack.Screen
             name="settings/reveal-seed-phrase"
             component={RevealSeedPhrase}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="settings/change-password"
+            component={chnagePassword}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

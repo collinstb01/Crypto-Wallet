@@ -49,7 +49,8 @@ const TransactionDInDepth = ({ txDepth }) => {
           <Text style={[styles.rightText, styles.text]}>Network Fee</Text>
           <Text style={[styles.firstText, styles.text]}>
             {txDepth.networkFee}{" "}
-            {txDepth.network.charAt(0).toUpperCase() + txDepth.network.slice(1)}
+            {txDepth?.network?.charAt(0)?.toUpperCase() +
+              txDepth?.network?.slice(1)}
           </Text>
         </View>
         <View style={[styles.first, styles.flex2]}>
@@ -59,7 +60,7 @@ const TransactionDInDepth = ({ txDepth }) => {
               {txDepth.status == "success" ? "Confirmed" : "Faile"}
             </Text>
             <Text style={[styles.firstText, styles.text]}>
-              {ethers.formatEther(txDepth.total.toString())}
+              {ethers.formatEther(txDepth?.total?.toString())}
             </Text>
           </View>
         </View>

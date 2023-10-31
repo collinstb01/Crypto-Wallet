@@ -38,6 +38,10 @@ const TokenDetails = ({ route, navigation }) => {
     networkFee: "",
     contractAddress: "",
     hash: "",
+    symbol: "",
+    type: "",
+    network: "",
+    total: "",
   });
   const { tokenName, amount, contractAddress, symbol } = route.params;
 
@@ -152,23 +156,37 @@ const TokenDetails = ({ route, navigation }) => {
               {!tokenHistory ? (
                 <Empty text={"No Transaction Data"} />
               ) : (
-                <TokenHistory
-                  DATA={tokenHistory}
-                  setShow={setShow}
-                  setTXDepth={setTXDepth}
-                />
+                <>
+                  <TokenHistory
+                    DATA={tokenHistory}
+                    setShow={setShow}
+                    setTXDepth={setTXDepth}
+                  />
+                  {tokenHistory.find((val) => val.status == "pending") ? (
+                    <LoadingBanner
+                      text1={"A Transaction Submitted"}
+                      text2={"Waiting for confirmation"}
+                      bg={"#3d3125"}
+                    />
+                  ) : (
+                    <LoadingBanner
+                      text1={"Transactions Confirmed"}
+                      text2={"All Transactions confirmation"}
+                      bg={"#162921"}
+                      type={"success"}
+                    />
+                  )}
+                </>
               )}
-              <LoadingBanner
-                text1={"Transaction Submitted"}
-                text2={"Waiting for confirmation"}
-                bg={"#3d3125"}
-              />
             </View>
           </View>
         </ReusableCard>
       </ScrollView>
-      {txDepth && (
-        <ResuableModalCTN text={"send 1INCH"} setShow={setShow}>
+      {show && (
+        <ResuableModalCTN
+          text={`${txDepth?.type} ${txDepth?.symbol?.toUpperCase()}`}
+          setShow={setShow}
+        >
           <TransactionDInDepth txDepth={txDepth} />
         </ResuableModalCTN>
       )}

@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ButtonGradient from "./ButtonGradient";
 import ButtonGradientTwo from "./ButtonGradientTwo";
 import { _decryotData } from "../constants/HelperFunctions";
+// import QRCode from "react-native-qrcode-svg";
 
 const QRCodeReceiveToken = ({ navigation, setText, text, activeWallet }) => {
   const [copied, setCopied] = useState("");

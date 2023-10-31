@@ -19,6 +19,7 @@ import {
   _encryotData,
   _getTokenDetail,
   _addTokens,
+  _getAllTokens,
 } from "../../constants/HelperFunctions";
 import { Pressable } from "react-native";
 import ButtonGradient from "../../components/ButtonGradient";
@@ -31,6 +32,7 @@ const AddTokens = ({ navigation }) => {
   const [show, setShow] = useState(false);
   const [valid, setValid] = useState(false);
   const [active, setActive] = useState(1);
+  const [allTokens, setAllTokens] = useState(null);
   const [data, setData] = useState({
     name: "",
     decimals: null,
@@ -104,7 +106,16 @@ const AddTokens = ({ navigation }) => {
     setLoading(false);
   };
 
-  useEffect(() => {}, []);
+  const getAllTokens = async () => {
+    const tokens = await _getAllTokens();
+    setAllTokens(tokens);
+  };
+
+  useEffect(() => {
+    getAllTokens();
+  }, []);
+
+  console.log(allTokens);
   return (
     <ReusableCard
       navigation={navigation}
