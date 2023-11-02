@@ -15,6 +15,7 @@ import { Alert } from "react-native";
 import {
   _decryotData,
   _getActiveWallet,
+  onShare,
 } from "../../constants/HelperFunctions";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -70,7 +71,7 @@ const Settings = ({ route, navigation }) => {
   const handleRoute = async ({ route }) => {
     if (route == "") return;
     if (route == "share") {
-      onShare();
+      handleShare();
       return;
     }
     if (route == "expolorer") {
@@ -80,24 +81,8 @@ const Settings = ({ route, navigation }) => {
     navigation.navigate(route);
   };
 
-  const onShare = async () => {
-    try {
-      const result = await Share.share({
-        message: activeWallet,
-        title: "Wallet Address",
-      });
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
-    } catch (error) {
-      Alert.alert(error.message);
-    }
+  const handleShare = () => {
+    onShare({ activeWallet });
   };
 
   const handlePress = async () => {

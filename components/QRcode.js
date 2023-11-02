@@ -1,20 +1,24 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Image } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 
-export default function QRcode() {
+export default function QRcode({ text }) {
   return (
-    <View style={{ justifyContent: "center", alignItems: "center" }}>
-      <Image source={require("../assets/qrcode.png")} style={styles.img} />
+    <View
+      style={[{ justifyContent: "center", alignItems: "center" }, styles.img]}
+    >
+      <QRCode value={text} color="blue" size={150} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   img: {
+    // flex: 1,
     borderRadius: 15,
-    width: 200,
-    height: 200,
+    width: 180,
+    height: 180,
     backgroundColor: "white",
   },
 });

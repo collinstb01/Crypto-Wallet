@@ -26,10 +26,10 @@ import ButtonGradient from "../../components/ButtonGradient";
 import TabstwoContents from "../../components/TabstwoContents";
 import { setMCMessage } from "../../features/StorageAuth/StorageAuth";
 import { useDispatch } from "react-redux";
+import AssestPrice from "../../components/AssestPrice";
 
 const AddTokens = ({ navigation }) => {
   const [receiveingAddr, setReceivingAddr] = useState("");
-  const [show, setShow] = useState(false);
   const [valid, setValid] = useState(false);
   const [active, setActive] = useState(1);
   const [allTokens, setAllTokens] = useState(null);
@@ -42,6 +42,9 @@ const AddTokens = ({ navigation }) => {
     id: "",
     walletAddress: "",
   });
+  const [show, setShow] = useState(false);
+  const [text, setText] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [disabled, setdisabled] = useState(true);
   const [err, setErr] = useState("");
@@ -107,8 +110,10 @@ const AddTokens = ({ navigation }) => {
   };
 
   const getAllTokens = async () => {
+    setLoading(true);
     const tokens = await _getAllTokens();
     setAllTokens(tokens);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -143,14 +148,33 @@ const AddTokens = ({ navigation }) => {
                 flexDirection: "column",
               }}
             >
-              <TextInput
-                placeholder={valid ? "" : "Search, public address (0x), or ENS"}
-                style={[styles.input, constantStyle.input]}
-                placeholderTextColor={"#a49eb9"}
-                onChangeText={(e) => handleChange(e)}
-                value={valid ? "" : receiveingAddr}
-                // editable={valid == false && true}
-              />
+              <View>
+                <TextInput
+                  placeholder={valid ? "" : "Search For Tokens"}
+                  style={[styles.input, constantStyle.input]}
+                  placeholderTextColor={"#a49eb9"}
+                  onChangeText={(e) => handleChange(e)}
+                  value={valid ? "" : receiveingAddr}
+                  // editable={valid == false && true}
+                />
+                {loading ? (
+                  <Text style={constantStyle.loading}>Loaing....</Text>
+                ) : (
+                  [1, 2, 3].map((val, index) => (
+                    <Pressable
+                      onPress={() => {
+                        setShow(true);
+                        setText("0x558A03Ea3052620c34D12fA3A1500EbA7D135bE9");
+                      }}
+                      key={index}
+                    >
+                      <View key={index}>
+                        <AssestPrice />
+                      </View>
+                    </Pressable>
+                  ))
+                )}
+              </View>
               <View style={{ marginTop: 50 }}>
                 <ButtonGradient
                   text={"Next"}

@@ -18,8 +18,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSeed } from "../../features/StorageAuth/StorageAuth";
 import Constants from "../../constants/styles";
 import { _encryotData } from "../../constants/HelperFunctions";
+import { usePreventScreenCapture } from "expo-screen-capture";
 
 const SecondPhase = ({ navigation }) => {
+  // usePreventScreenCapture();
   const [show, setshow] = useState(false);
   const [generating, setGenerating] = useState(true);
   const { seedPhrase, password } = useSelector((state) => state.storage);
@@ -116,24 +118,15 @@ const SecondPhase = ({ navigation }) => {
           "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
       },
       {
-        name: "Smart Chain - Testnet",
+        name: "Arbitrum Goerli",
         amount: 0,
-        symbol: "bscTestNet",
+        symbol: "arbitrumGoerli",
         address: "0x0000000000000000000000000000000000000000",
-        network: "bscTestNet",
+        network: "arbitrum",
         walletAddress: encryptedWalletAddress,
-        chainId: 97,
-        pcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-      },
-      {
-        name: "Binance Smart Chain",
-        amount: 0,
-        symbol: "bsc",
-        address: "0x0000000000000000000000000000000000000000",
-        network: "bsc",
-        walletAddress: encryptedWalletAddress,
-        chainId: 56,
-        rpcURL: "https://bsc-dataseed.binance.org/",
+        chainId: 421613,
+        rpcURL:
+          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
       },
     ];
 

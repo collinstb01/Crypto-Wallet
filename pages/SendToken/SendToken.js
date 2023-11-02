@@ -37,9 +37,7 @@ const SendToken = ({ navigation }) => {
   };
 
   const handleChange = async (e) => {
-    let encrypt = await _encryotData({ data: e });
-    setReceivingAddr(encrypt);
-
+    setReceivingAddr(e);
     if (!/^(0x)?[0-9a-fA-F]{40}$/.test(e)) {
       // Check if the address is 40 hexadecimal characters with or without the "0x" prefix.
       return setValid(false);
@@ -49,6 +47,8 @@ const SendToken = ({ navigation }) => {
       // Check if the address is not an empty address (40 zeros).
       return setValid(false);
     }
+    let encrypt = await _encryotData({ data: e });
+    setReceivingAddr(encrypt);
 
     Keyboard.dismiss(); // Close the keyboard
     return setValid(true);
@@ -169,6 +169,9 @@ const SendToken = ({ navigation }) => {
               }}
             />
           )}
+          <Text style={constantStyle.warning}>
+            Enter A valid Address to continue
+          </Text>
         </View>
         {/* <Recent /> */}
         {!valid && (

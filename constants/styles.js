@@ -64,4 +64,10 @@ export default contantStyles = {
     fontSize: 19,
     marginTop: 10,
   },
+  warning: {
+    fontSize: 11,
+    marginTop: 6,
+    color: "orange",
+    opacity: 0.6,
+  },
 };

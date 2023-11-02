@@ -3,6 +3,9 @@ import CryptoJS from "react-native-crypto-js";
 import { encryptionKey } from "../constants/DATA";
 import { ethers, Wallet, HDNodeWallet } from "ethers";
 import axios from "axios";
+import { Share } from "react-native";
+import { Alert } from "react-native";
+import { schedulePushNotification } from "../components/SendNotification";
 
 export const _checkPasswordStrength = ({ password, setPS }) => {
   if (password.length <= 6) {
@@ -34,6 +37,7 @@ export const _login = async ({
   setLoading,
   navigation,
   route,
+  setShowSeedPhrase,
 }) => {
   //compare with the one in the backedn
   setLoading(true);
@@ -63,6 +67,7 @@ export const _login = async ({
   }
 
   if (route == "show") {
+    setShowSeedPhrase(true);
     return;
   }
   navigation.navigate(route);
@@ -275,20 +280,13 @@ export const _createUserAccount = async ({
         chainId: 11155111,
       },
       {
-        name: "Smart Chain - Testnet",
-        id: "bscTestNet",
+        name: "Arbitrum Goerli",
+        id: "arbitrumGoerli",
         active: 0,
         color: "a769ec",
-        rpcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-        chainId: 97,
-      },
-      {
-        name: "Binance Smart Chain",
-        id: "bsc",
-        active: 0,
-        color: "29d041",
-        rpcURL: "https://bsc-dataseed.binance.org/",
-        chainId: 56,
+        rpcURL:
+          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
+        chainId: 421613,
       },
     ];
     const tokens = [
@@ -305,6 +303,8 @@ export const _createUserAccount = async ({
         network: "eth",
         walletAddress: encryptedWalletAddress,
         chaindId: 1,
+        rpcURL:
+          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
       },
       {
         name: "Sepolia Test Network",
@@ -319,34 +319,24 @@ export const _createUserAccount = async ({
         network: "sepolia",
         walletAddress: encryptedWalletAddress,
         chainId: 11155111,
+        rpcURL:
+          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
       },
       {
-        name: "Smart Chain - Testnet",
+        name: "Arbitrum Goerli",
         amount: Number(
           await getBalance({
             rpcURL: networks[2].rpcURL,
             address: walletPhraseData.address,
           })
         ),
-        symbol: "bscTestNet",
+        symbol: "arbitrumGoerli",
         address: "0x0000000000000000000000000000000000000000",
-        network: "bscTestNet",
+        network: "arbitrumGoerli",
         walletAddress: encryptedWalletAddress,
-        chainId: 97,
-      },
-      {
-        name: "Binance Smart Chain",
-        amount: Number(
-          await getBalance({
-            rpcURL: networks[3].rpcURL,
-            address: walletPhraseData.address,
-          })
-        ),
-        symbol: "bsc",
-        address: "0x0000000000000000000000000000000000000000",
-        network: "bsc",
-        walletAddress: encryptedWalletAddress,
-        chainId: 56,
+        chainId: 421613,
+        rpcURL:
+          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
       },
     ];
 
@@ -510,34 +500,21 @@ export const _createWallet = async ({
           "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
       },
       {
-        name: "Smart Chain - Testnet",
+        name: "Arbitrum Goerli",
         amount: Number(
           await getBalance({
-            rpcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+            rpcURL:
+              "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
             address: address,
           })
         ),
-        symbol: "bscTestNet",
+        symbol: "arbitrumGoerli",
         address: "0x0000000000000000000000000000000000000000",
-        network: "bscTestNet",
+        network: "arbitrumGoerli",
         walletAddress: encryptedWalletAddress,
-        chaindId: 97,
-        rpcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-      },
-      {
-        name: "Binance Smart Chain",
-        amount: Number(
-          await getBalance({
-            rpcURL: "https://bsc-dataseed.binance.org/",
-            address: address,
-          })
-        ),
-        symbol: "bsc",
-        address: "0x0000000000000000000000000000000000000000",
-        network: "bsc",
-        walletAddress: encryptedWalletAddress,
-        chaindId: 56,
-        rpcURL: "https://bsc-dataseed.binance.org/",
+        chainId: 421613,
+        rpcURL:
+          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
       },
     ];
 
@@ -1217,6 +1194,11 @@ export const confirmTX = async ({
     await AsyncStorage.setItem("recents", JSON.stringify(ParseRecents));
     console.log(ParseRecents);
     if (receipt.status === 1) {
+      receiveNotify({
+        title: "Sent Token (Success)",
+        body: `You sent ${userData[0].symbol} to` + realTX.to,
+        data: "https://etherscan.io/address/" + realTX.hash,
+      });
       // Transaction succeeded
       realTX.status = "success";
       realTX.gasUsed = Number(receipt.gasUsed);
@@ -1232,6 +1214,11 @@ export const confirmTX = async ({
       });
       await AsyncStorage.setItem("tokens", JSON.stringify(userData));
     } else if (receipt.status === 0) {
+      receiveNotify({
+        title: "Sent Token (Failed)",
+        body: `You sent ${userData[0].symbol} to` + realTX.to,
+        data: "https://etherscan.io/address/" + realTX.hash,
+      });
       realTX.status = "failed";
       realTX.gasUsed = receipt.gasUsed;
       realTX.gasPrice = receipt.gasPrice;
@@ -1320,79 +1307,13 @@ const listenForEthAndERC20Transfer = async () => {
       walletArray.push(decryptWalletAddress.toLowerCase());
     }
 
-    for (const filterToken of filterTokens) {
-      const provider = new ethers.JsonRpcProvider(filterToken.rpcURL); // Set your provider
-      let abi = await getContractAbi({
-        contractAddress: "addr",
-      });
-      const contract = new ethers.Contract(filterToken.address, abi, provider);
-
-      contract
-        .on("Transfer", async (from, to, amount, event) => {
-          console.log("calling..........");
-
-          if (walletArray.includes(to.toLowerCase())) {
-            let userData = parseTokens
-              .filter(
-                async (val) =>
-                  (
-                    await _decryotData({
-                      encryptedData: val.walletAddress,
-                    })
-                  ).toLowerCase() == filterToken.walletAddress.toLowerCase()
-              )
-              .filter((val) => val.address == filterToken.address)
-              .filter((val) => val.chainId == filterToken.chainId);
-            const date = formatDateToCustomFormat();
-
-            console.log(userData, "userData");
-            let TXhistoryObj = {
-              userWalletAddress: to,
-              network: userData[0].network,
-              contractAddress: filterToken.address,
-              status: "success",
-              statusNo: 1,
-              symbol: userData[0].symbol,
-              date: date,
-              type: "Receive",
-              from: from,
-              to: to,
-              value: Number(amount),
-              gasUsed: 0,
-              gasLimit: 0,
-              gasPrice: 0,
-              blockHash: null,
-              blockNumber: null,
-              timeStamp: "",
-              nonce: null,
-              hash: null,
-              chainId: Number(userData[0].chainId),
-            };
-
-            const TXhistory = await AsyncStorage.getItem("TXhistory");
-            const parseTXhistory = JSON.parse(TXhistory);
-            parseTXhistory.push(TXhistoryObj);
-
-            await AsyncStorage.setItem(
-              "TXhistory",
-              JSON.stringify(parseTXhistory)
-            );
-            // Update the user's balance here
-            userData[0].amount = await getBalance({
-              address: userData[0].rpcURL,
-              address: to,
-            });
-
-            await AsyncStorage.setItem("tokens", JSON.stringify(userData));
-          }
-        })
-        .catch((err) => {
-          console.log("something went wrong");
-        });
-    }
-
     for (const network of parsenetworks) {
-      const provider = new ethers.JsonRpcProvider(network.rpcURL); // Set your provider
+      let provider;
+      try {
+        provider = new ethers.JsonRpcProvider(network.rpcURL);
+      } catch (error) {
+        console.log("unable to connect");
+      } // Set your provider
 
       provider.on("block", async (blockNumber) => {
         // Get the block details
@@ -1441,6 +1362,12 @@ const listenForEthAndERC20Transfer = async () => {
               chainId: Number(tx.chainId),
             };
 
+            receiveNotify({
+              title: "Receive Token",
+              body: `You received Receive A Token from ${from}`,
+              data: "https://etherscan.io/address/",
+            });
+
             const TXhistory = await AsyncStorage.getItem("TXhistory");
             const parseTXhistory = JSON.parse(TXhistory);
             parseTXhistory.push(TXhistoryObj);
@@ -1459,6 +1386,86 @@ const listenForEthAndERC20Transfer = async () => {
           }
         }
       });
+    }
+
+    for (const filterToken of filterTokens) {
+      let provider;
+      try {
+        provider = new ethers.JsonRpcProvider(filterToken.rpcURL); // Set your provider
+      } catch (error) {
+        console.log("unable to connect");
+      }
+      let abi = await getContractAbi({
+        contractAddress: "addr",
+      });
+      const contract = new ethers.Contract(filterToken.address, abi, provider);
+
+      contract
+        .on("Transfer", async (from, to, amount, event) => {
+          console.log("calling..........");
+
+          if (walletArray.includes(to.toLowerCase())) {
+            let userData = parseTokens
+              .filter(
+                async (val) =>
+                  (
+                    await _decryotData({
+                      encryptedData: val.walletAddress,
+                    })
+                  ).toLowerCase() == filterToken.walletAddress.toLowerCase()
+              )
+              .filter((val) => val.address == filterToken.address)
+              .filter((val) => val.chainId == filterToken.chainId);
+            const date = formatDateToCustomFormat();
+
+            console.log(userData, "userData");
+            let TXhistoryObj = {
+              userWalletAddress: to,
+              network: userData[0].network,
+              contractAddress: filterToken.address,
+              status: "success",
+              statusNo: 1,
+              symbol: userData[0].symbol,
+              date: date,
+              type: "Receive",
+              from: from,
+              to: to,
+              value: Number(amount),
+              gasUsed: 0,
+              gasLimit: 0,
+              gasPrice: 0,
+              blockHash: null,
+              blockNumber: null,
+              timeStamp: "",
+              nonce: null,
+              hash: null,
+              chainId: Number(userData[0].chainId),
+            };
+            receiveNotify({
+              title: "Receive Token",
+              body: `You received Receive A Token from ${from}`,
+              data: "https://etherscan.io/address/",
+            });
+
+            const TXhistory = await AsyncStorage.getItem("TXhistory");
+            const parseTXhistory = JSON.parse(TXhistory);
+            parseTXhistory.push(TXhistoryObj);
+
+            await AsyncStorage.setItem(
+              "TXhistory",
+              JSON.stringify(parseTXhistory)
+            );
+            // Update the user's balance here
+            userData[0].amount = await getBalance({
+              address: userData[0].rpcURL,
+              address: to,
+            });
+            await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+          }
+        })
+        .catch((err) => {
+          console.log("something went wrong");
+        });
     }
   } catch (error) {
     console.log("An error occured");
@@ -1492,3 +1499,31 @@ export const _getAllTokens = async () => {
     console.log("Something went wrong while trying to get tokens", error);
   }
 };
+
+export const onShare = async ({ activeWallet }) => {
+  try {
+    const result = await Share.share({
+      message: activeWallet,
+      title: "Wallet Address",
+    });
+    if (result.action === Share.sharedAction) {
+      if (result.activityType) {
+        // shared with activity type of result.activityType
+      } else {
+        // shared
+      }
+    } else if (result.action === Share.dismissedAction) {
+      // dismissed
+    }
+  } catch (error) {
+    Alert.alert(error.message);
+  }
+};
+
+function receiveNotify({ title, body, data }) {
+  schedulePushNotification({
+    title: title,
+    body: body,
+    data: data,
+  });
+}

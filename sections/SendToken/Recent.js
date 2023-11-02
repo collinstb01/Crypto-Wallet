@@ -34,7 +34,6 @@ const Recent = ({ navigation, valid, to, from, handleChange }) => {
     getrecentsAddressSentTo();
   }, []);
 
-  console.log(Array.isArray(recents), JSON.parse(recents), " is recents");
   return (
     <View
       style={[
@@ -59,7 +58,7 @@ const Recent = ({ navigation, valid, to, from, handleChange }) => {
         {valid ? "Click Next to Proceed" : "Recent"}
       </Text>
       {!valid &&
-        (!recents ? (
+        (!Array.isArray(recents) ? (
           <Empty text={"No Recent Data Found"} />
         ) : (
           <>

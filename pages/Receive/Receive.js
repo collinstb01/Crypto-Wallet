@@ -32,8 +32,18 @@ const Receive = ({ navigation }) => {
             </View>
           </Pressable>
         ))}
+        <Text
+          style={{
+            alignItems: "center",
+            color: "white",
+            textAlign: "center",
+            fontWeight: "500",
+          }}
+        >
+          COMING SOON
+        </Text>
       </View>
-      {show && (
+      {/* {show && (
         <ResuableModalCTN text={"Receive"} setShow={setShow}>
           <QRCodeReceiveToken
             navigation={navigation}
@@ -41,7 +51,7 @@ const Receive = ({ navigation }) => {
             text={text}
           />
         </ResuableModalCTN>
-      )}
+      )} */}
     </ReusableCard>
   );
 };

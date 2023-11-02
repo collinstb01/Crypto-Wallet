@@ -192,6 +192,7 @@ const Home = ({ route, navigation }) => {
     console.log("isScrolling");
   }, [isScrolling]);
 
+  console.log(networks);
   return (
     <View style={[contantStyles.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -407,7 +408,7 @@ const Home = ({ route, navigation }) => {
         <ResuableModalCTN text={"Receive"} setShow={setshowSendEth}>
           <QRCodeReceiveToken
             navigation={navigation}
-            text={text}
+            text={"text"}
             activeWallet={activeWallet}
           />
         </ResuableModalCTN>

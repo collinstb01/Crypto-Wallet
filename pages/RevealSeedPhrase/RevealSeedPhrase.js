@@ -7,6 +7,7 @@ import ButtonGradient from "../../components/ButtonGradient";
 import TabstwoContents from "../../components/TabstwoContents";
 import QRCodeReceiveToken from "../../components/QRCodeReceiveToken";
 import QRcode from "../../components/QRcode";
+import CopyToClipboard from "../../components/CopyToClipboard";
 
 const RevealSeedPhrase = ({ navigation }) => {
   const [password, setPassword] = useState("");
@@ -24,13 +25,14 @@ const RevealSeedPhrase = ({ navigation }) => {
       setErr,
       setLoading,
       navigation,
+      setShowSeedPhrase,
       route: "show",
     });
     setLoading(false);
-    setShowSeedPhrase(true);
-    setTimeout(() => {
-      setShowSeedPhrase(false);
-    }, 10000);
+
+    // setTimeout(() => {
+    //   setShowSeedPhrase(false);
+    // }, 10000);
   };
 
   const getSP = async () => {
@@ -109,10 +111,17 @@ const ShowSeedPhrase = ({ seedPhrase }) => {
         <View style={styles.seedPhraseBox}>
           <Text style={styles.seedPhraseMsg}>Your Seed Phrase</Text>
           <Text style={styles.seedPhrase}>{seedPhrase}</Text>
+          <CopyToClipboard text={seedPhrase} />
         </View>
       ) : (
-        <View style={{ marginTop: 40 }}>
-          <QRcode />
+        <View
+          style={{
+            marginTop: 40,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <QRcode text={seedPhrase} />
         </View>
       )}
     </View>

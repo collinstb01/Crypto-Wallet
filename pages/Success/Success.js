@@ -54,20 +54,13 @@ const Success = ({ navigation }) => {
         chainId: 11155111,
       },
       {
-        name: "Smart Chain - Testnet",
-        id: "bscTestNet",
+        name: "Arbitrum Goerli",
+        id: "arbitrumGoerli",
         active: 0,
         color: "a769ec",
-        rpcURL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-        chainId: 97,
-      },
-      {
-        name: "Binance Smart Chain",
-        id: "bsc",
-        active: 0,
-        color: "29d041",
-        rpcURL: "https://bsc-dataseed.binance.org/",
-        chainId: 56,
+        rpcURL:
+          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
+        chainId: 421613,
       },
     ];
 
