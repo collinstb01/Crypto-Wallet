@@ -4,6 +4,7 @@ import ButtonGradient from "./ButtonGradient";
 import ButtonGradientTwo from "./ButtonGradientTwo";
 import { _decryotData, onShare } from "../constants/HelperFunctions";
 import CopyToClipboard from "./CopyToClipboard";
+import QRcode from "./QRcode";
 
 const QRCodeReceiveToken = ({ navigation, setText, text, activeWallet }) => {
   const [ActiveWallet, setActiveWallet] = useState("");
@@ -43,7 +44,7 @@ const QRCodeReceiveToken = ({ navigation, setText, text, activeWallet }) => {
             marginRight: 20,
           }}
         >
-          <Image source={require("../assets/qrcode.png")} style={styles.img} />
+          <QRcode text={ActiveWallet ? ActiveWallet : "Loading..."} />
         </View>
 
         <View>
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
   textAddress: {
     color: "white",
     fontSize: 22,
-    maxWidth: 100,
+    maxWidth: 120,
   },
   text: {
     color: "white",

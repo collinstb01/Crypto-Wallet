@@ -21,6 +21,9 @@ import {
 import Contants from "../constants/styles";
 import UseCheckUser from "../Hooks/UseCheckUser";
 import Loading from "../components/Loading";
+import { MaterialIcons } from "@expo/vector-icons";
+import UseBarCodeScanner from "../components/useBarCodeScanner";
+import { Keyboard } from "react-native";
 
 const ImportSeed = ({ navigation }) => {
   const [seedPhrase, setSeedPhrase] = useState("");
@@ -31,8 +34,12 @@ const ImportSeed = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showSeedPhrase, setShowSeedPhrase] = useState(false);
-
   let [data, loadingForUser] = UseCheckUser();
+  const [showScanner, setShowScanner] = useState(false);
+
+  const handleScanSeedPhrase = () => {
+    setShowScanner((e) => !e);
+  };
 
   useEffect(() => {
     setDoesUserExist(data);
@@ -88,15 +95,23 @@ const ImportSeed = ({ navigation }) => {
     navigation.goBack();
   };
 
+  const onBarCodeScanned = ({ text }) => {
+    setSeedPhrase(text);
+    setShowScanner(false);
+    Keyboard.dismiss();
+  };
+
+  console.log(seedPhrase);
   if (loadingForUser) {
     return <Loading />;
   }
-
   return (
     <ReusableCard
       text={doesUserExist ? "Login" : "Import From Seed"}
       backFunc={backFunc}
     >
+      {showScanner && <UseBarCodeScanner onBarCodeScanned={onBarCodeScanned} />}
+
       <View style={styles.inputContainer}>
         <View>
           {!doesUserExist && (
@@ -106,27 +121,32 @@ const ImportSeed = ({ navigation }) => {
                 onChangeText={(seed) => setSeedPhrase(seed)}
                 placeholder="Seed Phrase"
                 placeholderTextColor={"#948fa8"}
+                value={seedPhrase}
                 secureTextEntry={showSeedPhrase ? false : true}
               />
               {seedPhrase == "" && (
                 <>
-                  <Ionicons
-                    name="md-scan"
-                    size={20}
-                    color="#948fa8"
-                    style={{ position: "absolute", right: 50, top: 17 }}
-                  />
+                  <Pressable
+                    onPress={handleScanSeedPhrase}
+                    style={styles.input}
+                  >
+                    {showScanner ? (
+                      <MaterialIcons name="cancel" size={20} color="#948fa8" />
+                    ) : (
+                      <Ionicons
+                        name={showScanner ? "md-cro" : "md-scan"}
+                        size={20}
+                        color="#948fa8"
+                      />
+                    )}
+                  </Pressable>
                 </>
               )}
               <TouchableOpacity
                 onPress={(e) => func(e)}
                 style={{ position: "absolute", right: 15, top: 17 }}
               >
-                <Ionicons
-                  name={showSeedPhrase ? "md-eye-off" : "md-eye"}
-                  size={20}
-                  color="#948fa8"
-                />
+                <Ionicons name={"md-eye"} size={20} color="#948fa8" />
               </TouchableOpacity>
             </View>
           )}
@@ -163,6 +183,7 @@ const ImportSeed = ({ navigation }) => {
           )}
 
           <FaceId />
+
           <Text style={{ color: "white" }}>
             {doesUserExist
               ? "Already have a wallet address ?"
@@ -237,5 +258,28 @@ const styles = StyleSheet.create({
     marginRight: 30,
     justifyContent: "space-between",
     flex: 1,
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  camera: {
+    flex: 1,
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "transparent",
+    margin: 64,
+  },
+  button: {
+    flex: 1,
+    alignSelf: "flex-end",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
   },
 });

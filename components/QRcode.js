@@ -8,7 +8,7 @@ export default function QRcode({ text }) {
     <View
       style={[{ justifyContent: "center", alignItems: "center" }, styles.img]}
     >
-      <QRCode value={text} color="blue" size={150} />
+      <QRCode value={text} color="#1c1c1e" size={150} />
     </View>
   );
 }

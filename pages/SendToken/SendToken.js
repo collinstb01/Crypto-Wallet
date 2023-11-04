@@ -20,6 +20,7 @@ import {
   _encryotData,
 } from "../../constants/HelperFunctions";
 import { Pressable } from "react-native";
+import UseBarCodeScanner from "../../components/useBarCodeScanner";
 
 const SendToken = ({ navigation }) => {
   const [receiveingAddr, setReceivingAddr] = useState("");
@@ -31,6 +32,7 @@ const SendToken = ({ navigation }) => {
     WalletAddressNoFormat: "",
   });
   const [valid, setValid] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   const backFunc = () => {
     navigation.goBack();
@@ -86,9 +88,18 @@ const SendToken = ({ navigation }) => {
     getUserWallets();
   }, []);
 
+  const handleShowScanner = () => {
+    setShowScanner((e) => !e);
+  };
+
+  const onBarCodeScanned = async ({ text: e }) => {
+    handleChange(e);
+  };
   // console.log(re)
   return (
     <ReusableCard navigation={navigation} text={"Send To"} backFunc={backFunc}>
+      {showScanner && <UseBarCodeScanner onBarCodeScanned={onBarCodeScanned} />}
+
       <ScrollView style={styles.container}>
         <Pressable onPress={handleSetShow}>
           <View style={{ marginBottom: 20 }}>
@@ -150,12 +161,20 @@ const SendToken = ({ navigation }) => {
             </View>
           )}
           {!receiveingAddr && (
-            <Ionicons
-              name="md-scan"
-              size={20}
-              color="#948fa8"
+            <Pressable
               style={constantStyle.inputIcon}
-            />
+              onPress={handleShowScanner}
+            >
+              {showScanner ? (
+                <MaterialIcons name="cancel" size={20} color="#948fa8" />
+              ) : (
+                <Ionicons
+                  name={showScanner ? "cancel" : "md-scan"}
+                  size={20}
+                  color="#948fa8"
+                />
+              )}
+            </Pressable>
           )}
           {valid && (
             <MaterialIcons
