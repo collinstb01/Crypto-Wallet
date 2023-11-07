@@ -70,4 +70,37 @@ export default contantStyles = {
     color: "orange",
     opacity: 0.6,
   },
+  boxText: {
+    color: "black",
+  },
+  box: {
+    backgroundColor: "#f2f4f6",
+    height: 30,
+    width: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: "gray",
+  },
+  boxoverlay: {
+    position: "absolute",
+    left: 17,
+    top: -11,
+    fontWeight: "800",
+    backgroundColor: "#cdb6ec",
+    borderRadius: 50,
+    height: 20,
+    width: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  boxoverlayText: {
+    fontWeight: "300",
+    color: "white",
+    fontSize: 13,
+  },
+  text: {
+    color: "white",
+  },
 };

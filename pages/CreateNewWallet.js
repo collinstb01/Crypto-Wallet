@@ -20,6 +20,7 @@ import {
   _createUserAccount,
 } from "../constants/HelperFunctions";
 import { setPasswordForNewWallet } from "../features/StorageAuth/StorageAuth";
+import StatusBarForScreens from "../components/StatusBarForScreens";
 
 const CreateNewWallet = ({ navigation }) => {
   const { message } = useSelector((state) => state.storage);
@@ -64,15 +65,8 @@ const CreateNewWallet = ({ navigation }) => {
 
   return (
     <View style={Contants.container2Home}>
-      <StatusBar
-        animated={true}
-        // barStyle=""
-        translucent={false}
-        showHideTransition={true}
-        hidden={false}
-        backgroundColor="white"
-        barStyle="dark-content"
-      />
+      <StatusBarForScreens />
+
       <Step one={1} navigation={navigation} />
       <View style={styles.containerTwo}>
         <Text style={styles.createPass}>Create Passowrd</Text>

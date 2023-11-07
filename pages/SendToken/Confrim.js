@@ -113,12 +113,14 @@ const Confrim = ({ navigation }) => {
     });
     setBalance(balanceData);
     if (balanceData) {
-      if (Number(balanceData) <= sendToken.amount) {
-        setDisabled(true);
-        setError("Insufficient Balance for this TX");
-      } else {
-        setDisabled(false);
-        setError("");
+      if (address == "0x0000000000000000000000000000000000000000") {
+        if (Number(balanceData) <= sendToken.amount) {
+          setDisabled(true);
+          setError("Insufficient Balance for this TX");
+        } else {
+          setDisabled(false);
+          setError("");
+        }
       }
     }
   };
@@ -143,7 +145,7 @@ const Confrim = ({ navigation }) => {
                   {sendToken.amount.length > 10
                     ? sendToken.amount.slice(0, 4)
                     : sendToken.amount}{" "}
-                  {sendToken.symbol.toUpperCase()}
+                  {sendToken?.symbol?.toUpperCase()}
                 </Text>
                 <Text style={styles.text2}>Amount</Text>
               </View>
@@ -178,7 +180,7 @@ const Confrim = ({ navigation }) => {
                 <View style={styles.ctn}>
                   <Text style={[styles.amount]}>Amount</Text>
                   <Text style={[styles.amount]}>
-                    {sendToken.amount} {sendToken.symbol.toUpperCase()}
+                    {sendToken.amount} {sendToken?.symbol?.toUpperCase()}
                   </Text>
                 </View>
                 <View style={styles.ctn}>

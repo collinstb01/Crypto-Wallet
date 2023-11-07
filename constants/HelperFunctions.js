@@ -267,7 +267,7 @@ export const _createUserAccount = async ({
         active: 1,
         color: "6c62c5",
         rpcURL:
-          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
+          "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
         chainId: 1,
       },
       {
@@ -276,7 +276,7 @@ export const _createUserAccount = async ({
         active: 0,
         color: "ff3a58",
         rpcURL:
-          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+          "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
         chainId: 11155111,
       },
       {
@@ -285,7 +285,7 @@ export const _createUserAccount = async ({
         active: 0,
         color: "a769ec",
         rpcURL:
-          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
+          "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
         chainId: 421613,
       },
     ];
@@ -304,7 +304,7 @@ export const _createUserAccount = async ({
         walletAddress: encryptedWalletAddress,
         chaindId: 1,
         rpcURL:
-          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
+          "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
       },
       {
         name: "Sepolia Test Network",
@@ -320,7 +320,7 @@ export const _createUserAccount = async ({
         walletAddress: encryptedWalletAddress,
         chainId: 11155111,
         rpcURL:
-          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+          "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
       },
       {
         name: "Arbitrum Goerli",
@@ -336,7 +336,7 @@ export const _createUserAccount = async ({
         walletAddress: encryptedWalletAddress,
         chainId: 421613,
         rpcURL:
-          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
+          "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
       },
     ];
 
@@ -470,7 +470,7 @@ export const _createWallet = async ({
         amount: Number(
           await getBalance({
             rpcURL:
-              "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
+              "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
             address: address,
           })
         ),
@@ -480,14 +480,14 @@ export const _createWallet = async ({
         walletAddress: encryptedWalletAddress,
         chaindId: 1,
         rpcURL:
-          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
+          "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
       },
       {
         name: "Sepolia Test Network",
         amount: Number(
           await getBalance({
             rpcURL:
-              "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+              "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
             address: address,
           })
         ),
@@ -497,14 +497,14 @@ export const _createWallet = async ({
         walletAddress: encryptedWalletAddress,
         chainId: 11155111,
         rpcURL:
-          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+          "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
       },
       {
         name: "Arbitrum Goerli",
         amount: Number(
           await getBalance({
             rpcURL:
-              "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+              "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
             address: address,
           })
         ),
@@ -514,7 +514,7 @@ export const _createWallet = async ({
         walletAddress: encryptedWalletAddress,
         chainId: 421613,
         rpcURL:
-          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
+          "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
       },
     ];
 
@@ -591,41 +591,53 @@ export const _getTokens = async () => {
   return JSON.stringify(final);
 };
 
-export const _getTokenDetail = async ({ addr }) => {
-  const activeNetwork = await _getActiveNetwork();
-  const activeWallet = await _getActiveWallet();
-  let parseActiveNetwork = JSON.parse(activeNetwork);
-  let parseActiveWallet = JSON.parse(activeWallet);
+export const _getTokenDetail = async ({ addr, setErr, setLoading }) => {
+  try {
+    const activeNetwork = await _getActiveNetwork();
+    const activeWallet = await _getActiveWallet();
+    let parseActiveNetwork = JSON.parse(activeNetwork);
+    let parseActiveWallet = JSON.parse(activeWallet);
 
-  let abi = await getContractAbi({
-    contractAddress: addr,
-  });
+    let abi = await getContractAbi({
+      contractAddress: addr,
+    });
 
-  let provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
+    let provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
 
-  let userWalletAddress = await _decryotData({
-    encryptedData: parseActiveWallet.walletAddress,
-  });
+    let userWalletAddress = await _decryotData({
+      encryptedData: parseActiveWallet.walletAddress,
+    });
 
-  const contract = new ethers.Contract(addr, abi, provider);
-  const userTokenBalance = await contract.balanceOf(userWalletAddress);
+    const contract = new ethers.Contract(addr, abi, provider);
+    let userTokenBalance;
+    try {
+      userTokenBalance = await contract.balanceOf(userWalletAddress);
+    } catch (error) {
+      setLoading(false);
+      setErr("Token does not exist on this chain");
+      return;
+    }
 
-  let name = await contract.name();
-  let decimals = Number(await contract.decimals());
-  let symbol = await contract.symbol();
-  let balance = Number(userTokenBalance);
-  let id = parseActiveNetwork.id;
-  let walletAddress = parseActiveWallet.walletAddress;
+    let name = await contract.name();
+    let decimals = Number(await contract.decimals());
+    let symbol = await contract.symbol();
+    let balance = Number(userTokenBalance);
+    let id = parseActiveNetwork.id;
+    let walletAddress = parseActiveWallet.walletAddress;
 
-  return JSON.stringify({
-    name,
-    decimals,
-    symbol,
-    balance,
-    addr,
-    id,
-    walletAddress,
-  });
+    return JSON.stringify({
+      name,
+      decimals,
+      symbol,
+      balance,
+      addr,
+      id,
+      walletAddress,
+    });
+  } catch (error) {
+    console.log(error);
+    // setErr("Token does not exist on this chain");
+  }
 };
 
 export const _addTokens = async ({
@@ -654,7 +666,7 @@ export const _addTokens = async ({
 
   const token = {
     name: name,
-    amount: balance,
+    amount: ethers.formatEther(balance.toString()),
     symbol: symbol,
     address: addr,
     network: id,
@@ -871,6 +883,7 @@ export const getBalance = async ({ rpcURL, address }) => {
   const provider = new ethers.JsonRpcProvider(rpcURL);
   const balance = await provider.getBalance(address);
   const balanceInEth = ethers.formatEther(balance);
+  console.log(balanceInEth);
   return balanceInEth;
 };
 
@@ -894,6 +907,7 @@ export const eventListening = async () => {
 
     if (element.address == "0x0000000000000000000000000000000000000000") {
       // Listen for new blocks
+
       provider.on("block", async (blockNumber) => {
         // Get the block details
         console.log(`New block mined: ${blockNumber}`);
@@ -1116,7 +1130,7 @@ export const transferNativeTokensOrERC20 = async ({
       type: "Send",
       from: tx.from,
       to: tx.to,
-      value: Number(tx.value),
+      value: amount,
       gasUsed: "",
       gasLimit: Number(tx.gasLimit),
       gasPrice: null,
@@ -1287,7 +1301,7 @@ function formatDateToCustomFormat() {
   return formattedDate;
 }
 
-const listenForEthAndERC20Transfer = async () => {
+export const listenForEthAndERC20Transfer = async () => {
   try {
     const networks = await AsyncStorage.getItem("networks");
     const wallets = await AsyncStorage.getItem("wallets");
@@ -1310,162 +1324,178 @@ const listenForEthAndERC20Transfer = async () => {
     for (const network of parsenetworks) {
       let provider;
       try {
+        console.log("unable to connect");
         provider = new ethers.JsonRpcProvider(network.rpcURL);
       } catch (error) {
         console.log("unable to connect");
       } // Set your provider
 
-      provider.on("block", async (blockNumber) => {
-        // Get the block details
-        const block = await provider.getBlock(blockNumber, true);
-
-        // Check each transaction in the block
-        for (const tx of block.prefetchedTransactions) {
-          // If the transaction is to the user's address, log it and update the user's balance
-          if (tx.to && walletArray.includes(tx.to.toLowerCase())) {
-            console.log("calling.............");
-
-            const date = formatDateToCustomFormat();
-            let userData = parseTokens
-              .filter(
-                async (val) =>
-                  (
-                    await _decryotData({ encryptedData: val.walletAddress })
-                  ).toLowerCase() == tx.to.toLowerCase()
-              )
-              .filter(
-                (val) =>
-                  val.address == "0x0000000000000000000000000000000000000000"
-              )
-              .filter((val) => val.chainId == Number(tx.chainId));
-            console.log(userData, "userData");
-            let TXhistoryObj = {
-              userWalletAddress: tx.to,
-              network: userData[0].network,
-              contractAddress: "0x0000000000000000000000000000000000000000",
-              status: "success",
-              statusNo: 1,
-              symbol: userData[0].symbol,
-              date: date,
-              type: "Receive",
-              from: tx.from,
-              to: tx.to,
-              value: Number(tx.value),
-              gasUsed: Number(tx.gasUsed),
-              gasLimit: Number(tx.gasLimit),
-              gasPrice: Number(tx.gasPrice),
-              blockHash: tx.blockHash,
-              blockNumber: null,
-              timeStamp: "",
-              nonce: Number(tx.nonce),
-              hash: tx.hash,
-              chainId: Number(tx.chainId),
-            };
-
-            receiveNotify({
-              title: "Receive Token",
-              body: `You received Receive A Token from ${from}`,
-              data: "https://etherscan.io/address/",
-            });
-
-            const TXhistory = await AsyncStorage.getItem("TXhistory");
-            const parseTXhistory = JSON.parse(TXhistory);
-            parseTXhistory.push(TXhistoryObj);
-
-            await AsyncStorage.setItem(
-              "TXhistory",
-              JSON.stringify(parseTXhistory)
-            );
-            // Update the user's balance here
-            userData[0].amount = await getBalance({
-              address: network.rpcURL,
-              address: tx.to,
-            });
-
-            await AsyncStorage.setItem("tokens", JSON.stringify(userData));
-          }
-        }
-      });
+      if (
+        network.id == "eth" ||
+        network.id == "arbitrumGoerli" ||
+        network.id == "sepolia"
+      ) {
+        console.log("called something...........");
+      } else {
+        provider
+          .on("block", async (blockNumber) => {
+            // Get the block details
+            const block = await provider.getBlock(blockNumber, true);
+            // Check each transaction in the block
+            for (const tx of block.prefetchedTransactions) {
+              // If the transaction is to the user's address, log it and update the user's balance
+              if (tx.to && walletArray.includes(tx.to.toLowerCase())) {
+                console.log("calling.............");
+                const date = formatDateToCustomFormat();
+                let userData = parseTokens
+                  .filter(
+                    async (val) =>
+                      (
+                        await _decryotData({ encryptedData: val.walletAddress })
+                      ).toLowerCase() == tx.to.toLowerCase()
+                  )
+                  .filter(
+                    (val) =>
+                      val.address ==
+                      "0x0000000000000000000000000000000000000000"
+                  )
+                  .filter((val) => val.chainId == Number(tx.chainId));
+                console.log(userData, "userData");
+                let TXhistoryObj = {
+                  userWalletAddress: tx.to,
+                  network: userData[0].network,
+                  contractAddress: "0x0000000000000000000000000000000000000000",
+                  status: "success",
+                  statusNo: 1,
+                  symbol: userData[0].symbol,
+                  date: date,
+                  type: "Receive",
+                  from: tx.from,
+                  to: tx.to,
+                  value: Number(tx.value),
+                  gasUsed: Number(tx.gasUsed),
+                  gasLimit: Number(tx.gasLimit),
+                  gasPrice: Number(tx.gasPrice),
+                  blockHash: tx.blockHash,
+                  blockNumber: null,
+                  timeStamp: "",
+                  nonce: Number(tx.nonce),
+                  hash: tx.hash,
+                  chainId: Number(tx.chainId),
+                };
+                receiveNotify({
+                  title: "Receive Token",
+                  body: `You received Receive A Token from ${tx.from}`,
+                  data: "https://etherscan.io/address/",
+                });
+                const TXhistory = await AsyncStorage.getItem("TXhistory");
+                const parseTXhistory = JSON.parse(TXhistory);
+                parseTXhistory.push(TXhistoryObj);
+                await AsyncStorage.setItem(
+                  "TXhistory",
+                  JSON.stringify(parseTXhistory)
+                );
+                // Update the user's balance here
+                console.log(userData, "before");
+                userData[0].amount = await getBalance({
+                  rpcURL: userData[0].rpcURL,
+                  address: tx.to,
+                });
+                console.log(userData, "after");
+                await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+              }
+            }
+          })
+          .catch((err) =>
+            console.log("Something went wrong connecting to provider")
+          );
+      }
     }
 
-    for (const filterToken of filterTokens) {
-      let provider;
-      try {
-        provider = new ethers.JsonRpcProvider(filterToken.rpcURL); // Set your provider
-      } catch (error) {
-        console.log("unable to connect");
-      }
-      let abi = await getContractAbi({
-        contractAddress: "addr",
-      });
-      const contract = new ethers.Contract(filterToken.address, abi, provider);
-
-      contract
-        .on("Transfer", async (from, to, amount, event) => {
-          console.log("calling..........");
-
-          if (walletArray.includes(to.toLowerCase())) {
-            let userData = parseTokens
-              .filter(
-                async (val) =>
-                  (
-                    await _decryotData({
-                      encryptedData: val.walletAddress,
-                    })
-                  ).toLowerCase() == filterToken.walletAddress.toLowerCase()
-              )
-              .filter((val) => val.address == filterToken.address)
-              .filter((val) => val.chainId == filterToken.chainId);
-            const date = formatDateToCustomFormat();
-
-            console.log(userData, "userData");
-            let TXhistoryObj = {
-              userWalletAddress: to,
-              network: userData[0].network,
-              contractAddress: filterToken.address,
-              status: "success",
-              statusNo: 1,
-              symbol: userData[0].symbol,
-              date: date,
-              type: "Receive",
-              from: from,
-              to: to,
-              value: Number(amount),
-              gasUsed: 0,
-              gasLimit: 0,
-              gasPrice: 0,
-              blockHash: null,
-              blockNumber: null,
-              timeStamp: "",
-              nonce: null,
-              hash: null,
-              chainId: Number(userData[0].chainId),
-            };
-            receiveNotify({
-              title: "Receive Token",
-              body: `You received Receive A Token from ${from}`,
-              data: "https://etherscan.io/address/",
-            });
-
-            const TXhistory = await AsyncStorage.getItem("TXhistory");
-            const parseTXhistory = JSON.parse(TXhistory);
-            parseTXhistory.push(TXhistoryObj);
-
-            await AsyncStorage.setItem(
-              "TXhistory",
-              JSON.stringify(parseTXhistory)
-            );
-            // Update the user's balance here
-            userData[0].amount = await getBalance({
-              address: userData[0].rpcURL,
-              address: to,
-            });
-            await AsyncStorage.setItem("tokens", JSON.stringify(userData));
-          }
-        })
-        .catch((err) => {
-          console.log("something went wrong");
+    if (filterTokens.length != 0) {
+      for (const filterToken of filterTokens) {
+        let provider;
+        try {
+          provider = new ethers.JsonRpcProvider(filterToken.rpcURL); // Set your provider
+        } catch (error) {
+          console.log("unable to connect");
+        }
+        let abi = await getContractAbi({
+          contractAddress: "addr",
         });
+        const contract = new ethers.Contract(
+          filterToken.address,
+          abi,
+          provider
+        );
+
+        contract
+          .on("Transfer", async (from, to, amount, event) => {
+            console.log("calling..........");
+
+            if (walletArray.includes(to.toLowerCase())) {
+              let userData = parseTokens
+                .filter(
+                  async (val) =>
+                    (
+                      await _decryotData({
+                        encryptedData: val.walletAddress,
+                      })
+                    ).toLowerCase() == filterToken.walletAddress.toLowerCase()
+                )
+                .filter((val) => val.address == filterToken.address)
+                .filter((val) => val.chainId == filterToken.chainId);
+              const date = formatDateToCustomFormat();
+
+              console.log(userData, "userData");
+              let TXhistoryObj = {
+                userWalletAddress: to,
+                network: userData[0].network,
+                contractAddress: filterToken.address,
+                status: "success",
+                statusNo: 1,
+                symbol: userData[0].symbol,
+                date: date,
+                type: "Receive",
+                from: from,
+                to: to,
+                value: Number(amount),
+                gasUsed: 0,
+                gasLimit: 0,
+                gasPrice: 0,
+                blockHash: null,
+                blockNumber: null,
+                timeStamp: "",
+                nonce: null,
+                hash: null,
+                chainId: Number(userData[0].chainId),
+              };
+              receiveNotify({
+                title: "Receive Token",
+                body: `You received Receive A Token from ${from}`,
+                data: "https://etherscan.io/address/",
+              });
+
+              const TXhistory = await AsyncStorage.getItem("TXhistory");
+              const parseTXhistory = JSON.parse(TXhistory);
+              parseTXhistory.push(TXhistoryObj);
+
+              await AsyncStorage.setItem(
+                "TXhistory",
+                JSON.stringify(parseTXhistory)
+              );
+              // Update the user's balance here
+              userData[0].amount = await getBalance({
+                rpcURL: userData[0].rpcURL,
+                address: to,
+              });
+              await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+            }
+          })
+          .catch((err) => {
+            console.log("something went wrong");
+          });
+      }
     }
   } catch (error) {
     console.log("An error occured");

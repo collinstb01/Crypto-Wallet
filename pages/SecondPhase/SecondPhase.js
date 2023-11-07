@@ -115,7 +115,7 @@ const SecondPhase = ({ navigation }) => {
         walletAddress: encryptedWalletAddress,
         chainId: 11155111,
         rpcURL:
-          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+          "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
       },
       {
         name: "Arbitrum Goerli",

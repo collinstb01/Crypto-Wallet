@@ -14,9 +14,53 @@ const StorageAuth = createSlice({
       id: "",
       symbol: "",
     },
+    swapReceiveToken: {
+      address: "",
+      amount: "",
+      chaindId: "",
+      decimals: "",
+      name: "",
+      network: "",
+      rpcURL: "",
+      symbol: "",
+      walletAddress: "",
+    },
+    swapSendToken: {
+      address: "",
+      amount: "",
+      chaindId: "",
+      decimals: "",
+      name: "",
+      network: "",
+      rpcURL: "",
+      symbol: "",
+      walletAddress: "",
+    },
     loadingAfterSendToken: false,
   },
   reducers: {
+    setSwapReceiveToken(state, action) {
+      state.swapReceiveToken.address = action.payload.address;
+      state.swapReceiveToken.amount = action.payload.amount;
+      state.swapReceiveToken.chaindId = action.payload.chaindId;
+      state.swapReceiveToken.decimals = action.payload.decimals;
+      state.swapReceiveToken.name = action.payload.name;
+      state.swapReceiveToken.network = action.payload.network;
+      state.swapReceiveToken.rpcURL = action.payload.rpcURL;
+      state.swapReceiveToken.symbol = action.payload.symbol;
+      state.swapReceiveToken.walletAddress = action.payload.walletAddress;
+    },
+    setSwapSendToken(state, action) {
+      state.swapSendToken.address = action.payload.address;
+      state.swapSendToken.amount = action.payload.amount;
+      state.swapSendToken.chaindId = action.payload.chaindId;
+      state.swapSendToken.decimals = action.payload.decimals;
+      state.swapSendToken.name = action.payload.name;
+      state.swapSendToken.network = action.payload.network;
+      state.swapSendToken.rpcURL = action.payload.rpcURL;
+      state.swapSendToken.symbol = action.payload.symbol;
+      state.swapSendToken.walletAddress = action.payload.walletAddress;
+    },
     setSeed(state, action) {
       state.seedPhrase = action.payload.seedPhrase;
     },
@@ -41,6 +85,8 @@ const StorageAuth = createSlice({
 });
 
 export const {
+  setSwapReceiveToken,
+  setSwapSendToken,
   setPassword,
   setDate,
   setSeed,

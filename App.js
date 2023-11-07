@@ -27,11 +27,39 @@ import GeneralSettings from "./pages/GeneralSettings/GeneralSettings";
 import SecurityPrivacy from "./pages/SecurityPrivacy/SecurityPrivacy";
 import RevealSeedPhrase from "./pages/RevealSeedPhrase/RevealSeedPhrase";
 import chnagePassword from "./pages/chnagePassword/chnagePassword";
+import ListOfTokens from "./pages/ListOfTokens/ListOfTokens";
+import * as BackgroundFetch from "expo-background-fetch";
+import * as TaskManager from "expo-task-manager";
+import { listenForEthAndERC20Transfer } from "./constants/HelperFunctions";
+import React from "react";
 
 const Stack = createNativeStackNavigator();
+const BACKGROUND_FETCH_TASK = "background-fetch";
 
+TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+  console.log("called background running");
+  // listenForEthAndERC20Transfer();
+  // Be sure to return the successful result type!
+  return BackgroundFetch.BackgroundFetchResult.NewData;
+});
+
+async function registerBackgroundFetchAsync() {
+  console.log("called2");
+  return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
+    minimumInterval: 60 * 1, // 3 seconds
+    stopOnTerminate: false, // android only,
+    startOnBoot: true, // android only
+  });
+}
 export default function App() {
   const statusBarHeight = Platform.OS === "ios" ? 80 : 0;
+
+  React.useEffect(() => {
+    const register = async () => {
+      await registerBackgroundFetchAsync();
+    };
+    register();
+  }, []);
 
   return (
     <Provider store={store}>
@@ -151,6 +179,11 @@ export default function App() {
           <Stack.Screen
             name="settings/change-password"
             component={chnagePassword}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="swap/list-tokens"
+            component={ListOfTokens}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

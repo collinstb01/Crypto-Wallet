@@ -24,9 +24,6 @@ const Recent = ({ navigation, valid, to, from, handleChange }) => {
 
   const getrecentsAddressSentTo = async () => {
     const data = await _getrecentsAddressSentTo();
-    if (!data) {
-      return setRecents(false);
-    }
     let parseData = JSON.parse(data);
     setRecents(parseData);
   };
@@ -58,7 +55,7 @@ const Recent = ({ navigation, valid, to, from, handleChange }) => {
         {valid ? "Click Next to Proceed" : "Recent"}
       </Text>
       {!valid &&
-        (!Array.isArray(recents) ? (
+        (recents == "[]" ? (
           <Empty text={"No Recent Data Found"} />
         ) : (
           <>

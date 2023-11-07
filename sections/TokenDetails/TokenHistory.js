@@ -56,9 +56,12 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
                 from: item.from,
                 to: item.to,
                 nounce: item.nonce,
-                amount: ethers.formatEther(item.value.toString()),
+                amount: item.value,
                 networkFee: ethers.formatEther(item.gasPrice),
-                total: item.value + item.gasPrice,
+                total:
+                  (item.type == "Send"
+                    ? Number(ethers.parseEther(item.value.toString()))
+                    : Number(item.value)) + item.gasPrice,
                 contractAddress: item.contractAddress,
                 hash: item.hash,
                 symbol: item.symbol,
@@ -111,7 +114,9 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
               </View>
               <View style={{ alignItems: "flex-end", flexDirection: "column" }}>
                 <Text style={[styles.text4, styles.text]}>
-                  {ethers.formatEther(item.value.toString())}
+                  {item.type == "Send"
+                    ? item.value
+                    : ethers.formatEther(item.value.toString())}{" "}
                   {item.symbol.toUpperCase()}
                 </Text>
                 <Text style={[styles.text5, styles.text]}>$0.5588432</Text>

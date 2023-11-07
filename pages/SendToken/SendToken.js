@@ -34,10 +34,6 @@ const SendToken = ({ navigation }) => {
   const [valid, setValid] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
 
-  const backFunc = () => {
-    navigation.goBack();
-  };
-
   const handleChange = async (e) => {
     setReceivingAddr(e);
     if (!/^(0x)?[0-9a-fA-F]{40}$/.test(e)) {
@@ -84,10 +80,6 @@ const SendToken = ({ navigation }) => {
     getUserWallets();
   };
 
-  useEffect(() => {
-    getUserWallets();
-  }, []);
-
   const handleShowScanner = () => {
     setShowScanner((e) => !e);
   };
@@ -95,10 +87,23 @@ const SendToken = ({ navigation }) => {
   const onBarCodeScanned = async ({ text: e }) => {
     handleChange(e);
   };
-  // console.log(re)
+
+  const backFunc = () => {
+    navigation.goBack();
+  };
+
+  useEffect(() => {
+    getUserWallets();
+  }, []);
+
   return (
     <ReusableCard navigation={navigation} text={"Send To"} backFunc={backFunc}>
-      {showScanner && <UseBarCodeScanner onBarCodeScanned={onBarCodeScanned} />}
+      {showScanner && (
+        <UseBarCodeScanner
+          onBarCodeScanned={onBarCodeScanned}
+          setShow={setShowScanner}
+        />
+      )}
 
       <ScrollView style={styles.container}>
         <Pressable onPress={handleSetShow}>
@@ -192,7 +197,6 @@ const SendToken = ({ navigation }) => {
             Enter A valid Address to continue
           </Text>
         </View>
-        {/* <Recent /> */}
         {!valid && (
           <>
             <Text style={styles.txBtwAcc}>Transfer Between My Accounts</Text>

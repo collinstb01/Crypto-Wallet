@@ -75,7 +75,11 @@ const AddTokens = ({ navigation }) => {
 
     Keyboard.dismiss(); // Close the keyboard
 
-    const data = await _getTokenDetail({ addr: e });
+    const data = await _getTokenDetail({
+      addr: e,
+      setErr: setErr,
+      setLoading: setLoading,
+    });
     let parseData = JSON.parse(data);
 
     setData((prev) => ({

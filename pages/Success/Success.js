@@ -41,7 +41,7 @@ const Success = ({ navigation }) => {
         active: 1,
         color: "6c62c5",
         rpcURL:
-          "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
+          "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
         chainId: 1,
       },
       {
@@ -50,7 +50,7 @@ const Success = ({ navigation }) => {
         active: 0,
         color: "ff3a58",
         rpcURL:
-          "https://eth-sepolia.g.alchemy.com/v2/ydPFxm6YRyH0sTj5twpBzctDXXnpTejc",
+          "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
         chainId: 11155111,
       },
       {
@@ -59,7 +59,7 @@ const Success = ({ navigation }) => {
         active: 0,
         color: "a769ec",
         rpcURL:
-          "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
+          "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
         chainId: 421613,
       },
     ];

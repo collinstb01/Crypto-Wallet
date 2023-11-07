@@ -15,7 +15,7 @@ function useHandleScrollFunc() {
 
       setTimeout(() => {
         setIsScrollingUp(false);
-      }, 7000);
+      }, 1000);
     } else {
       console.log("not scrolling");
       setIsScrollingUp(false);

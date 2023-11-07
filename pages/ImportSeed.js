@@ -128,7 +128,7 @@ const ImportSeed = ({ navigation }) => {
                 <>
                   <Pressable
                     onPress={handleScanSeedPhrase}
-                    style={styles.input}
+                    style={{ position: "absolute", right: 60, top: 17 }}
                   >
                     {showScanner ? (
                       <MaterialIcons name="cancel" size={20} color="#948fa8" />

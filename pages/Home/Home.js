@@ -192,7 +192,7 @@ const Home = ({ route, navigation }) => {
     console.log("isScrolling");
   }, [isScrolling]);
 
-  console.log(networks);
+  console.log(tokens, "jjjjjjjjjjjjjjjjjjjjjjjjjjj");
   return (
     <View style={[contantStyles.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -313,12 +313,16 @@ const Home = ({ route, navigation }) => {
                             </Text>
                           </View>
                         </View>
-
                         <View>
                           <Text style={[styles3.text, styles3.tokenName]}>
-                            {val.amount.toString().length >= 222
-                              ? ethers.formatEther(val.amount.toString())
-                              : val.amount.toString().slice(0, 4)}
+                            {val.amount.toString().length == 1
+                              ? val.amount
+                              : `${
+                                  val.amount.toString().split(".")[0]
+                                }.${val.amount
+                                  ?.toString()
+                                  ?.split(".")[1]
+                                  ?.slice(0, 2)}`}
                           </Text>
                         </View>
                       </View>
