@@ -20,6 +20,7 @@ import {
 import { useState } from "react";
 import { useEffect } from "react";
 import { Linking } from "react-native";
+import { getPrivateKey } from "../../constants/CCIPconfig/CCIPconfig";
 
 const Settings = ({ route, navigation }) => {
   const [isScrolling, handleScroll] = useHandleScrollFunc();

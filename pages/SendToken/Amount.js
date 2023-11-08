@@ -1,20 +1,31 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import ReusableCard from "../../components/ReusableCard";
 import constants from "../../constants/styles";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import Keyboard from "../../components/Keyboard";
 import { _getTokens } from "../../constants/HelperFunctions";
 import { useDispatch, useSelector } from "react-redux";
 import { setSendToken } from "../../features/StorageAuth/StorageAuth";
 import { Pressable } from "react-native";
 import { ethers } from "ethers";
-const Amount = ({ navigation }) => {
+import ResuableModalCTN from "../../components/ResuableModalCTN";
+import { supportedNetworks } from "../../constants/CCIPconfig/CCIPconfig";
+
+const Amount = ({ route, navigation }) => {
   function backFunc() {
     navigation.goBack();
   }
   const { sendToken } = useSelector((state) => state.storage);
   const [valueArr, setValueArr] = useState([0]);
+  const [showSendTokenTOAnotherChain, setshowSendTokenTOAnotherChain] =
+    useState(false);
   const [tokensArr, setTokens] = useState(null);
   const [selectedToken, setSelectedToken] = useState({
     address: "",
@@ -22,6 +33,11 @@ const Amount = ({ navigation }) => {
     network: "",
     symbol: "",
     amount: null,
+  });
+  const [selectedTokenChain, setSelectedTokenChain] = useState({
+    name: "",
+    sourceName: "",
+    color: "",
   });
   const [show, setShow] = useState();
 
@@ -39,7 +55,11 @@ const Amount = ({ navigation }) => {
         symbol: selectedToken.symbol,
       })
     );
-    navigation.navigate("send-token/confirm");
+    navigation.navigate("send-token/confirm", {
+      name: selectedTokenChain.name,
+      sourceName: selectedTokenChain.sourceName,
+      color: selectedTokenChain.color,
+    });
     setValueArr([0]);
   };
 
@@ -72,7 +92,6 @@ const Amount = ({ navigation }) => {
     }));
     setShow(false);
   };
-  ``;
 
   useEffect(() => {
     getUserTokens();
@@ -81,8 +100,24 @@ const Amount = ({ navigation }) => {
   function setShowFunc() {
     setShow((e) => !e);
   }
+
+  const showSendTokenPopUp = () => {
+    setshowSendTokenTOAnotherChain(true);
+  };
+
+  const handleSetDestinationChain = ({ name, sourceName, color }) => {
+    setshowSendTokenTOAnotherChain(false);
+    setSelectedTokenChain({
+      name: name,
+      sourceName: sourceName,
+      color: color,
+    });
+  };
+
   return (
     <ScrollView style={{ backgroundColor: "#131118" }}>
+      {showSendTokenTOAnotherChain && <View style={constants.overlay}></View>}
+
       <ReusableCard navigation={navigation} text={"Amount"} backFunc={backFunc}>
         <View style={constants.container}>
           <View style={[constants.flex]}>
@@ -117,6 +152,7 @@ const Amount = ({ navigation }) => {
                   minHeight: 100,
                   borderRadius: 10,
                   width: 100,
+                  zIndex: 2222,
                 }}
               >
                 {tokensArr
@@ -159,6 +195,7 @@ const Amount = ({ navigation }) => {
                   ))}
               </View>
             )}
+
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View>
                 <Text style={[styles.text1, { color: "white" }]}>
@@ -178,7 +215,45 @@ const Amount = ({ navigation }) => {
               </Pressable>
             </View>
           </View>
-
+          {!showSendTokenTOAnotherChain && (
+            <TouchableOpacity
+              onPress={showSendTokenPopUp}
+              style={{
+                // position: "",
+                top: 30,
+                zIndex: -22,
+                backgroundColor: "#a88b72",
+                width: "100",
+                borderRadius: 20,
+                padding: 10,
+                flexDirection: "row",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={[
+                  {
+                    color: "white",
+                    textAlign: "center",
+                    fontWeight: "700",
+                    fontSize: 14,
+                    marginRight: 20,
+                    zIndex: -23,
+                    // opacity: 0.8,
+                  },
+                ]}
+              >
+                {selectedTokenChain?.name
+                  ? `You are able to send to ${selectedTokenChain.name}`
+                  : "Send to Another Chain"}
+              </Text>
+              {selectedTokenChain?.name && (
+                <Pressable onPress={handleSetDestinationChain}>
+                  <MaterialIcons name="cancel" size={20} color="black" />
+                </Pressable>
+              )}
+            </TouchableOpacity>
+          )}
           <View
             style={[
               {
@@ -217,7 +292,6 @@ const Amount = ({ navigation }) => {
               </Text>
             </View>
           </View>
-
           <Keyboard
             func={handleRoute}
             setValueArr={setValueArr}
@@ -226,6 +300,52 @@ const Amount = ({ navigation }) => {
           />
         </View>
       </ReusableCard>
+      {showSendTokenTOAnotherChain && (
+        <ResuableModalCTN
+          text={"All Supported Chains"}
+          setShow={setshowSendTokenTOAnotherChain}
+        >
+          <Text
+            style={{
+              textAlign: "center",
+              color: "white",
+              marginVertical: 10,
+              opacity: 0.9,
+            }}
+          >
+            Pick the chain you want to transfer to
+          </Text>
+          {supportedNetworks.map((val, index) => (
+            <TouchableOpacity
+              style={{ flexDirection: "row", alignItems: "center" }}
+              key={index}
+              onPress={() =>
+                handleSetDestinationChain({
+                  name: val.name,
+                  sourceName: val.sourceName,
+                  color: val.color,
+                })
+              }
+            >
+              <View
+                style={{
+                  width: 10,
+                  height: 10,
+                  backgroundColor: val.color,
+                  borderRadius: 50,
+                  marginRight: 10,
+                  opacity: 0.8,
+                }}
+              ></View>
+              <Text
+                style={{ color: "white", marginVertical: 10, fontSize: 16 }}
+              >
+                {val?.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ResuableModalCTN>
+      )}
     </ScrollView>
   );
 };

@@ -12,14 +12,25 @@ import StatusBarForScreens from "../components/StatusBarForScreens";
 import { useState } from "react";
 import UseCheckUser from "../Hooks/UseCheckUser";
 import { useEffect } from "react";
+import { checkIfTokenIsSupported } from "../constants/HelperFunctions";
 
 const WalletSetUp = ({ navigation }) => {
   const [doesUserExist, setDoesUserExist] = useState(null);
 
   let [data] = UseCheckUser();
 
+  // async function d() {
+  //   let data = await checkIfTokenIsSupported({
+  //     sourceChain: "ethereumSepolia",
+  //     tokenAddress: "0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05",
+  //     destinationChainSelector: "12532609583862916517",
+  //   });
+  //   console.log(data);
+  // }
   useEffect(() => {
     setDoesUserExist(data);
+
+    // d();
   }, [data]);
 
   return (

@@ -186,8 +186,6 @@ const Home = ({ route, navigation }) => {
 
   const [isScrolling, handleScroll] = useHandleScrollFunc();
 
-  // eventListening();
-
   useEffect(() => {
     console.log("isScrolling");
   }, [isScrolling]);

@@ -21,15 +21,18 @@ import {
   _getActiveNetwork,
   _getGas,
   getBalance,
+  getFeeToPay,
   transferNativeTokensOrERC20,
 } from "../../constants/HelperFunctions";
 import { ethers } from "ethers";
 import { setLoadingAfterSendToken } from "../../features/StorageAuth/StorageAuth";
 
-const Confrim = ({ navigation }) => {
+const Confrim = ({ route, navigation }) => {
   const { sendToken } = useSelector((state) => state.storage);
   const [show, setShow] = useState(false);
   const [active, setActive] = useState(1);
+
+  const { name, sourceName } = route.params;
 
   const [address, setAddress] = useState("");
   const [amount, setamount] = useState("");
@@ -95,10 +98,11 @@ const Confrim = ({ navigation }) => {
       setAddress(sendToken.tokenAddress);
       setamount(sendToken.amount);
       setRecipient(sendToken.to);
-      getGas();
+      // getGas();
     }
   }, [sendToken]);
 
+  const getActiveNetwork = () => {};
   const getUserBalance = async () => {
     const decryptAddress = await _decryotData({
       encryptedData: sendToken.from,
@@ -125,9 +129,25 @@ const Confrim = ({ navigation }) => {
     }
   };
 
+  async function h() {
+    await getFeeToPay({
+      sourceChain: "ethereumSepolia",
+      destinationChain: sourceName,
+      destinationAccount: sendToken.to,
+      tokenAddress: sendToken.tokenAddress,
+      amount: sendToken.amount,
+      feeTokenAddress: "",
+    });
+  }
+
   useEffect(() => {
     getUserBalance();
   }, [balance]);
+
+  useEffect(() => {
+    h();
+  }, []);
+
   return (
     <>
       <ScrollView>
@@ -142,9 +162,9 @@ const Confrim = ({ navigation }) => {
             <View style={constants.container}>
               <View style={styles.texts}>
                 <Text style={styles.text1}>
-                  {sendToken.amount.length > 10
+                  {sendToken?.amount?.length > 10
                     ? sendToken.amount.slice(0, 4)
-                    : sendToken.amount}{" "}
+                    : sendToken?.amount}{" "}
                   {sendToken?.symbol?.toUpperCase()}
                 </Text>
                 <Text style={styles.text2}>Amount</Text>
@@ -190,14 +210,14 @@ const Confrim = ({ navigation }) => {
                     </Text>
                   </Pressable>
                   <Text style={[styles.amount]}>
-                    {`${gasData.gasInEth.toString()} ${sendToken.symbol.toUpperCase()}`}
+                    {`${gasData.gasInEth.toString()} ${sendToken?.symbol?.toUpperCase()}`}
                   </Text>
                 </View>
                 <View style={styles.ctn}>
-                  <Text style={[styles.toalAmount]}>Total Amount</Text>
+                  <Text style={[styles?.toalAmount]}>Total Amount</Text>
                   <View>
                     <Text style={[styles.toalAmount]}>
-                      {totalAmount} {sendToken.symbol.toUpperCase()}
+                      {totalAmount} {sendToken?.symbol?.toUpperCase()}
                     </Text>
                     <Text style={[styles.amount]}>$0.558432</Text>
                   </View>

@@ -105,7 +105,9 @@ const SecondPhase = ({ navigation }) => {
         chainId: 1,
         rpcURL:
           "https://eth-mainnet.g.alchemy.com/v2/XC3CF1s2-vjl609ZpkChVZywHbCzh-YI",
+        sourceChainSelector: "ethereumMainnet",
       },
+
       {
         name: "Sepolia Test Network",
         amount: 0,
@@ -116,6 +118,7 @@ const SecondPhase = ({ navigation }) => {
         chainId: 11155111,
         rpcURL:
           "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
+        sourceChainSelector: "ethereumSepolia",
       },
       {
         name: "Arbitrum Goerli",
@@ -127,6 +130,19 @@ const SecondPhase = ({ navigation }) => {
         chainId: 421613,
         rpcURL:
           "https://arb-goerli.g.alchemy.com/v2/50I1kzCppaf9HooVWz_Z4jueJAPs1dAT",
+        sourceChainSelector: "avalancheFuji",
+      },
+      {
+        name: "Polygon Mumbai",
+        amount: 0,
+        symbol: "polygonMumbai",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "polygonMumbai",
+        walletAddress: encryptedWalletAddress,
+        chainId: 80001,
+        rpcURL:
+          "https://polygon-mumbai.g.alchemy.com/v2/v5XGTeB99ScNm1Kr5N7y_GsR0hT2NOsZ",
+        sourceChainSelector: "polygonMumbai",
       },
     ];
 

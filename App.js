@@ -32,6 +32,7 @@ import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
 import { listenForEthAndERC20Transfer } from "./constants/HelperFunctions";
 import React from "react";
+import ApproveSendToken from "./pages/ApproveSendToken/ApproveSendToken";
 
 const Stack = createNativeStackNavigator();
 const BACKGROUND_FETCH_TASK = "background-fetch";
@@ -186,6 +187,11 @@ export default function App() {
             component={ListOfTokens}
             options={{ headerShown: false }}
           />
+          {/* <Stack.Screen
+            name="swap/list-tokens"
+            component={ApproveSendToken}
+            options={{ headerShown: false }}
+          /> */}
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

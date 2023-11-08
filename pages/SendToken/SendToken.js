@@ -92,6 +92,12 @@ const SendToken = ({ navigation }) => {
     navigation.goBack();
   };
 
+  const handleSetAcc = async () => {
+    let encrypt = await _encryotData({ data: activeWallet.WalletAddress });
+    setReceivingAddr(encrypt);
+    setValid(true);
+  };
+
   useEffect(() => {
     getUserWallets();
   }, []);
@@ -199,7 +205,9 @@ const SendToken = ({ navigation }) => {
         </View>
         {!valid && (
           <>
-            <Text style={styles.txBtwAcc}>Transfer Between My Accounts</Text>
+            <Pressable onPress={handleSetAcc}>
+              <Text style={styles.txBtwAcc}>Transfer To Active Accounts</Text>
+            </Pressable>
           </>
         )}
         <Recent

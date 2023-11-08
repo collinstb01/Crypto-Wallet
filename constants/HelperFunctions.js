@@ -269,6 +269,7 @@ export const _createUserAccount = async ({
         rpcURL:
           "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
         chainId: 1,
+        sourceChainSelector: "ethereumMainnet",
       },
       {
         name: "Sepolia Test Network",
@@ -278,6 +279,7 @@ export const _createUserAccount = async ({
         rpcURL:
           "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
         chainId: 11155111,
+        sourceChainSelector: "ethereumSepolia",
       },
       {
         name: "Arbitrum Goerli",
@@ -287,6 +289,17 @@ export const _createUserAccount = async ({
         rpcURL:
           "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
         chainId: 421613,
+        sourceChainSelector: "avalancheFuji",
+      },
+      {
+        name: "Polygon Mumbai",
+        id: "polygonMumbai",
+        active: 0,
+        color: "0000FF",
+        rpcURL:
+          "https://polygon-mumbai.g.alchemy.com/v2/v5XGTeB99ScNm1Kr5N7y_GsR0hT2NOsZ",
+        chainId: 80001,
+        sourceChain: "polygonMumbai",
       },
     ];
     const tokens = [
@@ -305,6 +318,7 @@ export const _createUserAccount = async ({
         chaindId: 1,
         rpcURL:
           "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
+        sourceChainSelector: "ethereumMainnet",
       },
       {
         name: "Sepolia Test Network",
@@ -321,6 +335,7 @@ export const _createUserAccount = async ({
         chainId: 11155111,
         rpcURL:
           "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
+        sourceChainSelector: "ethereumSepolia",
       },
       {
         name: "Arbitrum Goerli",
@@ -337,6 +352,24 @@ export const _createUserAccount = async ({
         chainId: 421613,
         rpcURL:
           "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
+        sourceChainSelector: "avalancheFuji",
+      },
+      {
+        name: "Polygon Mumbai",
+        amount: Number(
+          await getBalance({
+            rpcURL: networks[3].rpcURL,
+            address: walletPhraseData.address,
+          })
+        ),
+        symbol: "polygonMumbai",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "polygonMumbai",
+        walletAddress: encryptedWalletAddress,
+        chainId: 80001,
+        rpcURL:
+          "https://polygon-mumbai.g.alchemy.com/v2/v5XGTeB99ScNm1Kr5N7y_GsR0hT2NOsZ",
+        sourceChainSelector: "polygonMumbai",
       },
     ];
 
@@ -429,10 +462,8 @@ export const _createWallet = async ({
 
     let encryptedWalletAddress, encryptedPrivateKey, address;
     if (privateKey !== "") {
-      console.log(privateKey, "This is the private key");
       let wallet = new ethers.Wallet(privateKey.toString());
       address = wallet.address;
-      console.log(wallet, "Reached");
 
       encryptedWalletAddress = await _encryotData({ data: address });
       encryptedPrivateKey = await _encryotData({ data: privateKey });
@@ -464,14 +495,13 @@ export const _createWallet = async ({
       walletName: walletName,
     };
 
-    const tokenArr = [
+    const tokensArr = [
       {
         name: "Ethereum main Network",
         amount: Number(
           await getBalance({
-            rpcURL:
-              "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
-            address: address,
+            rpcURL: networks[0].rpcURL,
+            address: walletPhraseData.address,
           })
         ),
         symbol: "Ethereum",
@@ -481,14 +511,14 @@ export const _createWallet = async ({
         chaindId: 1,
         rpcURL:
           "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
+        sourceChainSelector: "ethereumMainnet",
       },
       {
         name: "Sepolia Test Network",
         amount: Number(
           await getBalance({
-            rpcURL:
-              "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
-            address: address,
+            rpcURL: networks[1].rpcURL,
+            address: walletPhraseData.address,
           })
         ),
         symbol: "sepolia",
@@ -498,14 +528,14 @@ export const _createWallet = async ({
         chainId: 11155111,
         rpcURL:
           "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
+        sourceChainSelector: "ethereumSepolia",
       },
       {
         name: "Arbitrum Goerli",
         amount: Number(
           await getBalance({
-            rpcURL:
-              "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
-            address: address,
+            rpcURL: networks[2].rpcURL,
+            address: walletPhraseData.address,
           })
         ),
         symbol: "arbitrumGoerli",
@@ -515,10 +545,28 @@ export const _createWallet = async ({
         chainId: 421613,
         rpcURL:
           "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
+        sourceChainSelector: "avalancheFuji",
+      },
+      {
+        name: "Polygon Mumbai",
+        amount: Number(
+          await getBalance({
+            rpcURL: networks[3].rpcURL,
+            address: walletPhraseData.address,
+          })
+        ),
+        symbol: "polygonMumbai",
+        address: "0x0000000000000000000000000000000000000000",
+        network: "polygonMumbai",
+        walletAddress: encryptedWalletAddress,
+        chainId: 80001,
+        rpcURL:
+          "https://polygon-mumbai.g.alchemy.com/v2/v5XGTeB99ScNm1Kr5N7y_GsR0hT2NOsZ",
+        sourceChainSelector: "polygonMumbai",
       },
     ];
 
-    let newArr = [...parseTokens, ...tokenArr];
+    let newArr = [...parseTokens, ...tokensArr];
 
     parseWallets.push(walletObj);
     await AsyncStorage.setItem("wallets", JSON.stringify(parseWallets));
@@ -657,8 +705,11 @@ export const _addTokens = async ({
 
   const parseTokens = JSON.parse(tokens);
 
-  if (JSON.parse(tokens).find((val) => val.address == addr)) {
-    console.log("lise");
+  if (
+    JSON.parse(tokens)
+      .filter((val) => val.walletAddress == walletAddress)
+      .find((val) => val.address == addr)
+  ) {
     return setErr("Already Listed");
   }
 
@@ -674,6 +725,7 @@ export const _addTokens = async ({
     decimals: decimals,
     chaindId: parseActiveNetwork.chainId,
     rpcURL: parseActiveNetwork.rpcURL,
+    sourceChainSelector: parseActiveNetwork?.sourceChainSelector,
   };
 
   parseTokens.push(token);
@@ -861,7 +913,6 @@ export const _getUserTokenTransactions = async ({
   const data = await AsyncStorage.getItem("TXhistory");
   const parseData = JSON.parse(data);
 
-  console.log(parseData);
   let TokenHistory = parseData.filter(
     (item) => item.contractAddress == contractAddress
   );
@@ -883,7 +934,6 @@ export const getBalance = async ({ rpcURL, address }) => {
   const provider = new ethers.JsonRpcProvider(rpcURL);
   const balance = await provider.getBalance(address);
   const balanceInEth = ethers.formatEther(balance);
-  console.log(balanceInEth);
   return balanceInEth;
 };
 
@@ -1054,11 +1104,6 @@ export const transferNativeTokensOrERC20 = async ({
 
     const activeNetwork = await _getActiveNetwork();
     let parseActiveNetwork = JSON.parse(activeNetwork);
-    console.log(
-      "sending...................Eth",
-      _recipient,
-      parseActiveNetwork.rpcURL
-    );
 
     const provider = new ethers.JsonRpcProvider(parseActiveNetwork.rpcURL);
 
@@ -1206,7 +1251,6 @@ export const confirmTX = async ({
     });
 
     await AsyncStorage.setItem("recents", JSON.stringify(ParseRecents));
-    console.log(ParseRecents);
     if (receipt.status === 1) {
       receiveNotify({
         title: "Sent Token (Success)",
@@ -1333,7 +1377,8 @@ export const listenForEthAndERC20Transfer = async () => {
       if (
         network.id == "eth" ||
         network.id == "arbitrumGoerli" ||
-        network.id == "sepolia"
+        network.id == "sepolia" ||
+        network.id == "polygonMumbai"
       ) {
         console.log("called something...........");
       } else {
@@ -1556,4 +1601,309 @@ function receiveNotify({ title, body, data }) {
     body: body,
     data: data,
   });
+}
+
+////////////////////////////////////////
+///////// CCIP HELPERS /////////////////
+////////////////////////////////////////
+
+console.log(process.env.ETHEREUM_SEPOLIA_RPC_URL, "RPC URL...........");
+
+export const getPrivateKey = async () => {
+  const user = await _getActiveWallet();
+  const parsedUser = JSON.parse(user);
+  const decryptedPrivateKey = await _decryotData({
+    encryptedData: parsedUser.privateKey,
+  });
+
+  return decryptedPrivateKey;
+};
+
+// Import necessary modules and data
+import {
+  getProviderRpcUrl,
+  getRouterConfig,
+  getMessageState,
+} from "../constants/CCIPconfig/CCIPconfig.js";
+import routerAbi from "../constants/abis/routerAbi.json";
+import offRampAbi from "../constants/abis/offRampAbi.json";
+import erc20Abi from "../constants/abis/erc20Abi.json";
+
+export const checkIfTokenIsSupported = async ({
+  sourceChain,
+  tokenAddress,
+  destinationChainSelector,
+}) => {
+  const sourceRouterAddress = getRouterConfig(sourceChain).address;
+
+  const rpcUrl = getProviderRpcUrl(sourceChain);
+  const privateKey = await getPrivateKey();
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
+  const signer = new ethers.Wallet(privateKey, provider);
+
+  const sourceRouter = new ethers.Contract(
+    sourceRouterAddress,
+    routerAbi,
+    signer
+  );
+
+  // Fetch the list of supported tokens
+  const supportedTokens = await sourceRouter.getSupportedTokens(
+    destinationChainSelector
+  );
+
+  let obj = {
+    signer,
+    supportedTokens,
+  };
+
+  if (supportedTokens.includes(tokenAddress.toLowerCase())) {
+    return { bool: true, ...obj };
+  } else {
+    return { bool: false, ...obj };
+  }
+};
+
+export const getFeeToPay = async ({
+  sourceChain,
+  destinationChain,
+  destinationAccount,
+  tokenAddress,
+  amount,
+  feeTokenAddress,
+}) => {
+  const destinationChainSelector =
+    getRouterConfig(destinationChain).chainSelector;
+
+  const { bool, signer, supportedTokens } = await checkIfTokenIsSupported({
+    sourceChain,
+    tokenAddress,
+    destinationChainSelector,
+  });
+
+  if (bool == false) {
+    throw Error(
+      `Token address ${tokenAddress} not in the list of supportedTokens ${supportedTokens}`
+    );
+    return;
+  }
+
+  const tokenAmounts = [
+    {
+      token: tokenAddress,
+      amount: amount,
+    },
+  ];
+  const functionSelector = ethers.id("CCIP EVMExtraArgsV1").slice(0, 10);
+  //  "extraArgs" is a structure that can be represented as [ 'uint256', 'bool' ]
+  // extraArgs are { gasLimit: 0, strict: false }
+
+  const extraArgs = ethers.defaultAbiCoder.encode(
+    ["uint256", "bool"],
+    [0, false]
+  );
+
+  const encodedExtraArgs = functionSelector + extraArgs.slice(2);
+
+  const message = {
+    receiver: ethers.defaultAbiCoder.encode(["address"], [destinationAccount]),
+    data: "0x", // no data
+    tokenAmounts: tokenAmounts,
+    feeToken: feeTokenAddress ? feeTokenAddress : ethers.constants.AddressZero, // If fee token address is provided then fees must be paid in fee token.
+    extraArgs: encodedExtraArgs,
+  };
+
+  const fees = await sourceRouter.getFee(destinationChainSelector, message);
+  console.log(`Estimated fees (wei): ${fees}`);
+
+  // navigation.navigate("/approve", {
+  //   sourceChainSelector,
+  //   fees,
+  //   tokenAddress,
+  //   signer,
+  //   feeTokenAddress,
+  //   sourceRouterAddress,
+  //   amount,
+  //   message,
+  //   fees,
+  //   rpcURL,
+  // });
+};
+
+export const approveSendToken = async ({
+  tokenAddress,
+  signer,
+  feeTokenAddress,
+  sourceRouterAddress,
+  amount,
+  message,
+  fees,
+  rpcURL,
+}) => {
+  const provider = new ethers.JsonRpcProvider(rpcURL);
+  const erc20 = new ethers.Contract(tokenAddress, erc20Abi, signer);
+  let sendTx, approvalTx;
+
+  if (!feeTokenAddress) {
+    // Pay native
+    // First approve the router to spend tokens
+    approvalTx = await erc20.approve(sourceRouterAddress, amount);
+    await approvalTx.wait(); // wait for the transaction to be mined
+    console.log(
+      `approved router ${sourceRouterAddress} to spend ${amount} of token ${tokenAddress}. Transaction: ${approvalTx.hash}`
+    );
+
+    sendTx = await sourceRouter.ccipSend(destinationChainSelector, message, {
+      value: fees,
+    }); // fees are send as value since we are paying the fees in native
+  } else {
+    if (tokenAddress.toUpperCase() === feeTokenAddress.toUpperCase()) {
+      // fee token is the same as the token to transfer
+      // Amount tokens to approve are transfer amount + fees
+      approvalTx = await erc20.approve(sourceRouterAddress, amount + fees);
+      await approvalTx.wait(); // wait for the transaction to be mined
+      console.log(
+        `approved router ${sourceRouterAddress} to spend ${amount} and fees ${fees} of token ${tokenAddress}. Transaction: ${approvalTx.hash}`
+      );
+    } else {
+      // fee token is different than the token to transfer
+      // 2 approvals
+      approvalTx = await erc20.approve(sourceRouterAddress, amount); // 1 approval for the tokens to transfer
+      await approvalTx.wait(); // wait for the transaction to be mined
+      console.log(
+        `approved router ${sourceRouterAddress} to spend ${amount} of token ${tokenAddress}. Transaction: ${approvalTx.hash}`
+      );
+      const erc20Fees = new ethers.Contract(feeTokenAddress, erc20Abi, signer);
+      approvalTx = await erc20Fees.approve(sourceRouterAddress, fees); // 1 approval for the fees token
+      await approvalTx.wait();
+      console.log(
+        `approved router ${sourceRouterAddress} to spend  fees ${fees} of token ${feeTokenAddress}. Transaction: ${approvalTx.hash}`
+      );
+    }
+    sendTx = await sourceRouter.ccipSend(destinationChainSelector, message);
+  }
+
+  const receipt = await sendTx.wait(); // wait for the transaction to be mined
+
+  /* 
+  ==================================================
+      Section: Fetch message ID
+      The Router ccipSend function returns the messageId.
+      This section makes a call (simulation) to the blockchain
+      to fetch the messageId that was returned by the Router.
+  ==================================================
+  */
+
+  // Simulate a call to the router to fetch the messageID
+  const call = {
+    from: sendTx.from,
+    to: sendTx.to,
+    data: sendTx.data,
+    gasLimit: sendTx.gasLimit,
+    gasPrice: sendTx.gasPrice,
+    value: sendTx.value,
+  };
+
+  navigation.navigate("/approve", {});
+
+  // Simulate a contract call with the transaction data at the block before the transaction
+  const messageId = await provider.call(call, receipt.blockNumber - 1);
+
+  console.log(
+    `\n✅ ${amount} of Tokens(${tokenAddress}) Sent to account ${destinationAccount} on destination chain ${destinationChain} using CCIP. Transaction hash ${sendTx.hash} -  Message id is ${messageId}`
+  );
+};
+
+export const checkStatusOfDestinationChain = async ({
+  destinationChain,
+  sourceChainSelector,
+  messageId,
+}) => {
+  // Fetch status on destination chain
+  const destinationRpcUrl = getProviderRpcUrl(destinationChain);
+
+  // Initialize providers for interacting with the blockchains
+  const destinationProvider = new ethers.JsonRpcProvider(destinationRpcUrl);
+  const destinationRouterAddress = getRouterConfig(destinationChain).address;
+
+  // Instantiate the router contract on the destination chain
+  const destinationRouterContract = new ethers.Contract(
+    destinationRouterAddress,
+    routerAbi,
+    destinationProvider
+  );
+
+  // CHECK DESTINATION CHAIN - POLL UNTIL the messageID is found or timeout
+
+  const POLLING_INTERVAL = 60000; // Poll every 60 seconds
+  const TIMEOUT = 40 * 60 * 1000; // 40 minutes in milliseconds
+
+  let pollingId;
+  let timeoutId;
+
+  const pollStatus = async () => {
+    // Fetch the OffRamp contract addresses on the destination chain
+    const offRamps = await destinationRouterContract.getOffRamps();
+
+    // Iterate through OffRamps to find the one linked to the source chain and check message status
+    for (const offRamp of offRamps) {
+      if (offRamp.sourceChainSelector.toString() === sourceChainSelector) {
+        const offRampContract = new ethers.Contract(
+          offRamp.offRamp,
+          offRampAbi,
+          destinationProvider
+        );
+        const events = await offRampContract.queryFilter(
+          "ExecutionStateChanged"
+        );
+
+        // Check if an event with the specific messageId exists and log its status
+        for (let event of events) {
+          if (event.args && event.args.messageId === messageId) {
+            const state = event.args.state;
+            const status = getMessageState(state);
+            console.log(
+              `\n✅Status of message ${messageId} is ${status} - Check the explorer https://ccip.chain.link/msg/${messageId}`
+            );
+
+            // Clear the polling and the timeout
+            clearInterval(pollingId);
+            clearTimeout(timeoutId);
+            return;
+          }
+        }
+      }
+    }
+    // If no event found, the message has not yet been processed on the destination chain
+    console.log(
+      `Message ${messageId} has not been processed yet on the destination chain.Try again in 60sec - Check the explorer https://ccip.chain.link/msg/${messageId}`
+    );
+  };
+
+  // Start polling
+  console.log(
+    `\nWait for message ${messageId} to be executed on the destination chain - Check the explorer https://ccip.chain.link/msg/${messageId}`
+  );
+  pollingId = setInterval(pollStatus, POLLING_INTERVAL);
+
+  // Set timeout to stop polling after 40 minutes
+  timeoutId = setTimeout(() => {
+    console.log(
+      "\nTimeout reached. Stopping polling - check again later (Run `get-status` script) Or check the explorer https://ccip.chain.link/msg/${messageId}"
+    );
+    clearInterval(pollingId);
+  }, TIMEOUT);
+};
+
+function splitAtUppercase(str) {
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] >= "A" && str[i] <= "Z") {
+      // Uppercase letter found, split the string at this index
+      const firstPart = str.substring(0, i);
+      const secondPart = str.substring(i);
+      return [firstPart, secondPart];
+    }
+  }
+  // If no uppercase letter is found, return the entire string as the first part
+  return [str, ""];
 }

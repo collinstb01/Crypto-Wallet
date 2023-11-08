@@ -43,6 +43,7 @@ const Success = ({ navigation }) => {
         rpcURL:
           "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
         chainId: 1,
+        sourceChain: "ethereumMainnet",
       },
       {
         name: "Sepolia Test Network",
@@ -52,6 +53,7 @@ const Success = ({ navigation }) => {
         rpcURL:
           "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
         chainId: 11155111,
+        sourceChain: "ethereumSepolia",
       },
       {
         name: "Arbitrum Goerli",
@@ -61,6 +63,17 @@ const Success = ({ navigation }) => {
         rpcURL:
           "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
         chainId: 421613,
+        sourceChain: "avalancheFuji",
+      },
+      {
+        name: "Polygon Mumbai",
+        id: "polygonMumbai",
+        active: 0,
+        color: "0000FF",
+        rpcURL:
+          "https://polygon-mumbai.g.alchemy.com/v2/v5XGTeB99ScNm1Kr5N7y_GsR0hT2NOsZ",
+        chainId: 80001,
+        sourceChain: "polygonMumbai",
       },
     ];
 
