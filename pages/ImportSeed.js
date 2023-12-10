@@ -70,6 +70,7 @@ const ImportSeed = ({ navigation }) => {
       });
       setLoading(false);
     } catch (error) {
+      console.log(error);
       _helperFunc({
         setErr: setErr,
         setLoading: setLoading,

@@ -302,6 +302,7 @@ export const _createUserAccount = async ({
         sourceChain: "polygonMumbai",
       },
     ];
+    console.log(walletPhraseData.address, "sjsjsjjs");
     const tokens = [
       {
         name: "Ethereum main Network",
@@ -309,7 +310,7 @@ export const _createUserAccount = async ({
           await getBalance({
             rpcURL: networks[0].rpcURL,
             address: walletPhraseData.address,
-            tokenAddress,
+            tokenAddress: "0x0000000000000000000000000000000000000000",
           })
         ),
         symbol: "Ethereum",
@@ -327,7 +328,7 @@ export const _createUserAccount = async ({
           await getBalance({
             rpcURL: networks[1].rpcURL,
             address: walletPhraseData.address,
-            tokenAddress,
+            tokenAddress: "0x0000000000000000000000000000000000000000",
           })
         ),
         symbol: "sepolia",
@@ -345,7 +346,7 @@ export const _createUserAccount = async ({
           await getBalance({
             rpcURL: networks[2].rpcURL,
             address: walletPhraseData.address,
-            tokenAddress,
+            tokenAddress: "0x0000000000000000000000000000000000000000",
           })
         ),
         symbol: "arbitrumGoerli",
@@ -363,7 +364,7 @@ export const _createUserAccount = async ({
           await getBalance({
             rpcURL: networks[3].rpcURL,
             address: walletPhraseData.address,
-            tokenAddress,
+            tokenAddress: "0x0000000000000000000000000000000000000000",
           })
         ),
         symbol: "polygonMumbai",
@@ -483,6 +484,7 @@ export const _createWallet = async ({
       const wallet = HDNodeWallet.fromPhrase(decryptMnemonic, undefined, path);
 
       address = wallet.address;
+      console.log(address);
       encryptedWalletAddress = await _encryotData({
         data: wallet.address,
       });
@@ -499,13 +501,56 @@ export const _createWallet = async ({
       walletName: walletName,
     };
 
+    let networks = [
+      {
+        name: "Ethereum main Network",
+        id: "eth",
+        active: 1,
+        color: "6c62c5",
+        rpcURL:
+          "https://eth-mainnet.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
+        chainId: 1,
+        sourceChainSelector: "ethereumMainnet",
+      },
+      {
+        name: "Sepolia Test Network",
+        id: "sepolia",
+        active: 0,
+        color: "ff3a58",
+        rpcURL:
+          "https://eth-sepolia.g.alchemy.com/v2/ZkFgCAUBdigtKoqowEjqdlyfjchhbvmg",
+        chainId: 11155111,
+        sourceChainSelector: "ethereumSepolia",
+      },
+      {
+        name: "Arbitrum Goerli",
+        id: "arbitrumGoerli",
+        active: 0,
+        color: "a769ec",
+        rpcURL:
+          "https://arbitrum-goerli.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a",
+        chainId: 421613,
+        sourceChainSelector: "avalancheFuji",
+      },
+      {
+        name: "Polygon Mumbai",
+        id: "polygonMumbai",
+        active: 0,
+        color: "0000FF",
+        rpcURL:
+          "https://polygon-mumbai.g.alchemy.com/v2/v5XGTeB99ScNm1Kr5N7y_GsR0hT2NOsZ",
+        chainId: 80001,
+        sourceChain: "polygonMumbai",
+      },
+    ];
     const tokensArr = [
       {
         name: "Ethereum main Network",
         amount: Number(
           await getBalance({
             rpcURL: networks[0].rpcURL,
-            address: walletPhraseData.address,
+            address: address,
+            tokenAddress: "",
           })
         ),
         symbol: "Ethereum",
@@ -522,7 +567,8 @@ export const _createWallet = async ({
         amount: Number(
           await getBalance({
             rpcURL: networks[1].rpcURL,
-            address: walletPhraseData.address,
+            address: address,
+            tokenAddress: "",
           })
         ),
         symbol: "sepolia",
@@ -539,7 +585,8 @@ export const _createWallet = async ({
         amount: Number(
           await getBalance({
             rpcURL: networks[2].rpcURL,
-            address: walletPhraseData.address,
+            address: address,
+            tokenAddress: "",
           })
         ),
         symbol: "arbitrumGoerli",
@@ -556,7 +603,8 @@ export const _createWallet = async ({
         amount: Number(
           await getBalance({
             rpcURL: networks[3].rpcURL,
-            address: walletPhraseData.address,
+            address: address,
+            tokenAddress: "",
           })
         ),
         symbol: "polygonMumbai",
