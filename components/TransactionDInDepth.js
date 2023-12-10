@@ -1,24 +1,37 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import ButtonGradientTwo from "./ButtonGradientTwo";
 import { ethers } from "ethers";
+import { checkStatusOfDestinationChain } from "../constants/HelperFunctions";
 
 const TransactionDInDepth = ({ txDepth }) => {
+  const [loading, setLoading] = useState(false);
+  const [text, setText] = useState("");
+  const [data, setData] = useState(null);
   const routeToExplorer = () => {};
 
+  const verifyStatusOnOtherChain = async () => {
+    await checkStatusOfDestinationChain({
+      destinationChain: txDepth.destinationChain,
+      sourceChainSelector: txDepth.sourceChainSelector,
+      messageId: txDepth.messageId,
+      setLoading,
+      setText,
+    });
+  };
   return (
     <>
       <View style={{ marginTop: 30 }}>
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>Status</Text>
           <Text style={[styles.firstText, styles.text, styles.confirmed]}>
-            {txDepth.status}
+            {txDepth?.status}
           </Text>
         </View>
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>Date</Text>
           <Text style={[styles.firstText, styles.text, styles.date]}>
-            {txDepth.date}
+            {txDepth?.date}
           </Text>
         </View>
         <View style={[styles.first, styles.flex]}>
@@ -34,6 +47,14 @@ const TransactionDInDepth = ({ txDepth }) => {
           </Text>
         </View>
       </View>
+      {txDepth.messageId && (
+        <View style={[styles.first, styles.flex]}>
+          <Text style={[styles.rightText, styles.text]}>Message ID</Text>
+          <Text style={[styles.firstText, styles.text, styles.address]}>
+            {txDepth?.messageId}
+          </Text>
+        </View>
+      )}
       <View style={styles.box}>
         <View style={[styles.first, styles.flex]}>
           <Text style={[styles.rightText, styles.text]}>Nounce</Text>
@@ -57,7 +78,7 @@ const TransactionDInDepth = ({ txDepth }) => {
           <Text style={[styles.text, styles.TA]}>Total Amount</Text>
           <View style={{ flexDirection: "column", alignItems: "flex-end" }}>
             <Text style={[styles.TA, styles.text, { color: "green" }]}>
-              {txDepth.status == "success" ? "Confirmed" : "Faile"}
+              {txDepth?.status == "success" ? "Confirmed" : "Faile"}
             </Text>
             <Text style={[styles.firstText, styles.text]}>
               {ethers.formatEther(txDepth?.total?.toString())}
@@ -65,7 +86,33 @@ const TransactionDInDepth = ({ txDepth }) => {
           </View>
         </View>
       </View>
-      <ButtonGradientTwo text={"View On Etherscan"} func={routeToExplorer} />
+      <View style={{ flexDirection: "column", justifyContent: "center" }}>
+        <View style={{ flexDirection: "row", justifyContent: "center" }}>
+          <ButtonGradientTwo
+            text={"View On Etherscan"}
+            func={routeToExplorer}
+          />
+          {txDepth.messageId && (
+            <View style={{ marginLeft: 10 }}>
+              <ButtonGradientTwo
+                text={loading ? "Verifying" : "Verify"}
+                func={verifyStatusOnOtherChain}
+              />
+            </View>
+          )}
+        </View>
+        {txDepth.messageId && (
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              marginHorizontal: 20,
+            }}
+          >
+            {text}
+          </Text>
+        )}
+      </View>
     </>
   );
 };

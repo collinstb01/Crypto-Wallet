@@ -20,6 +20,7 @@ import {
   _decryotData,
   _getActiveNetwork,
   _getGas,
+  approveSendToken,
   getBalance,
   getFeeToPay,
   transferNativeTokensOrERC20,
@@ -59,19 +60,34 @@ const Confrim = ({ route, navigation }) => {
   async function func() {
     dispatch(setLoadingAfterSendToken({ loading: true }));
     setLoading(true);
-    await transferNativeTokensOrERC20({
-      gasPrice: gasData.gasPrice,
-      gasLEstimate: gasData.gasLEstimate,
-      recipient: sendToken.to,
-      amount: sendToken.amount,
-      contractAddress: sendToken.tokenAddress,
-      symbol: sendToken.symbol,
-      navigation: navigation,
-      setErr: setError,
-      setLoading: setLoading,
-    });
+    if (sourceName == "") {
+      await transferNativeTokensOrERC20({
+        gasPrice: gasData.gasPrice,
+        gasLEstimate: gasData.gasLEstimate,
+        recipient: sendToken.to,
+        amount: sendToken.amount,
+        contractAddress: sendToken.tokenAddress,
+        symbol: sendToken.symbol,
+        navigation: navigation,
+        setErr: setError,
+        setLoading: setLoading,
+      });
+      setLoading(false);
+    } else {
+      await approveSendToken({
+        tokenAddress: sendToken.tokenAddress,
+        feeTokenAddress: "",
+        sourceName: sourceName,
+        amount: Number(ethers.parseEther(sendToken?.amount.toString())),
+        fees: Number(gasData.gasPrice),
+        symbol: sendToken.symbol,
+        navigation: navigation,
+        setErr: setError,
+        setLoading: setLoading,
+        destinationAccount: sendToken.to,
+      });
+    }
     dispatch(setLoadingAfterSendToken({ loading: false }));
-    setLoading(false);
   }
 
   const getGas = async () => {
@@ -79,6 +95,7 @@ const Confrim = ({ route, navigation }) => {
       address: sendToken.tokenAddress,
       amount: sendToken.amount,
       recipient: sendToken.to,
+      setDisabled,
     });
     const parseGas = JSON.parse(gas);
     let totalGasInEth = parseGas.gasLEstimate * parseGas.gasPrice;
@@ -87,13 +104,16 @@ const Confrim = ({ route, navigation }) => {
       ...prev,
       gasPrice: parseGas.gasPrice,
       gasLEstimate: parseGas.gasLEstimate,
-      gasInEth: ethers.formatEther(totalGasInEth),
+      gasInEth: ethers.formatEther(totalGasInEth).slice(0, 15),
     }));
   };
 
   useEffect(() => {
-    // getGasFee
-    // getGasLimit
+    if (!sourceName) {
+      getGas();
+    } else {
+      getFee();
+    }
     if (sendToken) {
       setAddress(sendToken.tokenAddress);
       setamount(sendToken.amount);
@@ -107,6 +127,7 @@ const Confrim = ({ route, navigation }) => {
     const decryptAddress = await _decryotData({
       encryptedData: sendToken.from,
     });
+    console.log("frof fkdmasdmvmv", decryptAddress);
 
     const activeNetwork = await _getActiveNetwork();
     const parseActiveNetwork = JSON.parse(activeNetwork);
@@ -114,6 +135,7 @@ const Confrim = ({ route, navigation }) => {
     const balanceData = await getBalance({
       rpcURL: parseActiveNetwork.rpcURL,
       address: decryptAddress,
+      tokenAddress: "",
     });
     setBalance(balanceData);
     if (balanceData) {
@@ -129,24 +151,24 @@ const Confrim = ({ route, navigation }) => {
     }
   };
 
-  async function h() {
-    await getFeeToPay({
+  async function getFee() {
+    let gasFee = await getFeeToPay({
       sourceChain: "ethereumSepolia",
-      destinationChain: sourceName,
+      destinationChain: "polygonMumbai",
       destinationAccount: sendToken.to,
       tokenAddress: sendToken.tokenAddress,
       amount: sendToken.amount,
       feeTokenAddress: "",
+      setDisabled,
+      setError,
+      setGasData,
     });
   }
 
   useEffect(() => {
+    if (!sendToken) return;
     getUserBalance();
-  }, [balance]);
-
-  useEffect(() => {
-    h();
-  }, []);
+  }, [balance, sendToken]);
 
   return (
     <>
@@ -210,7 +232,7 @@ const Confrim = ({ route, navigation }) => {
                     </Text>
                   </Pressable>
                   <Text style={[styles.amount]}>
-                    {`${gasData.gasInEth.toString()} ${sendToken?.symbol?.toUpperCase()}`}
+                    {`${gasData.gasInEth.toString()} ${"ETH"}`}
                   </Text>
                 </View>
                 <View style={styles.ctn}>
@@ -228,7 +250,7 @@ const Confrim = ({ route, navigation }) => {
               </Text>
             </View>
             <ButtonGradient
-              text={loading ? "Sending" : "Send"}
+              text={loading ? "Sending..." : "Send"}
               func={func}
               route={"func"}
               widthSp={150}

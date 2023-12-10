@@ -20,6 +20,9 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
     type,
     network,
     total,
+    messageId,
+    destinationChain,
+    sourceChainSelector,
   }) => {
     let _to = await _formatAddr({ addr: to, notEncrypted: true });
     let _from = await _formatAddr({ addr: from, notEncrypted: true });
@@ -40,6 +43,9 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
       type,
       network,
       total,
+      destinationChain,
+      sourceChainSelector,
+      messageId,
     }));
     setShow(true);
   };
@@ -51,22 +57,27 @@ const TokenHistory = ({ DATA, setShow, setTXDepth }) => {
             onPress={() => {
               if (item.status == "pending") return;
               handleShowTXDepth({
-                status: item.status,
+                status: item?.status,
                 date: item?.date,
-                from: item.from,
-                to: item.to,
-                nounce: item.nonce,
-                amount: item.value,
-                networkFee: ethers.formatEther(item.gasPrice),
+                from: item?.from,
+                to: item?.to,
+                nounce: item?.nonce,
+                amount: item?.value,
+                networkFee:
+                  item?.gasPrice && ethers?.formatEther(item.gasPrice),
                 total:
-                  (item.type == "Send"
-                    ? Number(ethers.parseEther(item.value.toString()))
-                    : Number(item.value)) + item.gasPrice,
-                contractAddress: item.contractAddress,
-                hash: item.hash,
-                symbol: item.symbol,
-                type: item.type,
-                network: item.network,
+                  (item?.type == "Send"
+                    ? Number(ethers.parseEther(item?.value?.toString())) +
+                      item?.gasPrice
+                    : Number(item?.value)) + item?.gasPrice,
+                contractAddress: item?.contractAddress,
+                hash: item?.hash,
+                symbol: item?.symbol,
+                type: item?.type,
+                network: item?.network,
+                messageId: item?.messageId,
+                destinationChain: item?.destinationChain,
+                sourceChainSelector: item?.sourceChainSelector,
               });
             }}
             key={index}

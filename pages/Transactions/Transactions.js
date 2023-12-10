@@ -59,7 +59,6 @@ const Transactions = ({ route, navigation }) => {
     getTransactions();
   }, [loadingAfterSendToken]);
 
-  console.log(transactions);
   return (
     <View style={[Constants.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}

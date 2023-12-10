@@ -42,6 +42,9 @@ const TokenDetails = ({ route, navigation }) => {
     type: "",
     network: "",
     total: "",
+    messageId: "",
+    destinationChain: "",
+    sourceChainSelector: "",
   });
   const { tokenName, amount, contractAddress, symbol } = route.params;
 

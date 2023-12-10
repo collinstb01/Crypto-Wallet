@@ -1,7 +1,9 @@
 import {
   BackHandler,
+  Dimensions,
   Image,
   Pressable,
+  RefreshControl,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -37,10 +39,12 @@ import {
   _setWallets,
   eventListening,
   listenForTransactions,
+  refreshUserBalance,
 } from "../../constants/HelperFunctions";
 import { useSelector } from "react-redux";
 import { ethers } from "ethers";
 import Constants from "../../constants/styles";
+import { Platform } from "react-native";
 
 const Home = ({ route, navigation }) => {
   const [active, setActive] = useState(1);
@@ -57,6 +61,7 @@ const Home = ({ route, navigation }) => {
   const [activeWallet, setActiveWallet] = useState(null);
   const [walletName, setWalletName] = useState("");
   const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const [activeCTN, setActiveCTN] = useState(1);
 
@@ -182,15 +187,22 @@ const Home = ({ route, navigation }) => {
 
   useEffect(() => {
     getTokens();
-  }, [showAddToken, showPerson, show]);
+  }, [showAddToken, showPerson, show, refreshing]);
 
   const [isScrolling, handleScroll] = useHandleScrollFunc();
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await refreshUserBalance();
+    setRefreshing(false);
+  }, [refreshing]);
 
   useEffect(() => {
     console.log("isScrolling");
   }, [isScrolling]);
 
-  console.log(tokens, "jjjjjjjjjjjjjjjjjjjjjjjjjjj");
+  const height = Platform.OS == "ios" ? 60 : 20;
+
   return (
     <View style={[contantStyles.container2Home]}>
       {!isScrolling && <Tabs navigation={navigation} route={route} />}
@@ -199,8 +211,23 @@ const Home = ({ route, navigation }) => {
       {showSendEth == true && <View style={contantStyles.overlay}></View>}
       {showAddToken == true && <View style={contantStyles.overlay}></View>}
       <StatusBarForScreens />
-
-      <ScrollView onScroll={handleScroll}>
+      {refreshing && (
+        <View
+          style={{
+            position: "absolute",
+            marginTop: height,
+            left: Dimensions.get("window").width / 2,
+          }}
+        >
+          <Text style={{ color: "white" }}>Refresing...</Text>
+        </View>
+      )}
+      <ScrollView
+        onScroll={handleScroll}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View>
           <StatusBarForScreens />
           <View style={styles.f}>

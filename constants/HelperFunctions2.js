@@ -309,7 +309,6 @@ export const _createUserAccount = async ({
           await getBalance({
             rpcURL: networks[0].rpcURL,
             address: walletPhraseData.address,
-            tokenAddress,
           })
         ),
         symbol: "Ethereum",
@@ -327,7 +326,6 @@ export const _createUserAccount = async ({
           await getBalance({
             rpcURL: networks[1].rpcURL,
             address: walletPhraseData.address,
-            tokenAddress,
           })
         ),
         symbol: "sepolia",
@@ -345,7 +343,6 @@ export const _createUserAccount = async ({
           await getBalance({
             rpcURL: networks[2].rpcURL,
             address: walletPhraseData.address,
-            tokenAddress,
           })
         ),
         symbol: "arbitrumGoerli",
@@ -363,7 +360,6 @@ export const _createUserAccount = async ({
           await getBalance({
             rpcURL: networks[3].rpcURL,
             address: walletPhraseData.address,
-            tokenAddress,
           })
         ),
         symbol: "polygonMumbai",
@@ -934,26 +930,11 @@ export const _getrecentsAddressSentTo = async () => {
   return JSON.stringify(recentsAddressSentTo);
 };
 
-export const getBalance = async ({ rpcURL, address, tokenAddress }) => {
+export const getBalance = async ({ rpcURL, address }) => {
   const provider = new ethers.JsonRpcProvider(rpcURL);
-  const abi = await getContractAbi({ contractAddress: tokenAddress });
-
-  if (
-    tokenAddress != "" &&
-    tokenAddress !== "0x0000000000000000000000000000000000000000"
-  ) {
-    const contract = new ethers.Contract(tokenAddress, abi, provider);
-    const balance = await contract.balanceOf(address);
-
-    console.log(balance, " this is the balance");
-    return ethers.formatEther(balance.toString());
-  } else {
-    const balance = await provider.getBalance(address);
-    const balanceInEth = ethers.formatEther(balance);
-    console.log(balanceInEth, "2 this is the balance");
-
-    return balanceInEth;
-  }
+  const balance = await provider.getBalance(address);
+  const balanceInEth = ethers.formatEther(balance);
+  return balanceInEth;
 };
 
 export const eventListening = async () => {
@@ -1079,9 +1060,8 @@ export const _getNativePrice = async () => {
     });
 };
 
-export const _getGas = async ({ address, amount, recipient, setDisabled }) => {
+export const _getGas = async ({ address, amount, recipient }) => {
   try {
-    setDisabled(true);
     const activeNetwork = await _getActiveNetwork();
     let parseActiveNetwork = JSON.parse(activeNetwork);
 
@@ -1097,7 +1077,6 @@ export const _getGas = async ({ address, amount, recipient, setDisabled }) => {
       value: ethers.parseEther("0.5"),
     });
 
-    setDisabled(false);
     return JSON.stringify({
       gasPrice: Number(gasPrice.baseFeePerGas),
       gasLEstimate: Number(gasLEstimate),
@@ -1395,87 +1374,87 @@ export const listenForEthAndERC20Transfer = async () => {
         console.log("unable to connect");
       } // Set your provider
 
-      // if (
-      //   network.id == "eth" ||
-      //   network.id == "arbitrumGoerli" ||
-      //   network.id == "sepolia" ||
-      //   network.id == "polygonMumbai"
-      // ) {
-      //   console.log("called something...........");
-      // } else {
-      //   provider
-      //     .on("block", async (blockNumber) => {
-      //       // Get the block details
-      //       const block = await provider.getBlock(blockNumber, true);
-      //       // Check each transaction in the block
-      //       for (const tx of block.prefetchedTransactions) {
-      //         // If the transaction is to the user's address, log it and update the user's balance
-      //         if (tx.to && walletArray.includes(tx.to.toLowerCase())) {
-      //           console.log("calling.............");
-      //           const date = formatDateToCustomFormat();
-      //           let userData = parseTokens
-      //             .filter(
-      //               async (val) =>
-      //                 (
-      //                   await _decryotData({ encryptedData: val.walletAddress })
-      //                 ).toLowerCase() == tx.to.toLowerCase()
-      //             )
-      //             .filter(
-      //               (val) =>
-      //                 val.address ==
-      //                 "0x0000000000000000000000000000000000000000"
-      //             )
-      //             .filter((val) => val.chainId == Number(tx.chainId));
-      //           console.log(userData, "userData");
-      //           let TXhistoryObj = {
-      //             userWalletAddress: tx.to,
-      //             network: userData[0].network,
-      //             contractAddress: "0x0000000000000000000000000000000000000000",
-      //             status: "success",
-      //             statusNo: 1,
-      //             symbol: userData[0].symbol,
-      //             date: date,
-      //             type: "Receive",
-      //             from: tx.from,
-      //             to: tx.to,
-      //             value: Number(tx.value),
-      //             gasUsed: Number(tx.gasUsed),
-      //             gasLimit: Number(tx.gasLimit),
-      //             gasPrice: Number(tx.gasPrice),
-      //             blockHash: tx.blockHash,
-      //             blockNumber: null,
-      //             timeStamp: "",
-      //             nonce: Number(tx.nonce),
-      //             hash: tx.hash,
-      //             chainId: Number(tx.chainId),
-      //           };
-      //           receiveNotify({
-      //             title: "Receive Token",
-      //             body: `You received Receive A Token from ${tx.from}`,
-      //             data: "https://etherscan.io/address/",
-      //           });
-      //           const TXhistory = await AsyncStorage.getItem("TXhistory");
-      //           const parseTXhistory = JSON.parse(TXhistory);
-      //           parseTXhistory.push(TXhistoryObj);
-      //           await AsyncStorage.setItem(
-      //             "TXhistory",
-      //             JSON.stringify(parseTXhistory)
-      //           );
-      //           // Update the user's balance here
-      //           console.log(userData, "before");
-      //           userData[0].amount = await getBalance({
-      //             rpcURL: userData[0].rpcURL,
-      //             address: tx.to,
-      //           });
-      //           console.log(userData, "after");
-      //           await AsyncStorage.setItem("tokens", JSON.stringify(userData));
-      //         }
-      //       }
-      //     })
-      //     .catch((err) =>
-      //       console.log("Something went wrong connecting to provider")
-      //     );
-      // }
+      if (
+        network.id == "eth" ||
+        network.id == "arbitrumGoerli" ||
+        network.id == "sepolia" ||
+        network.id == "polygonMumbai"
+      ) {
+        console.log("called something...........");
+      } else {
+        provider
+          .on("block", async (blockNumber) => {
+            // Get the block details
+            const block = await provider.getBlock(blockNumber, true);
+            // Check each transaction in the block
+            for (const tx of block.prefetchedTransactions) {
+              // If the transaction is to the user's address, log it and update the user's balance
+              if (tx.to && walletArray.includes(tx.to.toLowerCase())) {
+                console.log("calling.............");
+                const date = formatDateToCustomFormat();
+                let userData = parseTokens
+                  .filter(
+                    async (val) =>
+                      (
+                        await _decryotData({ encryptedData: val.walletAddress })
+                      ).toLowerCase() == tx.to.toLowerCase()
+                  )
+                  .filter(
+                    (val) =>
+                      val.address ==
+                      "0x0000000000000000000000000000000000000000"
+                  )
+                  .filter((val) => val.chainId == Number(tx.chainId));
+                console.log(userData, "userData");
+                let TXhistoryObj = {
+                  userWalletAddress: tx.to,
+                  network: userData[0].network,
+                  contractAddress: "0x0000000000000000000000000000000000000000",
+                  status: "success",
+                  statusNo: 1,
+                  symbol: userData[0].symbol,
+                  date: date,
+                  type: "Receive",
+                  from: tx.from,
+                  to: tx.to,
+                  value: Number(tx.value),
+                  gasUsed: Number(tx.gasUsed),
+                  gasLimit: Number(tx.gasLimit),
+                  gasPrice: Number(tx.gasPrice),
+                  blockHash: tx.blockHash,
+                  blockNumber: null,
+                  timeStamp: "",
+                  nonce: Number(tx.nonce),
+                  hash: tx.hash,
+                  chainId: Number(tx.chainId),
+                };
+                receiveNotify({
+                  title: "Receive Token",
+                  body: `You received Receive A Token from ${tx.from}`,
+                  data: "https://etherscan.io/address/",
+                });
+                const TXhistory = await AsyncStorage.getItem("TXhistory");
+                const parseTXhistory = JSON.parse(TXhistory);
+                parseTXhistory.push(TXhistoryObj);
+                await AsyncStorage.setItem(
+                  "TXhistory",
+                  JSON.stringify(parseTXhistory)
+                );
+                // Update the user's balance here
+                console.log(userData, "before");
+                userData[0].amount = await getBalance({
+                  rpcURL: userData[0].rpcURL,
+                  address: tx.to,
+                });
+                console.log(userData, "after");
+                await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+              }
+            }
+          })
+          .catch((err) =>
+            console.log("Something went wrong connecting to provider")
+          );
+      }
     }
 
     if (filterTokens.length != 0) {
@@ -1495,72 +1474,72 @@ export const listenForEthAndERC20Transfer = async () => {
           provider
         );
 
-        // contract
-        //   .on("Transfer", async (from, to, amount, event) => {
-        //     console.log("calling..........");
+        contract
+          .on("Transfer", async (from, to, amount, event) => {
+            console.log("calling..........");
 
-        //     if (walletArray.includes(to.toLowerCase())) {
-        //       let userData = parseTokens
-        //         .filter(
-        //           async (val) =>
-        //             (
-        //               await _decryotData({
-        //                 encryptedData: val.walletAddress,
-        //               })
-        //             ).toLowerCase() == filterToken.walletAddress.toLowerCase()
-        //         )
-        //         .filter((val) => val.address == filterToken.address)
-        //         .filter((val) => val.chainId == filterToken.chainId);
-        //       const date = formatDateToCustomFormat();
+            if (walletArray.includes(to.toLowerCase())) {
+              let userData = parseTokens
+                .filter(
+                  async (val) =>
+                    (
+                      await _decryotData({
+                        encryptedData: val.walletAddress,
+                      })
+                    ).toLowerCase() == filterToken.walletAddress.toLowerCase()
+                )
+                .filter((val) => val.address == filterToken.address)
+                .filter((val) => val.chainId == filterToken.chainId);
+              const date = formatDateToCustomFormat();
 
-        //       console.log(userData, "userData");
-        //       let TXhistoryObj = {
-        //         userWalletAddress: to,
-        //         network: userData[0].network,
-        //         contractAddress: filterToken.address,
-        //         status: "success",
-        //         statusNo: 1,
-        //         symbol: userData[0].symbol,
-        //         date: date,
-        //         type: "Receive",
-        //         from: from,
-        //         to: to,
-        //         value: Number(amount),
-        //         gasUsed: 0,
-        //         gasLimit: 0,
-        //         gasPrice: 0,
-        //         blockHash: null,
-        //         blockNumber: null,
-        //         timeStamp: "",
-        //         nonce: null,
-        //         hash: null,
-        //         chainId: Number(userData[0].chainId),
-        //       };
-        //       receiveNotify({
-        //         title: "Receive Token",
-        //         body: `You received Receive A Token from ${from}`,
-        //         data: "https://etherscan.io/address/",
-        //       });
+              console.log(userData, "userData");
+              let TXhistoryObj = {
+                userWalletAddress: to,
+                network: userData[0].network,
+                contractAddress: filterToken.address,
+                status: "success",
+                statusNo: 1,
+                symbol: userData[0].symbol,
+                date: date,
+                type: "Receive",
+                from: from,
+                to: to,
+                value: Number(amount),
+                gasUsed: 0,
+                gasLimit: 0,
+                gasPrice: 0,
+                blockHash: null,
+                blockNumber: null,
+                timeStamp: "",
+                nonce: null,
+                hash: null,
+                chainId: Number(userData[0].chainId),
+              };
+              receiveNotify({
+                title: "Receive Token",
+                body: `You received Receive A Token from ${from}`,
+                data: "https://etherscan.io/address/",
+              });
 
-        //       const TXhistory = await AsyncStorage.getItem("TXhistory");
-        //       const parseTXhistory = JSON.parse(TXhistory);
-        //       parseTXhistory.push(TXhistoryObj);
+              const TXhistory = await AsyncStorage.getItem("TXhistory");
+              const parseTXhistory = JSON.parse(TXhistory);
+              parseTXhistory.push(TXhistoryObj);
 
-        //       await AsyncStorage.setItem(
-        //         "TXhistory",
-        //         JSON.stringify(parseTXhistory)
-        //       );
-        //       // Update the user's balance here
-        //       userData[0].amount = await getBalance({
-        //         rpcURL: userData[0].rpcURL,
-        //         address: to,
-        //       });
-        //       await AsyncStorage.setItem("tokens", JSON.stringify(userData));
-        //     }
-        //   })
-        //   .catch((err) => {
-        //     console.log("something went wrong");
-        //   });
+              await AsyncStorage.setItem(
+                "TXhistory",
+                JSON.stringify(parseTXhistory)
+              );
+              // Update the user's balance here
+              userData[0].amount = await getBalance({
+                rpcURL: userData[0].rpcURL,
+                address: to,
+              });
+              await AsyncStorage.setItem("tokens", JSON.stringify(userData));
+            }
+          })
+          .catch((err) => {
+            console.log("something went wrong");
+          });
       }
     }
   } catch (error) {
@@ -1657,9 +1636,7 @@ export const checkIfTokenIsSupported = async ({
 
   const rpcUrl = getProviderRpcUrl(sourceChain);
   const privateKey = await getPrivateKey();
-  const provider = new ethers.JsonRpcProvider(
-    "https://eth-sepolia.blastapi.io/f2bc55e4-f583-4370-891d-5885b319d05a"
-  );
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
   const signer = new ethers.Wallet(privateKey, provider);
 
   const sourceRouter = new ethers.Contract(
@@ -1692,12 +1669,7 @@ export const getFeeToPay = async ({
   tokenAddress,
   amount,
   feeTokenAddress,
-  setDisabled,
-  setError,
-  setGasData,
 }) => {
-  setDisabled(true);
-
   const destinationChainSelector =
     getRouterConfig(destinationChain).chainSelector;
 
@@ -1709,16 +1681,16 @@ export const getFeeToPay = async ({
     });
 
   if (bool == false) {
-    setTimeout(() => setError(""), 5000);
-    return setError(
+    throw Error(
       `Token address ${tokenAddress} not in the list of supportedTokens ${supportedTokens}`
     );
+    return;
   }
 
   const tokenAmounts = [
     {
       token: tokenAddress,
-      amount: ethers.parseEther(amount.toString()),
+      amount: amount,
     },
   ];
 
@@ -1734,6 +1706,8 @@ export const getFeeToPay = async ({
     encryptedData: destinationAccount,
   });
 
+  console.log("constructing message", contractAddress);
+
   const message = {
     receiver: abiCode.encode(["address"], [contractAddress]),
     data: "0x", // no data
@@ -1746,14 +1720,7 @@ export const getFeeToPay = async ({
 
   const fees = await sourceRouter.getFee(destinationChainSelector, message);
   console.log(`Estimated fees (wei): ${fees}`);
-  setDisabled(false);
-
-  setGasData((prev) => ({
-    ...prev,
-    gasPrice: fees,
-    gasLEstimate: "",
-    gasInEth: ethers.formatEther(fees.toString()).slice(0, 15),
-  }));
+  return fees;
 };
 
 export const approveSendToken = async ({
@@ -1761,81 +1728,31 @@ export const approveSendToken = async ({
   feeTokenAddress,
   sourceName,
   amount,
+  message,
   fees,
-  symbol,
-  navigation,
-  setErr,
-  setLoading,
-  destinationAccount,
 }) => {
-  setLoading(true);
-  const network = await _getActiveNetwork();
-  const parsedNetwork = JSON.parse(network);
-
-  const rpcURL = getProviderRpcUrl(parsedNetwork.sourceChainSelector);
-  const sourceRouterAddress = getRouterConfig(
-    parsedNetwork.sourceChainSelector
-  ).address;
-  const sourceRouterSelector = getRouterConfig(
-    parsedNetwork.sourceChainSelector
-  ).chainSelector;
-
-  const destinationChainSelector = getRouterConfig(sourceName).chainSelector;
+  const rpcURL = getProviderRpcUrl(sourceName);
+  const sourceRouterAddress = getRouterConfig(sourceName).address;
 
   const provider = new ethers.JsonRpcProvider(rpcURL);
   const privateKey = await getPrivateKey();
   const signer = new ethers.Wallet(privateKey, provider);
-  const erc20Abi = await getContractAbi({ contractAddress: "" });
 
   const erc20 = new ethers.Contract(tokenAddress, erc20Abi, signer);
-  const sourceRouter = new ethers.Contract(
-    sourceRouterAddress,
-    routerAbi,
-    signer
-  );
-
   let sendTx, approvalTx;
-
-  const functionSelector = ethers.id("CCIP EVMExtraArgsV1").slice(0, 10);
-  const abiCode = new ethers.AbiCoder();
-  const extraArgs = abiCode.encode(["uint256", "bool"], [0, false]);
-  const encodedExtraArgs = functionSelector + extraArgs.slice(2);
-
-  const tokenAmounts = [
-    {
-      token: tokenAddress,
-      amount: amount.toString(),
-    },
-  ];
-
-  const destinationAccountAddress = await _decryotData({
-    encryptedData: destinationAccount,
-  });
-  const message = {
-    receiver: abiCode.encode(["address"], [destinationAccountAddress]),
-    data: "0x", // no data
-    tokenAmounts: tokenAmounts,
-    feeToken: feeTokenAddress
-      ? feeTokenAddress
-      : "0x0000000000000000000000000000000000000000", // If fee token address is provided then fees must be paid in fee token.
-    extraArgs: encodedExtraArgs,
-  };
+  console.log(tokenAddress, feeTokenAddress, sourceName, amount, message, fees);
 
   if (!feeTokenAddress) {
     // Pay native
     // First approve the router to spend tokens
-    console.log(
-      await provider.getBalance("0xC93d7e03b4DC0d6473C6A0A7f568744166f513fe")
-    );
-    approvalTx = await erc20.approve(sourceRouterAddress, amount.toString());
+    approvalTx = await erc20.approve(sourceRouterAddress, amount);
     await approvalTx.wait(); // wait for the transaction to be mined
-
     console.log(
-      `${destinationAccountAddress} approved router ${sourceRouterAddress} to spend ${amount} of token ${tokenAddress}. Transaction: ${approvalTx.hash}`
+      `approved router ${sourceRouterAddress} to spend ${amount} of token ${tokenAddress}. Transaction: ${approvalTx.hash}`
     );
 
     sendTx = await sourceRouter.ccipSend(destinationChainSelector, message, {
-      value: fees.toString(),
+      value: fees,
     }); // fees are send as value since we are paying the fees in native
   } else {
     if (tokenAddress.toUpperCase() === feeTokenAddress.toUpperCase()) {
@@ -1863,107 +1780,71 @@ export const approveSendToken = async ({
     }
     sendTx = await sourceRouter.ccipSend(destinationChainSelector, message);
   }
-  const receipt = await sendTx.wait(); // waitx for the transaction to be mined
 
-  const call = {
-    from: sendTx.from,
-    to: sendTx.to,
-    data: sendTx.data,
-    gasLimit: sendTx.gasLimit,
-    gasPrice: sendTx.gasPrice,
-    value: sendTx.value,
-  };
+  const receipt = await sendTx.wait(); // wait for the transaction to be mined
+  console.log(receipt);
 
-  console.log(
-    receipt.blockNumber - 1,
-    receipt.blockNumber,
-    typeof receipt.blockNumber
-  );
-  // Simulate a contract call with the transaction data at the block before the transaction
-  approvalTx = await erc20.approve(sourceRouterAddress, amount.toString());
-  await approvalTx.wait(); // wait for the transaction to be mined
+  // // Simulate a call to the router to fetch the messageID
+  // const call = {
+  //   from: sendTx.from,
+  //   to: sendTx.to,
+  //   data: sendTx.data,
+  //   gasLimit: sendTx.gasLimit,
+  //   gasPrice: sendTx.gasPrice,
+  //   value: sendTx.value,
+  // };
 
-  const messageId = await provider.call(call, receipt.blockNumber - 1);
+  // // Simulate a contract call with the transaction data at the block before the transaction
+  // const messageId = await provider.call(call, receipt.blockNumber - 1);
 
-  console.log(messageId, "this is the message id");
+  // console.log(
+  //   `\n✅ ${amount} of Tokens(${tokenAddress}) Sent to account ${destinationAccount} on destination chain ${destinationChain} using CCIP. Transaction hash ${sendTx.hash} -  Message id is ${messageId}`
+  // );
 
-  console.log(
-    `\n✅ ${ethers.formatEther(
-      amount.toString()
-    )} of Tokens(${tokenAddress}) Sent to account ${"destinationAccount"} on destination chain ${"destinationChain"} using CCIP. Transaction hash ${
-      sendTx.hash
-    } -  Message id is ${messageId}`
-  );
+  // const walletActive = await _getActiveWallet();
+  // const parseWallet = JSON.parse(walletActive);
 
-  const walletActive = await _getActiveWallet();
-  const parseWallet = JSON.parse(walletActive);
+  // const activeNetwork = await _getActiveNetwork();
+  // let parseActiveNetwork = JSON.parse(activeNetwork);
 
-  const activeNetwork = await _getActiveNetwork();
-  let parseActiveNetwork = JSON.parse(activeNetwork);
+  // const date = formatDateToCustomFormat();
+  // let TXhistoryObj = {
+  //   userWalletAddress: parseWallet.walletAddress,
+  //   network: parseActiveNetwork.id,
+  //   contractAddress,
+  //   status: "pending",
+  //   statusNo: null,
+  //   symbol: symbol,
+  //   date: date,
+  //   type: "Send",
+  //   from: tx.from,
+  //   to: tx.to,
+  //   value: amount,
+  //   gasUsed: "",
+  //   gasLimit: Number(tx.gasLimit),
+  //   gasPrice: null,
+  //   blockHash: tx.blockHash,
+  //   blockNumber: null,
+  //   timeStamp: "",
+  //   nonce: Number(tx.nonce),
+  //   hash: tx.hash,
+  //   chainId: Number(tx.chainId),
+  // };
 
-  const date = formatDateToCustomFormat();
-  let TXhistoryObj = {
-    userWalletAddress: parseWallet.walletAddress,
-    network: parseActiveNetwork.id,
-    contractAddress: tokenAddress,
-    status: "success",
-    statusNo: null,
-    symbol: symbol,
-    date: date,
-    type: "Send",
-    from: sendTx.from,
-    to: sendTx.to,
-    value: ethers.formatEther(amount.toString()),
-    gasUsed: "",
-    gasLimit: Number(sendTx.gasLimit),
-    gasPrice: fees,
-    blockHash: sendTx.blockHash,
-    blockNumber: null,
-    timeStamp: "",
-    nonce: Number(sendTx.nonce),
-    hash: sendTx.hash,
-    chainId: Number(sendTx.chainId),
-    data: sendTx.data,
-    ccipTransaction: true,
-    messageId,
-    sourceRouterSelector,
-    destinationChain: sourceName,
-  };
+  // const TXhistory = await AsyncStorage.getItem("TXhistory");
+  // const parseTXhistory = JSON.parse(TXhistory);
+  // parseTXhistory.push(TXhistoryObj);
 
-  receiveNotify({
-    title: "Sent Token (Success)",
-    body: `\n✅ ${ethers.formatEther(
-      amount.toString()
-    )} of Tokens(${tokenAddress}) Sent to account ${destinationAccountAddress} on destination chain ${sourceName} using CCIP.
-      } -  Message id is ${messageId}`,
-    data: "https://etherscan.io/address/" + sendTx.hash,
-  });
-
-  const TXhistory = await AsyncStorage.getItem("TXhistory");
-  const parseTXhistory = JSON.parse(TXhistory);
-  parseTXhistory.push(TXhistoryObj);
-
-  await AsyncStorage.setItem("TXhistory", JSON.stringify(parseTXhistory));
-  setLoading(false);
-
-  navigation.navigate("transactions", {
-    ...TXhistoryObj,
-    destinationChain: sourceName,
-    sourceRouterSelector,
-  });
+  // await AsyncStorage.setItem("TXhistory", JSON.stringify(parseTXhistory));
+  // navigation.navigate("transactions", { tokenName: "1INCH" });
 };
 
 export const checkStatusOfDestinationChain = async ({
   destinationChain,
   sourceChainSelector,
   messageId,
-  setLoading,
-  setText,
 }) => {
-  setLoading(true);
-
   // Fetch status on destination chain
-  console.log(destinationChain);
   const destinationRpcUrl = getProviderRpcUrl(destinationChain);
 
   // Initialize providers for interacting with the blockchains
@@ -2009,7 +1890,6 @@ export const checkStatusOfDestinationChain = async ({
             console.log(
               `\n✅Status of message ${messageId} is ${status} - Check the explorer https://ccip.chain.link/msg/${messageId}`
             );
-            setLoading(false);
 
             // Clear the polling and the timeout
             clearInterval(pollingId);
@@ -2020,20 +1900,20 @@ export const checkStatusOfDestinationChain = async ({
       }
     }
     // If no event found, the message has not yet been processed on the destination chain
-    setText(
+    console.log(
       `Message ${messageId} has not been processed yet on the destination chain.Try again in 60sec - Check the explorer https://ccip.chain.link/msg/${messageId}`
     );
   };
 
   // Start polling
-  setText(
+  console.log(
     `\nWait for message ${messageId} to be executed on the destination chain - Check the explorer https://ccip.chain.link/msg/${messageId}`
   );
   pollingId = setInterval(pollStatus, POLLING_INTERVAL);
 
   // Set timeout to stop polling after 40 minutes
   timeoutId = setTimeout(() => {
-    setText(
+    console.log(
       "\nTimeout reached. Stopping polling - check again later (Run `get-status` script) Or check the explorer https://ccip.chain.link/msg/${messageId}"
     );
     clearInterval(pollingId);
@@ -2049,26 +1929,22 @@ export const refreshUserBalance = async () => {
     const parseAllTokens = JSON.parse(allTokens);
 
     const address = await _decryotData({
-      encryptedData: parseDatas[0].walletAddress,
+      encryptedData: parseData.walletAddress,
     });
 
-    for (let i = 0; i < parseDatas.length; i++) {
-      parseDatas[i].amount = await getBalance({
+    for (const parseData of parseDatas) {
+      parseData.amount = await getBalance({
         address: address,
-        rpcURL: parseDatas[i].rpcURL,
-        tokenAddress: parseDatas[i].address,
+        rpcURL: parseData.rpcURL,
       });
-
-      console.log(parseDatas[i].amount);
     }
 
     const filteredTokens = parseAllTokens.filter(
-      (val) => val.network != parseDatas[0].network
+      (val) => val.walletAddress == parseDatas.walletAddress
     );
-
     let newArr = [...filteredTokens, ...parseDatas];
-
-    await AsyncStorage.setItem("tokens", JSON.stringify(newArr));
+    console.log(newArr);
+    // await AsyncStorage.setItem("tokens", newArr);
   } catch (err) {
     console.log(err);
   }

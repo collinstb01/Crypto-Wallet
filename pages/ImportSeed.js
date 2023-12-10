@@ -72,7 +72,7 @@ const ImportSeed = ({ navigation }) => {
     } catch (error) {
       _helperFunc({
         setErr: setErr,
-        loading: setLoading,
+        setLoading: setLoading,
       });
       // Error saving data
     }

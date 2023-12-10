@@ -45,7 +45,8 @@ const CreateNewWallet = ({ navigation }) => {
   const _storeData = async () => {
     try {
       // return navigation.navigate("SecureYourWallet");
-      _createUserAccount({
+      setLoading(true);
+      await _createUserAccount({
         password,
         confirmPassword,
         setErr,
